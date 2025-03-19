@@ -2,6 +2,9 @@ from django.db import models
 from django.core.validators import MinValueValidator,MaxValueValidator
 from datetime import datetime,date
 
+#this is a test!!!!
+
+
 
 class Dipendenti(models.Model):
     nome = models.CharField(max_length=50)
