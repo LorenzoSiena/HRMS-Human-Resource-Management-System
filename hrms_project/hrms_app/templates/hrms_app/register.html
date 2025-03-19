@@ -1,0 +1,94 @@
+{% extends "hrms_app/base.html" %}
+
+{% block title %} Registrazione utente {% endblock title %}
+
+
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="card p-4" style="max-width: 400px; width: 100%; position: relative;">
+        <h2 class="text-center mb-4">Register</h2>
+        <form method="POST" novalidate> 
+        {% csrf_token %}
+        {% comment %} novalidate non si autocompila, non abbiamo action perchè è gestito da django {% endcomment %}
+        <div class="mb-3 position-relative">
+            <label for="id_username" class="form-label">Username</label>
+            <input type="text" id="id_username" name="username" class="form-control {% if form.username.errors %}is-invalid{% endif %}" required>
+            
+            {% if form.username.errors %}
+                <div class="invalid-feedback">{{ form.username.errors|join:" QUESTO è UN TEST " }}</div>
+            {% endif %}
+        
+        </div>
+
+        <div class="mb-3 position-relative">
+            <label for="id_first_name" class="form-label">Nome</label>
+            <input type="text" id="id_first_name" name="first_name" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" required>
+            
+            {% if form.first_name.errors %}
+                <div class="invalid-feedback">{{ form.first_name.errors|join:" " }}</div>
+            {% endif %}
+        
+        </div>
+
+      
+
+        <div class="mb-3 position-relative">
+            <label for="id_last_name" class="form-label">Cognome</label>
+            <input type="text" id="id_last_name" name="last_name" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" required>
+            
+            {% if form.last_name.errors %}
+                <div class="invalid-feedback">{{ form.last_name.errors|join:" " }}</div>
+            {% endif %}
+        
+        </div>
+
+        <div class="mb-3 position-relative">
+            <label for="id_email" class="form-label">email</label>
+            <input type="email" id="id_email" name="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" required>
+            
+            {% if form.email.errors %}
+                <div class="invalid-feedback">{{ form.email.errors|join:" " }}</div>
+            {% endif %}
+        
+        </div>
+
+      
+
+        <div class="mb-3 position-relative">
+            <label for="id_password1" class="form-label">Password</label>
+            <input type="password" id="id_password1" name="password1" class="form-control {% if form.password1.errors %}is-invalid{% endif %}" required>
+            
+            {% if form.password1.errors %}
+                <div class="invalid-feedback">{{ form.password1.errors|join:" " }}</div>
+            {% endif %}
+        
+        </div>
+
+      
+      
+
+        <div class="mb-3 position-relative">
+            <label for="id_password2" class="form-label">Ripeti la password</label>
+            <input type="password" id="id_password2" name="password2" class="form-control {% if form.password2.errors %}is-invalid{% endif %}" required>
+            
+            {% if form.password2.errors %}
+                <div class="invalid-feedback">{{ form.password2.errors|join:" " }}</div>
+            {% endif %}
+        
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary w-100">Register</button>
+        </form>
+        <p class="text-center mt-3">
+            Already have an account? <a href="{% url 'login' %}">Login</a> 
+        </p>
+    </div>
+</div>
+
+       
+
+
+
+{% endblock content %}
