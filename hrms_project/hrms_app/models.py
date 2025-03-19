@@ -14,7 +14,7 @@ class Dipendenti(models.Model):
     data_assunzione = models.DateField()
     ruolo = models.ForeignKey("Ruoli", on_delete=models.SET_NULL, null=True)
     stipendio = models.DecimalField(max_digits=10, decimal_places=2)
-    documento_contratto = models.BinaryField() #oppure filefield?
+    documento_contratto = models.BinaryField() #oppure filefield? cartella media
     def __str__(self):
         return f"{self.nome} {self.cognome}" 
 

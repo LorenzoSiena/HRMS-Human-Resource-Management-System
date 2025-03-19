@@ -28,6 +28,7 @@ from django.contrib.auth.forms import PasswordResetForm
 def hrms_app(request: HttpRequest):
     return render(request,'hrms_app/home.html')
 
+
 def register(request: HttpRequest):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
