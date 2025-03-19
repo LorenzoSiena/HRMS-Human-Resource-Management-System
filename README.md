@@ -7,6 +7,9 @@ Centralizzare la gestione del personale.
 Automatizzare la registrazione delle presenze e la gestione delle ferie.   
 Fornire un'interfaccia web intuitiva per dipendenti e amministratori.   
 
+
+![Nome del file](hrms_project/static/img/logo.png)
+
 ### Funzionalità Principali   
 ## 1. Gestione Dipendenti
 Creazione, modifica e rimozione di dipendenti.
