@@ -1,15 +1,20 @@
 from django.db import models
 from django.core.validators import MinValueValidator,MaxValueValidator
 from datetime import datetime,date
-
-#this is a test!!!!
-
+from django.conf import settings
+from django.contrib.auth.models import User
 
 
 class Dipendenti(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     nome = models.CharField(max_length=50)
     cognome = models.CharField(max_length=50)
     email = models.EmailField(unique=True)
+
+    # user name di user é la sua mail
+     
+
+
     telefono = models.CharField(max_length=20)
     data_assunzione = models.DateField()
     ruolo = models.ForeignKey("Ruoli", on_delete=models.SET_NULL, null=True)
@@ -17,6 +22,9 @@ class Dipendenti(models.Model):
     documento_contratto = models.BinaryField() #oppure filefield? cartella media
     def __str__(self):
         return f"{self.nome} {self.cognome}" 
+
+# deve estender l'user di django???
+
 
 
 
