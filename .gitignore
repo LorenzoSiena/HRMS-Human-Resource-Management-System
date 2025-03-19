@@ -1,0 +1,33 @@
+# 🔹 Cartelle di Python
+__pycache__/
+*.py[cod]
+*.so
+
+# 🔹 Virtual Environment
+venv/
+env/
+*.venv
+
+# 🔹 Configurazioni di sistema e IDE
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+*.log
+
+# 🔹 Database SQLite (se usato)
+db.sqlite3
+*.sqlite3
+
+# 🔹 File di migrazione compilati (opzionale)
+*/migrations/*.pyc
+*/migrations/__pycache__/
+
+# 🔹 Chiavi e credenziali
+.env
+*.secret
+
+# 🔹 File statici e media generati
+staticfiles/
+media/
