@@ -29,7 +29,21 @@ def hrms_app(request: HttpRequest):
     return render(request,'hrms_app/home.html')
 
 
+#TODO: TESTARE!
 def register(request: HttpRequest):
+    if request.method == "POST":
+        form = RegisterForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect("login")  # Dopo la registrazione, reindirizza al login
+    else:
+        form = RegisterForm()
+    return render(request, "register_test_debug.html", {"form": form})
+
+"""
+OLD REGISTER
+
+ def register(request: HttpRequest):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         email = request.POST.get('email')
@@ -42,7 +56,7 @@ def register(request: HttpRequest):
     else:
         form = RegisterForm() 
     return render(request,'hrms_app/register.html',{'form':form})
-
+ """
 
 
 def user_login(request: HttpRequest):
@@ -84,3 +98,6 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 
 class CustomPasswordResetCompleteView(PasswordResetCompleteView):
     template_name = 'hrms_app/reset_password_complete.html'  # Messaggio di avvenuto reset
+
+
+
