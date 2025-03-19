@@ -169,7 +169,7 @@ def user_login(request: HttpRequest):
 
 def user_logout(request: HttpRequest):
     logout(request)
-    return redirect('login')
+    return redirect('home')
 
 
 
