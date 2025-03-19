@@ -1,22 +1,48 @@
 from django.db import models
 from django.core.validators import MinValueValidator,MaxValueValidator
 from datetime import datetime,date
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 
-#this is a test!!!!
-
-
-
-class Dipendenti(models.Model):
-    nome = models.CharField(max_length=50)
-    cognome = models.CharField(max_length=50)
+class Dipendenti(AbstractUser):
+    #email == username!!!
     email = models.EmailField(unique=True)
     telefono = models.CharField(max_length=20)
     data_assunzione = models.DateField()
     ruolo = models.ForeignKey("Ruoli", on_delete=models.SET_NULL, null=True)
     stipendio = models.DecimalField(max_digits=10, decimal_places=2)
-    documento_contratto = models.BinaryField() #oppure filefield? cartella media
+    documento_contratto = models.FileField( upload_to='media/documenti_contratti/', null=True, blank=True)
+    USERNAME_FIELD = 'email'  # Usiamo l'email come username
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']  # Campi obbligatori oltre a `email`
+
+    #Per comoditá [username->email]  [first_name->nome] [last_name->cognome]
+    @property
+    def nome(self):
+        return self.first_name
+
+    @nome.setter
+    def nome(self, value):
+        self.first_name = value
+
+    @property
+    def cognome(self):
+        return self.last_name
+
+    @cognome.setter
+    def cognome(self, value):
+        self.last_name = value
+
+    @property
+    def indirizzo_email(self):
+        return self.email
+
+    @indirizzo_email.setter
+    def indirizzo_email(self, value):
+        self.email = value
     def __str__(self):
-        return f"{self.nome} {self.cognome}" 
+        return f"{self.nome} {self.cognome} ({self.email})"
+
+
 
 
 
