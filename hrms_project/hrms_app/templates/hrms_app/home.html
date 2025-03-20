@@ -1,41 +1,61 @@
 {% extends 'hrms_app/base.html' %}
 {% block title %} Home {% endblock title %}
 {% block content %}
+
+<div class="container">
+    <h3>Bacheca</h3>
+    <p>Messaggio nella bacheca</p>
+</div>
     
-    <div class="login-container">
-        <h2 class="text-center mb-4">Login</h2>            
-        
-        {% if messages %}
-        <div class="alert alert-danger">
-            {% for m in messages %}
-                <p>{{m}}</p>
-            {% endfor %}
+<div class="container">
+    <h3>Timbrature:</h3>
+    <button type="button" class="btn btn-primary">Entrata</button>
+    <button type="button" class="btn btn-primary">Uscita</button>
+</div>
+
+<!-- TODO Definire come passare la data corrente per limitare di inputare una date passata -->
+
+<div class="container">
+    <form action="">
+        <h3>Richiesta Ferie</h3>
+        <div class="mb-3">
+            <label for="data_inizio" class="form-label">Data inizio</label>
+            <input type="date" class="form-control" id="data_inizio" placeholder="Data di inzio ferie" min={{ today }}>
         </div>
-        {% endif %}        
-    
-        <form method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="email" class="form-label">E-mail</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your e-mail" required>
-            </div>
-            
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
-            </div>
-    
-            <button type="submit" class="btn btn-primary w-100">Login</button>
-            </form>
-            <p class="text-center mt-2">
-                Don't have an account? <a href="{% url 'register' %}">Registrati</a>
-            </p>
-    
-            <p class="text-center mt-3">
-                <a href="{% url 'reset_password' %}">Forgot your password?</a>
-            </p>
-    
+        <div class="mb-3">
+            <label for="data_fine" class="form-label">Data fine</label>
+            <input type="date" class="form-control" id="data_fine" placeholder="Data di fine ferie" min={{ today + 1 }}>
         </div>
-    </div>
+        <input class="form-control" type="text" placeholder="Motivo della richiesta" aria-label="default input example">
+        <button type="button" class="btn btn-primary">Invia Richiesta</button>    
+    </form>
+</div>
+
+<!--TODO Creare l'elenco tramite ciclo For -->
+<!--TODO Definire se aggiungere una lista delle persone che hanno le ferie confermate -->
+
+<div class="container">
+    <h3>Elenco ferie richieste:</h3>
+    <ul class="list-group">
+        <li class="list-group-item">
+          <input class="form-check-input me-1" type="checkbox" value="" id="firstCheckboxStretched">
+          <label class="form-check-label stretched-link" for="firstCheckboxStretched">Dipendente A - dal giorno 19-03 al giorno 20-03</label>
+        </li>
+        <li class="list-group-item">
+          <input class="form-check-input me-1" type="checkbox" value="" id="secondCheckboxStretched">
+          <label class="form-check-label stretched-link" for="secondCheckboxStretched">Dipendente B - dal giorno 19-03 al giorno 20-03</label>
+        </li>
+        <li class="list-group-item">
+          <input class="form-check-input me-1" type="checkbox" value="" id="thirdCheckboxStretched">
+          <label class="form-check-label stretched-link" for="thirdCheckboxStretched">Dipendente C - dal giorno 19-03 al giorno 20-03</label>
+        </li>
+    </ul>
+    <button type="button" class="btn btn-primary">Accetta</button>
+    <button type="button" class="btn btn-primary">Rifiuta</button>
+</div>
+
+<div class="container">    
+    <button type="button" class="btn btn-primary">Scarica busta paga</button>
+</div>
 
 {% endblock %}
