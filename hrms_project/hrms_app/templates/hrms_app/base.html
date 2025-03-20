@@ -11,26 +11,29 @@
         <div class="container-fluid">
             <div>
                 <a class="navbar-brand" href="#">
-                <img src="../../../static/img/logo.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
-                HRM 
+                  <img src="../../../static/img/logo.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top" style="border-radius: 50%;">
                 </a>
             </div>
-          <div class="collapse navbar-collapse justify-content-center" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-              <a class="nav-link active" aria-current="page" href="#">Home</a>
-              <a class="nav-link" aria-current="page" href="#">Notifiche</a>
-            </div>
-          </div>
+        <button class="navbar-toggler ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-          <div>
-                <span class="text-dark me-3">Benvenuto {{user.username}}</span>
-                <a href="{% url 'logout' %}" class="btn btn-outline-dark btn-sm">Logout</a>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link active" aria-current="page" href="#">HRM</a> 
+                <a class="nav-link active" aria-current="page" href="#">Home</a>
+                <a class="nav-link" aria-current="page" href="#">Notifiche</a>
+            </div>
         </div>
+        <div>
+            <span class="text-dark me-3">Benvenuto {{ user.username }}</span>
+            <a href="{% url 'logout' %}" class="btn btn-outline-dark btn-sm">Logout</a>
         </div>
-      </nav>
+    </div>
+</nav>
       <img src="../../../static/img/background_cleanup.png" class="img-fluid opacity-50" alt="background">
       <footer class="bg-white text-dark text-center py-3">
-        <div class="container">
+        <div class="container" style="font-size: 10px;">
           <p class="mb-1">&copy; 2025 Il Tuo Nome. Tutti i diritti riservati.</p>
           <p class="mb-0">
             <a href="#" class="text-dark me-3">Privacy Policy</a>
