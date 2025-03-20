@@ -35,6 +35,8 @@ from django.contrib.auth.forms import PasswordResetForm
 
 
 def hrms_app(request: HttpRequest):
+    if not request.user.is_authenticated:
+        return redirect('/hrms_app/login/')
     return render(request,'hrms_app/home.html')
 
 def dipendenti(request:HttpRequest):
