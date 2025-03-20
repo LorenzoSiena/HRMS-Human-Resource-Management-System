@@ -4,6 +4,9 @@ from datetime import datetime,date
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
+from django.db.models import Sum
+from .utils import calcola_ore_lavorate,formatta_ore  # Importiamo la funzione per il calcolo delle ore lavorate
+
 class Dipendenti(AbstractUser):
     #email == username!!!
     email = models.EmailField(unique=True)
@@ -47,11 +50,9 @@ class Dipendenti(AbstractUser):
 
 
 
-class Permessi(models.Model):
+class Autorizzazioni(models.Model):
     nome=models.CharField(max_length=100,unique=True) #: 'gestione_dipendenti', 'approva_ferie'
     descrizione=models.TextField()
-    # aggiungere una lista di permessi predefiniti?
-
 
 
 
@@ -60,12 +61,20 @@ class Ruoli(models.Model):
     nome = models.CharField(max_length=50, unique=True)
     livello_accesso = models.IntegerField(validators=[MinValueValidator(1)]) #solo positivi
     descrizione = models.TextField()
-    permessi = models.ManyToManyField(Permessi)
+    autorizzazioni = models.ManyToManyField(Autorizzazioni)
+
+
+
+
+
+
+
+
+# FIXARE IL CALCOLO DEL TEMPO
 
 
 class Ferie(models.Model):
     
-
     STATI_CHOICES = [
         ('In attesa', 'In attesa'),
         ('Approvata', 'Approvata'),
@@ -76,11 +85,10 @@ class Ferie(models.Model):
     data_fine=models.DateField()
     stato = models.CharField(max_length=20, choices=STATI_CHOICES, default=STATI_CHOICES[0][0]) # DA TESTARE 
 
-
-class PermessiLavorativi(Ferie): 
+class Permessi(Ferie): 
     retribuito=models.BooleanField()
-    orario_inizio=models.DateField()
-    orario_inizio=models.DateField()
+    orario_inizio=models.DateTimeField()
+    orario_fine=models.DateTimeField()
 
 #report permessi
 class ReportPermessi(models.Model):
@@ -88,51 +96,63 @@ class ReportPermessi(models.Model):
     mese =  models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
     anno = models.IntegerField(validators=[MinValueValidator(2000)])
     #TODO calcolo permessi totali nel mese
-    #permessi totali per mese
     permessi_totali = models.DecimalField(max_digits=5, decimal_places=2) #999.99
-
     
 
 
 
 
-class Certificati(models.Model):
-    
-    nome= models.CharField(max_length=100)
-    descrizione=models.TextField()
-    documento=models.FileField(upload_to='media/documenti_certificati/')
-    data_emissione=models.DateField()
-    data_scadenza=models.DateField(null=True)
-    dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
 
 
-#DA TESTARE    
+
+
+
+#------------------------------------2test------------------------------------------------
+#OK MA DA TESTARE
 class Presenze(models.Model):
 
     data = models.DateField()
-    ora_ingresso=models.TimeField()
-    ora_uscita=models.TimeField(null=True)
+    ora_ingresso=models.TimeField()  #'14:30:00'
+    ora_uscita=models.TimeField(null=True,blank=True) #'17:30:00'
+    dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
+    ore_lavorate = models.FloatField(null=True, blank=True) 
 
-    @property
-    def ore_lavorate(self):
-        if self.ora_uscita and self.ora_ingresso:
-            delta = datetime.combine(date.min, self.ora_uscita) - datetime.combine(date.min, self.ora_ingresso)
-            return delta.total_seconds() / 3600  # Converti in ore
-        return None
-    
-class Bacheca(models.Model):
-    titolo=models.CharField(max_length=100)
-    messaggio=models.TextField()
-    data_pubblicazione=models.DateTimeField(auto_now_add=True)
+    def save(self, *args, **kwargs):
+        self.ore_lavorate = calcola_ore_lavorate(self.ora_ingresso, self.ora_uscita)
+        super().save(*args, **kwargs)
 
 
 class ReportPresenze(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
     mese =  models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
     anno = models.IntegerField(validators=[MinValueValidator(2000)])
-    ore_totali = models.DecimalField(max_digits=5, decimal_places=2) #999.99
+    ore_totali_float = models.DecimalField(max_digits=5, decimal_places=2) #999.99
 
-    #BUG CONTROLLARE!!! SE POI QUANDO LE VADO A SOMMARE ROMPONO TUTTO sum(Presenze.ore_lavorate)
+    def save(self, *args, **kwargs):
+        # Calcola le ore totali direttamente dal DB
+        ore_lavorate = Presenze.objects.filter(
+            dipendente=self.dipendente,
+            data__year=self.anno,
+            data__month=self.mese
+        ).aggregate(Sum('ore_lavorate'))['ore_lavorate__sum'] or 0
+
+        self.ore_totali_float = round(ore_lavorate, 2)  # Arrotonda a due decimali
+        super().save(*args, **kwargs)  # Salva l'oggetto
+    @property
+    def ore_totali(self):
+        return formatta_ore(self.ore_totali_float or 0)
+#------------------------------------2test------------------------------------------------
+
+
+
+
+class Bacheca(models.Model):
+    titolo=models.CharField(max_length=100)
+    messaggio=models.TextField()
+    data_pubblicazione=models.DateTimeField(auto_now_add=True)
+
+
+
 
 class BustePaga(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
@@ -147,6 +167,18 @@ class Notifiche(models.Model):
     messaggio=models.TextField()
     data_invio=models.DateTimeField(auto_now_add=True)
     letto=models.BooleanField(default=False)
+
+
+
+class Certificati(models.Model):
+    
+    nome= models.CharField(max_length=100)
+    descrizione=models.TextField()
+    documento=models.FileField(upload_to='media/documenti_certificati/')
+    data_emissione=models.DateField()
+    data_scadenza=models.DateField(null=True)
+    dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
+
 
     
 """ 
