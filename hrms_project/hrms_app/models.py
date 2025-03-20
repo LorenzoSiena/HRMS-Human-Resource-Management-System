@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
 from django.db.models import Sum
-from .utils import calcola_ore_lavorate,formatta_ore  # Importiamo la funzione per il calcolo delle ore lavorate
+from .utils import calcola_ore_lavorate,formatta_ore,calcola_giorni_totali  # Importiamo la funzione per il calcolo delle ore lavorate
 
 class Dipendenti(AbstractUser):
     #email == username!!!
@@ -84,11 +84,38 @@ class Ferie(models.Model):
     data_inizio=models.DateField()
     data_fine=models.DateField()
     stato = models.CharField(max_length=20, choices=STATI_CHOICES, default=STATI_CHOICES[0][0]) # DA TESTARE 
+    giorni_totali_previsti=models.IntegerField(default=0)
+    motivo=models.TextField()
+
+    def save(self, *args, **kwargs):
+        self.giorni_totali_previsti = calcola_giorni_totali(self.data_inizio, self.data_fine)
+        super().save(*args, **kwargs)
+
+    @property
+    def giorni_totali_approvati(self):
+        if self.stato == 'Approvata':
+            giorni_totali_approvati = calcola_giorni_totali(self.data_inizio, self.data_fine)
+        else:
+            giorni_totali_approvati = 0
+        return giorni_totali_approvati
+
+
+class ReportFerie(models.Model):
+    dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
+    mese =  models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
+    anno = models.IntegerField(validators=[MinValueValidator(2000)])
+    giorni_totali = models.DecimalField(max_digits=5, decimal_places=2)
+
+#===>>> continuare quii
+    
+
 
 class Permessi(Ferie): 
     retribuito=models.BooleanField()
     orario_inizio=models.DateTimeField()
     orario_fine=models.DateTimeField()
+#===>>> continuare quii
+    
 
 #report permessi
 class ReportPermessi(models.Model):
@@ -98,14 +125,8 @@ class ReportPermessi(models.Model):
     #TODO calcolo permessi totali nel mese
     permessi_totali = models.DecimalField(max_digits=5, decimal_places=2) #999.99
     
-
-
-
-
-
-
-
-
+#===>>> continuare quii
+    
 
 #------------------------------------2test------------------------------------------------
 #OK MA DA TESTARE
@@ -142,7 +163,6 @@ class ReportPresenze(models.Model):
     def ore_totali(self):
         return formatta_ore(self.ore_totali_float or 0)
 #------------------------------------2test------------------------------------------------
-
 
 
 

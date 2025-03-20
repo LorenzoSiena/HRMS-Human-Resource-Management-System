@@ -6,11 +6,34 @@ ORARIO_FINE_LAVORO = time(18, 0)    # 18:00
 PAUSA_PRANZO_INIZIO = time(13, 0)   # 13:00
 PAUSA_PRANZO_FINE = time(14, 0)     # 14:00
 
+# Giorni lavorativi sono immutabili! in caso fixami
+GIORNI_LAVORATIVI = {
+    1: 'Lunedi',
+    2: 'Martedi',
+    3: 'Mercoledi',
+    4: 'Giovedi',
+    5: 'Venerdi',
+}
     
 def formatta_ore(ore_float):
         ore = int(ore_float)  # Parte intera = ore
         minuti = round((ore_float - ore) * 60)  # Parte decimale convertita in minuti
         return f"{ore}h {minuti}m"
+
+
+def calcola_giorni_totali(data_inizio,data_fine):
+
+    if not data_inizio or not data_fine:
+        return 0
+    giorni_totali = 0
+    giorno_corrente = data_inizio
+
+    while giorno_corrente <= data_fine:
+        if giorno_corrente.weekday() < 5:  # 0 = lunedì, ..., 4 = venerdì
+            giorni_totali += 1
+        giorno_corrente += timedelta(days=1)
+
+    return giorni_totali
 
 
 def calcola_ore_lavorate(ora_ingresso, ora_uscita):
