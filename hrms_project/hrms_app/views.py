@@ -5,7 +5,7 @@
 from django.shortcuts import render,redirect
 from django.http import HttpRequest
 from django.contrib import messages
-
+from django.shortcuts import get_object_or_404, redirect
 
 #Model user 
 from django.contrib.auth.models import User
@@ -42,40 +42,63 @@ def dipendenti(request:HttpRequest):
 
 
 
-def inserisci_dipendente(request:HttpRequest):
-   if request.method =="POST":
-    dipendente = Dipendenti.objects.create(
-        nome=nome,
-        cognome=cognome,
-        email=email,
-        ruolo=ruolo,
-        data_assunzione=data_assunzione,
-        livello_accesso=livello_accesso
-    )
-    messages.success( request , f"✏️ Dipendente '{nome} {cognome}' aggiunto con successo!")
-    return redirect ('dipendente')
 
+def inserisci_dipendente(request: HttpRequest):
+    if request.method == "POST":
+        nome = request.POST.get('nome', '').strip()
+        cognome = request.POST.get('cognome', '').strip()
+        email = request.POST.get('email', '').strip()
+        ruolo = request.POST.get('ruolo', '').strip()
+        data_assunzione = request.POST.get('data_assunzione', '').strip()
+        livello_accesso = request.POST.get('livello_accesso', '').strip()
+
+        if nome and cognome and email and ruolo and data_assunzione and livello_accesso:
+            Dipendenti.objects.create(
+                nome=nome,
+                cognome=cognome,
+                email=email,
+                ruolo=ruolo,
+                data_assunzione=data_assunzione,
+                livello_accesso=livello_accesso
+            )
+            messages.success(request, f"✅ Dipendente '{nome} {cognome}' aggiunto con successo!")
+        else:
+            messages.error(request, "⚠️ Tutti i campi sono obbligatori!")
+
+    return redirect('dipendenti')
    
 
 
 
-def modifica_dipendente( nome, cognome, email, ruolo, data_assunzione, livello_accesso):
-   try:
-    dipendente = Dipendenti.objects.get(id = id_dipendente)
-    dipendente.nome = nuovo_nome
-    dipendente.cognome = nuovo_cognome
-    dipendente.email = nuovo_email
-    dipendente.ruolo = nuovo_ruolo
-    dipendente.data_assunzione = nuovo_data_assunzione
-    dipendente.livello_accesso = nuovo_livello_accesso
-    dipendente.save()
-    print(f"✏️ Dipendente '{id_dipendente}' modificato con successo!")
-   except Bacheca.DoesNotExist:
-        print(f"⚠️ Dipendente '{id_dipendente}' non trovato.")
+def modifica_dipendente(request: HttpRequest, id_dipendente):
+    dipendente = get_object_or_404(Dipendenti, id=id_dipendente)
+
+    if request.method == "POST":
+        nome = request.POST.get('nome', '').strip()
+        cognome = request.POST.get('cognome', '').strip()
+        email = request.POST.get('email', '').strip()
+        ruolo = request.POST.get('ruolo', '').strip()
+        data_assunzione = request.POST.get('data_assunzione', '').strip()
+        livello_accesso = request.POST.get('livello_accesso', '').strip()
+
+        if nome and cognome and email and ruolo and data_assunzione and livello_accesso:
+            dipendente.nome = nome
+            dipendente.cognome = cognome
+            dipendente.email = email
+            dipendente.ruolo = ruolo
+            dipendente.data_assunzione = data_assunzione
+            dipendente.livello_accesso = livello_accesso
+            dipendente.save()
+            messages.success(request, f"✅ Dipendente '{nome} {cognome}' modificato con successo!")
+        else:
+            messages.error(request, "⚠️ Tutti i campi sono obbligatori!")
 
 
-def elimina_dipendente():
-    pass
+def elimina_dipendente(request: HttpRequest, id_dipendente):
+    dipendente = get_object_or_404(Dipendenti, id=id_dipendente)
+    dipendente.delete()
+    messages.success(request, f"🗑️ Dipendente '{dipendente.nome} {dipendente.cognome}' eliminato con successo!")
+    return redirect('dipendenti')
 
 def presenze(request:HttpRequest):
     return render(request,'hrms_app/presenze.html')
@@ -94,37 +117,51 @@ def notifiche_mail():
     pass
 
 def aggiungi_messaggio_bacheca(request:HttpRequest):
-    titolo=request.POST.get('titolo')
-    messaggio=request.POST.get('messaggio')
-    nuovo_messaggio = Bacheca.objects.create(titolo=titolo, messaggio=messaggio)
-    messages.success(request,f"✅ Messaggio '{titolo}' aggiunto con successo!")
-    return render(request ,'hrms_app/home.html')
+    if request.method == "POST":
+        titolo=request.POST.get('titolo').strip()
+        messaggio=request.POST.get('messaggio').strip()
+        if titolo and messaggio:
+            Bacheca.objects.create(titolo=titolo, messaggio=messaggio)
+            messages.success(request,f"✅ Messaggio '{titolo}' aggiunto con successo!")
+        else:
+            messages.error(request,"⚠️ Titolo e messaggio sono obbligatori!") 
+        return redirect('home')      
+    return redirect(request ,'hrms_app/home.html')
 
-def leggi_messaggio_bacheca():
+
+def leggi_messaggio_bacheca(request:HttpRequest):
     messaggio = Bacheca.objects.all().order_by('data_pubblicazione')
-    if not messaggio:
-      return render('hrms_app/home.html',f"La tua Bacheca è vuota!")
+    if not messaggio.exist():
+      messages.info(request,f"La tua Bacheca è vuota!")
     else:
         for msg in messaggio:
-         return render(f"[{msg.data_pubblicazione}] {msg.titolo}: {msg.messaggio}")
+         return render(request,f"[{msg.data_pubblicazione}] {msg.titolo}: {msg.messaggio}")
+        
 
-def modifica_messaggio(msg_id, nuovo_titolo, nuovo_messaggio):
-    try:
-        messaggio = Bacheca.objects.get(id=msg_id)
-        messaggio.titolo = nuovo_titolo
-        messaggio.messaggio = nuovo_messaggio
-        messaggio.save()
-        print(f"✏️ Messaggio '{msg_id}' modificato con successo!")
-    except Bacheca.DoesNotExist:
-        print(f"⚠️ Messaggio '{msg_id}' non trovato.")
+def modifica_messaggio(request:HttpRequest,msg_id):
+    messaggio = get_object_or_404(Bacheca, id=msg_id)
+    if request.method == "POST":
+        nuovo_titolo = request.POST.get('titolo', '').strip()
+        nuovo_messaggio = request.POST.get('messaggio', '').strip()
 
-def cancella_messaggio(msg_id):
-    try:
-        messaggio = Bacheca.objects.get(id=msg_id)
-        messaggio.delete()
-        print(f"🗑️ Messaggio '{msg_id}' eliminato con successo!")
-    except Bacheca.DoesNotExist:
-        print(f"⚠️ Messaggio '{msg_id}' non trovato.")
+        if nuovo_titolo and nuovo_messaggio:
+            messaggio.titolo = nuovo_titolo
+            messaggio.messaggio = nuovo_messaggio
+            messaggio.save()
+            messages.success(request, f"✏️ Messaggio '{msg_id}' modificato con successo!")
+        else:
+            messages.error(request, "⚠️ Titolo e messaggio sono obbligatori!")
+
+    return redirect('home')
+
+
+def cancella_messaggio(request: HttpRequest, msg_id):
+    messaggio = get_object_or_404(Bacheca, id=msg_id)
+    messaggio.delete()
+    messages.success(request, f"🗑️ Messaggio '{msg_id}' eliminato con successo!")
+    return redirect('home')
+
+
 
 def crea_busta_paga():
     pass
