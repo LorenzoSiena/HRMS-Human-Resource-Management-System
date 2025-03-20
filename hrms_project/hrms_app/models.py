@@ -9,6 +9,7 @@ class Dipendenti(AbstractUser):
     email = models.EmailField(unique=True)
     telefono = models.CharField(max_length=20)
     data_assunzione = models.DateField()
+    superiore = models.ForeignKey("Dipendenti", on_delete=models.SET_NULL, null=True)
     ruolo = models.ForeignKey("Ruoli", on_delete=models.SET_NULL, null=True)
     stipendio = models.DecimalField(max_digits=10, decimal_places=2)
     documento_contratto = models.FileField( upload_to='media/documenti_contratti/', null=True, blank=True)
@@ -51,6 +52,10 @@ class Permessi(models.Model):
     descrizione=models.TextField()
     # aggiungere una lista di permessi predefiniti?
 
+
+
+
+
 class Ruoli(models.Model):
     nome = models.CharField(max_length=50, unique=True)
     livello_accesso = models.IntegerField(validators=[MinValueValidator(1)]) #solo positivi
@@ -71,6 +76,34 @@ class Ferie(models.Model):
     data_fine=models.DateField()
     stato = models.CharField(max_length=20, choices=STATI_CHOICES, default=STATI_CHOICES[0][0]) # DA TESTARE 
 
+
+class PermessiLavorativi(Ferie): 
+    retribuito=models.BooleanField()
+    orario_inizio=models.DateField()
+    orario_inizio=models.DateField()
+
+#report permessi
+class ReportPermessi(models.Model):
+    dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
+    mese =  models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
+    anno = models.IntegerField(validators=[MinValueValidator(2000)])
+    #TODO calcolo permessi totali nel mese
+    #permessi totali per mese
+    permessi_totali = models.DecimalField(max_digits=5, decimal_places=2) #999.99
+
+    
+
+
+
+
+class Certificati(models.Model):
+    
+    nome= models.CharField(max_length=100)
+    descrizione=models.TextField()
+    documento=models.FileField(upload_to='media/documenti_certificati/')
+    data_emissione=models.DateField()
+    data_scadenza=models.DateField(null=True)
+    dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
 
 
 #DA TESTARE    
@@ -107,7 +140,7 @@ class BustePaga(models.Model):
     anno = models.IntegerField(validators=[MinValueValidator(2000)])
     importo = models.DecimalField(max_digits=8, decimal_places=2) #max 999 999.99
     data_emissione=models.DateField(auto_now_add=True)
-    documento=models.BinaryField() #oppure filefield?
+    documento=models.FileField(upload_to='media/documenti_bustepaga/')
 
 class Notifiche(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
