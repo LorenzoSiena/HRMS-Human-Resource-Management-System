@@ -3,8 +3,11 @@ from . import views
 
 urlpatterns = [
     path("home", views.hrms_app,name="home"),
-    path("register", views.register, name="register"),
+
     path("", views.user_login, name="login"),
+
+    
+    path("register", views.register, name="register"),
     path("logout", views.user_logout, name="logout"),
     path("presenza",views.presenze,name="presenze"),
     path("dipendenti",views.dipendenti,name="dipendenti"),
@@ -23,7 +26,7 @@ urlpatterns = [
     path("leggi_messaggio_bacheca",views.leggi_messaggio_bacheca,name="leggi_messaggio_bacheca"),
     path("modifica_messaggio_bacheca",views.modifica_messaggio_bacheca,name="modifica_messaggio_bacheca"),
     path("cancella_messaggio_bacheca",views.cancella_messaggio_bacheca,name="cancella_messaggio_bacheca"),
-    path("visualizza_report_mensile",views.report_mensile,name="report_mensile"),
+    #path("visualizza_report_mensile",views.report_mensile,name="report_mensile"),
     
     # per resettare la password
     path('reset_password/', views.CustomPasswordResetView.as_view(), name='reset_password'),
