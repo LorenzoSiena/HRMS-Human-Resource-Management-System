@@ -1,0 +1,58 @@
+{% extends 'hrms_app/base.html' %}
+{% block title %} Home {% endblock title %}
+{% block content %}
+
+<div class="container">
+    <h3>Bacheca</h3>
+    <p>Messaggio nella bacheca</p>
+</div>
+    
+<div class="container">
+    <h3>Timbrature:</h3>
+    <button href="{% url 'timbra_entrata' %}" class="btn btn-primary">Entrata</button>
+    <button href="{% url 'timbra_uscita' %}" class="btn btn-primary">Uscita</button>
+</div>
+
+<!-- TODO Definire come passare la data corrente per limitare di inputare una date passata -->
+
+<div class="container">
+    <form method="post">
+      {% csrf_token %} 
+        <h3>Richiesta Ferie</h3>
+        <div class="mb-3">
+            <label for="data_inizio" class="form-label">Data inizio</label>
+            <input type="date" class="form-control" id="data_inizio" placeholder="Data di inzio ferie" min="{{ today }}">
+        </div>
+        <div class="mb-3">
+            <label for="data_fine" class="form-label">Data fine</label>
+            <input type="date" class="form-control" id="data_fine" placeholder="Data di fine ferie" min="2025-03-21">
+        </div>
+        <input class="form-control" type="text" placeholder="Motivo della richiesta" aria-label="default input example">
+        <button href="{% url 'richiedi_ferie' %}" class="btn btn-primary">Invia Richiesta</button>    
+    </form>
+</div>
+
+<!--TODO Creare l'elenco tramite ciclo For -->
+<!--TODO Definire se aggiungere una lista delle persone che hanno le ferie confermate -->
+
+<div class="container">
+    <h3>Elenco ferie richieste:</h3>
+    <ul class="list-group">
+        {% for dipendente in richiesta_ferie%}
+        <li class="list-group-item">
+          <input class="form-check-input me-1" type="checkbox" value="" id="firstCheckboxStretched">
+          <label class="form-check-label stretched-link" for="firstCheckboxStretched">{{ dipendente.nome }}{{dipendente.cognome }}{{ dipendente.data_inizio}}{{ dipendente.data_fine}}</label>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <button href="{% url 'accetta_ferie' %}" type="button" class="btn btn-primary">Accetta</button>
+    <button href="{% url 'rifiuta_ferie' %}" type="button" class="btn btn-primary">Rifiuta</button>
+</div>
+
+<div class="container">    
+    <button href="{% url 'visualizza_busta_paga' %}" type="button" class="btn btn-primary">Scarica busta paga</button>
+</div>
+
+{% endblock %}
+
