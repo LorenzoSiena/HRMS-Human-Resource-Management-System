@@ -23,6 +23,7 @@ db.sqlite3
 # 🔹 File di migrazione compilati (opzionale)
 */migrations/*.pyc
 */migrations/__pycache__/
+hrms_project/hrms_app/migrations/
 
 # 🔹 Chiavi e credenziali
 .env

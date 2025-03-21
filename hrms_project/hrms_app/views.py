@@ -36,7 +36,7 @@ from django.contrib.auth.forms import PasswordResetForm
 
 def hrms_app(request: HttpRequest):
     if not request.user.is_authenticated:
-        return redirect('/hrms_app/login/')
+        return redirect('login')
     return render(request,'hrms_app/home.html')
 
 def dipendenti(request:HttpRequest):
@@ -112,10 +112,22 @@ def stipendi(request:HttpRequest):
 def richiedi_ferie():
     pass
 
+def accetta_ferie():
+    pass
+
+def rifiuta_ferie():
+    pass
+
 def archivia_documenti():
     pass
 
 def notifiche_mail():
+    pass
+
+def timbra_entrata():
+    pass
+
+def timbra_uscita():
     pass
 
 def aggiungi_messaggio_bacheca(request:HttpRequest):
@@ -140,7 +152,7 @@ def leggi_messaggio_bacheca(request:HttpRequest):
          return render(request,f"[{msg.data_pubblicazione}] {msg.titolo}: {msg.messaggio}")
         
 
-def modifica_messaggio(request:HttpRequest,msg_id):
+def modifica_messaggio_bacheca(request:HttpRequest,msg_id):
     messaggio = get_object_or_404(Bacheca, id=msg_id)
     if request.method == "POST":
         nuovo_titolo = request.POST.get('titolo', '').strip()
@@ -157,7 +169,7 @@ def modifica_messaggio(request:HttpRequest,msg_id):
     return redirect('home')
 
 
-def cancella_messaggio(request: HttpRequest, msg_id):
+def cancella_messaggio_bacheca(request: HttpRequest, msg_id):
     messaggio = get_object_or_404(Bacheca, id=msg_id)
     messaggio.delete()
     messages.success(request, f"🗑️ Messaggio '{msg_id}' eliminato con successo!")
@@ -171,7 +183,7 @@ def crea_busta_paga():
 def visualizza_busta_paga():
     pass
 
-def report_mensile():
+def visualizza_report_mensile():
     pass
 
 
