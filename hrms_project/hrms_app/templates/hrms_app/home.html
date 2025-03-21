@@ -9,25 +9,26 @@
     
 <div class="container">
     <h3>Timbrature:</h3>
-    <button type="button" class="btn btn-primary">Entrata</button>
-    <button type="button" class="btn btn-primary">Uscita</button>
+    <button href="{% url 'timbra_entrata' %}" class="btn btn-primary">Entrata</button>
+    <button href="{% url 'timbra_uscita' %}" class="btn btn-primary">Uscita</button>
 </div>
 
 <!-- TODO Definire come passare la data corrente per limitare di inputare una date passata -->
 
 <div class="container">
-    <form action="">
+    <form method="post">
+      {% csrf_token %} 
         <h3>Richiesta Ferie</h3>
         <div class="mb-3">
             <label for="data_inizio" class="form-label">Data inizio</label>
-            <input type="date" class="form-control" id="data_inizio" placeholder="Data di inzio ferie" min={{ today }}>
+            <input type="date" class="form-control" id="data_inizio" placeholder="Data di inzio ferie" min="{{ today }}">
         </div>
         <div class="mb-3">
             <label for="data_fine" class="form-label">Data fine</label>
-            <input type="date" class="form-control" id="data_fine" placeholder="Data di fine ferie" min={{ today + 1 }}>
+            <input type="date" class="form-control" id="data_fine" placeholder="Data di fine ferie" min="2025-03-21">
         </div>
         <input class="form-control" type="text" placeholder="Motivo della richiesta" aria-label="default input example">
-        <button type="button" class="btn btn-primary">Invia Richiesta</button>    
+        <button href="{% url 'richiedi_ferie' %}" class="btn btn-primary">Invia Richiesta</button>    
     </form>
 </div>
 
@@ -37,25 +38,20 @@
 <div class="container">
     <h3>Elenco ferie richieste:</h3>
     <ul class="list-group">
+        {% for dipendente in richiesta_ferie%}
         <li class="list-group-item">
           <input class="form-check-input me-1" type="checkbox" value="" id="firstCheckboxStretched">
-          <label class="form-check-label stretched-link" for="firstCheckboxStretched">Dipendente A - dal giorno 19-03 al giorno 20-03</label>
+          <label class="form-check-label stretched-link" for="firstCheckboxStretched">{{ dipendente.nome }}{{dipendente.cognome }}{{ dipendente.data_inizio}}{{ dipendente.data_fine}}</label>
         </li>
-        <li class="list-group-item">
-          <input class="form-check-input me-1" type="checkbox" value="" id="secondCheckboxStretched">
-          <label class="form-check-label stretched-link" for="secondCheckboxStretched">Dipendente B - dal giorno 19-03 al giorno 20-03</label>
-        </li>
-        <li class="list-group-item">
-          <input class="form-check-input me-1" type="checkbox" value="" id="thirdCheckboxStretched">
-          <label class="form-check-label stretched-link" for="thirdCheckboxStretched">Dipendente C - dal giorno 19-03 al giorno 20-03</label>
-        </li>
+        {% endfor %}
     </ul>
-    <button type="button" class="btn btn-primary">Accetta</button>
-    <button type="button" class="btn btn-primary">Rifiuta</button>
+
+    <button href="{% url 'accetta_ferie' %}" type="button" class="btn btn-primary">Accetta</button>
+    <button href="{% url 'rifiuta_ferie' %}" type="button" class="btn btn-primary">Rifiuta</button>
 </div>
 
 <div class="container">    
-    <button type="button" class="btn btn-primary">Scarica busta paga</button>
+    <button href="{% url 'visualizza_busta_paga' %}" type="button" class="btn btn-primary">Scarica busta paga</button>
 </div>
 
 {% endblock %}
