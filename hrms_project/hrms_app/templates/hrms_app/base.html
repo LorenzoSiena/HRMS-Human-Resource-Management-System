@@ -11,12 +11,9 @@
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
+
             <a class="navbar-brand" href="#">
-
-                
-
                 <img src="{% static 'img/logo.png' %}" alt="Logo" width="30" height="30" class="d-inline-block align-text-top" style="border-radius: 50%;">
-
             </a>
             <button class="navbar-toggler ms-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon" style="width: 20px; height: 15px; background-size: 100% auto; margin-left: 0;"> </span>
@@ -30,22 +27,21 @@
                 </div>
             </div>
 
-            <div>
+            <div>                            
                 <span class="text-dark me-3">Benvenuto {{ user.username }}</span>
                 <a href="{% url 'logout' %}" class="btn btn-outline-dark btn-sm">Logout</a>
             </div>
         </div>
     </nav>
-
   
     <div class="container-fluid p-0">
         <div class="d-flex justify-content-center align-items-center vh-100" 
-             style="background-image: url("{% static 'img/background_cleanup.png' %}"); background-size: cover; background-position: center;">
-          {% block content %} {% endblock  %}
-        </div>
-      </div>
-      
+            style="background-image: url({% static 'img/background_cleanup.png' %}); background-size: cover; background-position: center;">
 
+            {% block content %} {% endblock  %}
+
+        </div>
+    </div>
 
     <footer class="bg-white text-dark text-center py-4" style="position: relative; background-color: white; padding: 20px 0; font-size: 14px;">
         <div class="container">
