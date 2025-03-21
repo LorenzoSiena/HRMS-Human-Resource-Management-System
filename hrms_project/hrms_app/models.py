@@ -69,10 +69,8 @@ class Ruoli(models.Model):
 
 
 
-
-# FIXARE IL CALCOLO DEL TEMPO
-
-
+#------------------------------------2test------------------------------------------------
+#OK MA DA TESTARE
 class Ferie(models.Model):
     
     STATI_CHOICES = [
@@ -105,9 +103,27 @@ class ReportFerie(models.Model):
     mese =  models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
     anno = models.IntegerField(validators=[MinValueValidator(2000)])
     giorni_totali = models.DecimalField(max_digits=5, decimal_places=2)
-
-#===>>> continuare quii
     
+    def save(self, *args, **kwargs):
+        giorni_totali = Ferie.objects.filter(
+            dipendente=self.dipendente,
+            data_inizio__year=self.anno,
+            data_inizio__month=self.mese
+        ).aggregate(Sum('giorni_totali_previsti'))['giorni_totali_previsti__sum'] or 0
+
+        self.giorni_totali = giorni_totali 
+        super().save(*args, **kwargs)
+
+#---------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
 
 
 class Permessi(Ferie): 
@@ -115,7 +131,7 @@ class Permessi(Ferie):
     orario_inizio=models.DateTimeField()
     orario_fine=models.DateTimeField()
 #===>>> continuare quii
-    
+    # TODO
 
 #report permessi
 class ReportPermessi(models.Model):
@@ -126,7 +142,28 @@ class ReportPermessi(models.Model):
     permessi_totali = models.DecimalField(max_digits=5, decimal_places=2) #999.99
     
 #===>>> continuare quii
-    
+    # TODO
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #------------------------------------2test------------------------------------------------
 #OK MA DA TESTARE
