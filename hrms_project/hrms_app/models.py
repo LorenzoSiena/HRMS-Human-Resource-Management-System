@@ -18,13 +18,14 @@ from .utils import calcola_ore_lavorate,formatta_ore,calcola_giorni_totali,ore_l
 
 class Dipendenti(AbstractUser):
     #email == username!!!
-    email = models.EmailField(unique=True)
     telefono = models.CharField(max_length=20)
     data_assunzione = models.DateField(default=date.today)
     superiore = models.ForeignKey("Dipendenti", on_delete=models.SET_NULL, null=True)
     ruolo = models.ForeignKey("Ruoli", on_delete=models.SET_NULL, null=True)
     stipendio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     documento_contratto = models.FileField( upload_to='media/documenti_contratti/', null=True, blank=True)
+
+    email = models.EmailField(unique=True)
     USERNAME_FIELD = 'email'  # Usiamo l'email come username
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']  # Campi obbligatori oltre a `email`
 
@@ -62,7 +63,8 @@ class Dipendenti(AbstractUser):
 class Autorizzazioni(models.Model):
     nome=models.CharField(max_length=100,unique=True) #: 'gestione_dipendenti', 'approva_ferie'
     descrizione=models.TextField()
-
+    def __str__(self): 
+        return self.nome
 
 
 

@@ -32,3 +32,12 @@ class RegisterForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+
+
+""" <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Registrati</button>
+</form>
+ """
