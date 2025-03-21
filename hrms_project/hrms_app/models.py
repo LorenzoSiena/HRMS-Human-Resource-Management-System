@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
 from django.db.models import Sum
-from .utils import calcola_ore_lavorate,formatta_ore,calcola_giorni_totali  # Importiamo la funzione per il calcolo delle ore lavorate
+from .utils import calcola_ore_lavorate,formatta_ore,calcola_giorni_totali,ore_lavorative_tra_date  # Importiamo la funzione per il calcolo delle ore lavorate
 
 class Dipendenti(AbstractUser):
     #email == username!!!
@@ -83,7 +83,7 @@ class Ferie(models.Model):
     data_fine=models.DateField()
     stato = models.CharField(max_length=20, choices=STATI_CHOICES, default=STATI_CHOICES[0][0]) # DA TESTARE 
     giorni_totali_previsti=models.IntegerField(default=0)
-    motivo=models.TextField()
+    
 
     def save(self, *args, **kwargs):
         self.giorni_totali_previsti = calcola_giorni_totali(self.data_inizio, self.data_fine)
@@ -120,18 +120,38 @@ class ReportFerie(models.Model):
 
 
 
-
-
-
-
-
-
-class Permessi(Ferie): 
+class Permessi(models.Model): 
+    
+    STATI_CHOICES = [
+        ('In attesa', 'In attesa'),
+        ('Approvata', 'Approvata'),
+        ('Rifiutata', 'Rifiutata'),
+    ]
+    
+    dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
+    data_ora_inizio=models.DateTimeField()
+    data_ora_fine=models.DateTimeField()
+    stato = models.CharField(max_length=20, choices=STATI_CHOICES, default=STATI_CHOICES[0][0]) # DA TESTARE 
     retribuito=models.BooleanField()
-    orario_inizio=models.DateTimeField()
-    orario_fine=models.DateTimeField()
-#===>>> continuare quii
-    # TODO
+    motivo=models.TextField()
+    ore_totali_permesso_previste_float=models.FloatField() # in ore e giorni
+    
+    def save(self, *args, **kwargs):
+        self.ore_totali_permesso_previste_float = ore_lavorative_tra_date(self.data_ora_inizio, self.data_ora_fine)
+        super().save(*args, **kwargs)
+
+
+    @property
+    def ore_totali_permesso_approvate_float(self) -> float:
+        if self.stato == 'Approvata':
+            ore_totali_permesso_approvate = self.ore_totali_permesso_previste_float
+        else:
+            ore_totali_permesso_approvate = 0
+        return ore_totali_permesso_approvate
+    @property
+    def ore_totali_permesso_approvate(self) -> str:
+        return formatta_ore(self.ore_totali_permesso_approvate_float or 0)
+
 
 #report permessi
 class ReportPermessi(models.Model):
@@ -163,8 +183,7 @@ class ReportPermessi(models.Model):
 
 
 
-
-
+#POTENZIALE BUG!
 #------------------------------------2test------------------------------------------------
 #OK MA DA TESTARE
 class Presenze(models.Model):
@@ -176,7 +195,7 @@ class Presenze(models.Model):
     ore_lavorate = models.FloatField(null=True, blank=True) 
 
     def save(self, *args, **kwargs):
-        self.ore_lavorate = calcola_ore_lavorate(self.ora_ingresso, self.ora_uscita)
+        self.ore_lavorate = calcola_ore_lavorate(self.ora_ingresso, self.ora_uscita)  #BUG! QUA SE GLI PASSO LE ORE RIESCE A CALCOLARSELE??
         super().save(*args, **kwargs)
 
 
