@@ -7,6 +7,15 @@ from django.contrib.auth.models import AbstractUser
 from django.db.models import Sum
 from .utils import calcola_ore_lavorate,formatta_ore,calcola_giorni_totali,ore_lavorative_tra_date  # Importiamo la funzione per il calcolo delle ore lavorate
 
+
+#BUG NOTI
+
+#ReportPermessi
+#Funziona solo se non sforo il mese , altrimenti sballa il conto
+
+#utils.py viene usato ma
+#calcola_ore_lavorate va letto bene se funziona
+
 class Dipendenti(AbstractUser):
     #email == username!!!
     email = models.EmailField(unique=True)
@@ -154,36 +163,31 @@ class Permessi(models.Model):
 
 
 #report permessi
+#BUG! Funziona solo se non sforo il mese @.@
 class ReportPermessi(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
     mese =  models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
     anno = models.IntegerField(validators=[MinValueValidator(2000)])
-    #TODO calcolo permessi totali nel mese
-    permessi_totali = models.DecimalField(max_digits=5, decimal_places=2) #999.99
-    
-#===>>> continuare quii
-    # TODO
+
+    ore_totali_permessi_float = models.DecimalField(max_digits=5, decimal_places=2) #999.99
+
+    def save(self, *args, **kwargs):
+        ore_totali_permessi = Permessi.objects.filter(
+            dipendente=self.dipendente,
+            data_ora_inizio__year=self.anno, 
+            data_ora_inizio__month=self.mese #BUG!
+        ).aggregate(Sum('ore_totali_permesso_approvate_float'))['ore_totali_permesso_approvate_float__sum'] or 0
+
+        self.ore_totali_permessi_float = ore_totali_permessi
+        super().save(*args, **kwargs)   
+    @property
+    def ore_totali_permessi(self):
+        return formatta_ore(self.ore_totali_permessi_float or 0)
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#POTENZIALE BUG!
 #------------------------------------2test------------------------------------------------
 #OK MA DA TESTARE
 class Presenze(models.Model):
@@ -192,11 +196,15 @@ class Presenze(models.Model):
     ora_ingresso=models.TimeField()  #'14:30:00'
     ora_uscita=models.TimeField(null=True,blank=True) #'17:30:00'
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
-    ore_lavorate = models.FloatField(null=True, blank=True) 
+    ore_lavorate_float = models.FloatField(null=True, blank=True) 
 
     def save(self, *args, **kwargs):
-        self.ore_lavorate = calcola_ore_lavorate(self.ora_ingresso, self.ora_uscita)  #BUG! QUA SE GLI PASSO LE ORE RIESCE A CALCOLARSELE??
+        self.ore_lavorate_float = calcola_ore_lavorate(self.ora_ingresso, self.ora_uscita) 
         super().save(*args, **kwargs)
+    @property
+    def ore_lavorate(self):
+        return formatta_ore(self.ore_lavorate or 0)
+
 
 
 class ReportPresenze(models.Model):
@@ -211,7 +219,7 @@ class ReportPresenze(models.Model):
             dipendente=self.dipendente,
             data__year=self.anno,
             data__month=self.mese
-        ).aggregate(Sum('ore_lavorate'))['ore_lavorate__sum'] or 0
+        ).aggregate(Sum('ore_lavorate_float'))['ore_lavorate_float__sum'] or 0
 
         self.ore_totali_float = round(ore_lavorate, 2)  # Arrotonda a due decimali
         super().save(*args, **kwargs)  # Salva l'oggetto
