@@ -20,10 +20,10 @@ class Dipendenti(AbstractUser):
     #email == username!!!
     email = models.EmailField(unique=True)
     telefono = models.CharField(max_length=20)
-    data_assunzione = models.DateField()
+    data_assunzione = models.DateField(default=date.today)
     superiore = models.ForeignKey("Dipendenti", on_delete=models.SET_NULL, null=True)
     ruolo = models.ForeignKey("Ruoli", on_delete=models.SET_NULL, null=True)
-    stipendio = models.DecimalField(max_digits=10, decimal_places=2)
+    stipendio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     documento_contratto = models.FileField( upload_to='media/documenti_contratti/', null=True, blank=True)
     USERNAME_FIELD = 'email'  # Usiamo l'email come username
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']  # Campi obbligatori oltre a `email`

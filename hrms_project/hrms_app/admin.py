@@ -5,7 +5,7 @@ admin.site.register(Dipendenti) """
 #Test e debug!
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Dipendenti
+from .models import Dipendenti,Ruoli,Autorizzazioni
 
 class DipendentiAdmin(UserAdmin):
     model = Dipendenti
@@ -25,4 +25,6 @@ class DipendentiAdmin(UserAdmin):
     search_fields = ('email', 'nome', 'cognome')
     ordering = ('email',)
 
-admin.site.register(Dipendenti, DipendentiAdmin)
+admin.site.register(Dipendenti)
+admin.site.register(Ruoli)
+admin.site.register(Autorizzazioni)
