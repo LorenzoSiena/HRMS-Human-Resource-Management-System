@@ -158,8 +158,6 @@ class Permessi(models.Model):
     def ore_totali_permesso_approvate(self) -> str:
         return formatta_ore(self.ore_totali_permesso_approvate_float or 0)
 
-
-#report permessi
 #BUG! Funziona solo se non sforo il mese @.@
 class ReportPermessi(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
