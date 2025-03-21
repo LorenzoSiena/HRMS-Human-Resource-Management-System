@@ -126,9 +126,6 @@ class ReportFerie(models.Model):
 #---------------------------------------------------------------------------------------
 
 
-
-
-
 class Permessi(models.Model): 
     
     STATI_CHOICES = [
@@ -185,11 +182,6 @@ class ReportPermessi(models.Model):
         return formatta_ore(self.ore_totali_permessi_float or 0)
 
 
-
-
-
-#------------------------------------2test------------------------------------------------
-#OK MA DA TESTARE
 class Presenze(models.Model):
 
     data = models.DateField()
@@ -200,11 +192,12 @@ class Presenze(models.Model):
 
     def save(self, *args, **kwargs):
         self.ore_lavorate_float = calcola_ore_lavorate(self.ora_ingresso, self.ora_uscita) 
+        #arrotondo a due decimali
+        self.ore_lavorate_float = round(self.ore_lavorate_float, 2)
         super().save(*args, **kwargs)
     @property
     def ore_lavorate(self):
         return formatta_ore(self.ore_lavorate or 0)
-
 
 
 class ReportPresenze(models.Model):
@@ -226,7 +219,6 @@ class ReportPresenze(models.Model):
     @property
     def ore_totali(self):
         return formatta_ore(self.ore_totali_float or 0)
-#------------------------------------2test------------------------------------------------
 
 
 
