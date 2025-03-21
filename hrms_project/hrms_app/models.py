@@ -20,7 +20,7 @@ class Dipendenti(AbstractUser):
     #email == username!!!
     telefono = models.CharField(max_length=20)
     data_assunzione = models.DateField(default=date.today)
-    superiore = models.ForeignKey("Dipendenti", on_delete=models.SET_NULL, null=True)
+    superiore = models.ForeignKey("Dipendenti", on_delete=models.SET_NULL, null=True,blank=True)
     ruolo = models.ForeignKey("Ruoli", on_delete=models.SET_NULL, null=True)
     stipendio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     documento_contratto = models.FileField( upload_to='media/documenti_contratti/', null=True, blank=True)
