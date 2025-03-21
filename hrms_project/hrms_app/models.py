@@ -74,12 +74,6 @@ class Ruoli(models.Model):
 
 
 
-
-
-
-
-#------------------------------------2test------------------------------------------------
-#OK MA DA TESTARE
 class Ferie(models.Model):
     
     STATI_CHOICES = [
