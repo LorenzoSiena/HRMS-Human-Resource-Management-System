@@ -1,5 +1,3 @@
-# TODO: CONTROLLARE E ADATTARE
-#start 
 
 #Standard imports
 from django.shortcuts import render,redirect
@@ -9,15 +7,8 @@ from django.shortcuts import get_object_or_404, redirect
 
 #Model user 
 from django.contrib.auth.models import User
-from .models import Dipendenti
-from .models import Permessi
-from .models import Ruoli
-from .models import Ferie
-from .models import Presenze
-from .models import Bacheca
-from .models import ReportPresenze
-from .models import BustePaga
-from .models import Notifiche
+from .models import *
+
 
 #Form
 from .forms import RegisterForm
@@ -30,10 +21,6 @@ from django.contrib.auth.forms import PasswordResetForm
 
 
 
-
-#User register,login and logout
-
-
 def hrms_app(request: HttpRequest):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -41,7 +28,6 @@ def hrms_app(request: HttpRequest):
 
 def dipendenti(request:HttpRequest):
     return render(request,'hrms_app/dipendenti.html')
-
 
 
 
@@ -109,6 +95,10 @@ def presenze(request:HttpRequest):
 def stipendi(request:HttpRequest):
     return render(request,'hrms_app/stipendi.html')
     
+
+
+
+
 def richiedi_ferie():
     pass
 
@@ -183,7 +173,22 @@ def crea_busta_paga():
 def visualizza_busta_paga():
     pass
 
-def visualizza_report_mensile():
+
+
+
+
+def visualizza_report_presenze(request:HttpRequest):
+    pass
+
+def visualizza_report_ferie(request:HttpRequest):
+    pass
+
+def visualizza_report_permessi(request:HttpRequest):
+    pass
+
+
+
+def visualizza_report_mensile(request:HttpRequest):
     pass
 
 
@@ -221,15 +226,14 @@ OLD REGISTER
 
 def user_login(request: HttpRequest):
     if request.method == "POST":
-
-        username = request.POST.get("username")
+        email = request.POST.get("email")
         password = request.POST.get("password")
-        user = authenticate(request,username=username,password=password)
+        user = authenticate(request,username=email,password=password)
         if user is not None:
             login(request,user)
             return redirect('home')
         else:
-            messages.error(request,'Utente non trovato o password sbagliata')
+            messages.error(request,'Utente non trovato o password sbagliata:')
     return render(request,'hrms_app/login.html',{'login':login})
 
 def user_logout(request: HttpRequest):
