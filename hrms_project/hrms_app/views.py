@@ -1,5 +1,5 @@
 # TODO: CONTROLLARE E ADATTARE
- 
+#start 
 
 #Standard imports
 from django.shortcuts import render,redirect
