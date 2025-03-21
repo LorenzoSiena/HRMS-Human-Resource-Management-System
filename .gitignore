@@ -24,6 +24,8 @@ db.sqlite3
 */migrations/*.pyc
 */migrations/__pycache__/
 hrms_project/hrms_app/migrations/
+*/hrms_app/migrations/
+*/migrations/
 
 # 🔹 Chiavi e credenziali
 .env
