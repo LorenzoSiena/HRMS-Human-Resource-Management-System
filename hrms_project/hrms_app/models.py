@@ -4,11 +4,24 @@ from datetime import datetime,date
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
+from django.db.models import Sum
+from .utils import calcola_ore_lavorate,formatta_ore,calcola_giorni_totali,ore_lavorative_tra_date  # Importiamo la funzione per il calcolo delle ore lavorate
+
+
+#BUG NOTI
+
+#ReportPermessi
+#Funziona solo se non sforo il mese , altrimenti sballa il conto
+
+#utils.py viene usato ma
+#calcola_ore_lavorate va letto bene se funziona
+
 class Dipendenti(AbstractUser):
     #email == username!!!
     email = models.EmailField(unique=True)
     telefono = models.CharField(max_length=20)
     data_assunzione = models.DateField()
+    superiore = models.ForeignKey("Dipendenti", on_delete=models.SET_NULL, null=True)
     ruolo = models.ForeignKey("Ruoli", on_delete=models.SET_NULL, null=True)
     stipendio = models.DecimalField(max_digits=10, decimal_places=2)
     documento_contratto = models.FileField( upload_to='media/documenti_contratti/', null=True, blank=True)
@@ -46,21 +59,23 @@ class Dipendenti(AbstractUser):
 
 
 
-class Permessi(models.Model):
+class Autorizzazioni(models.Model):
     nome=models.CharField(max_length=100,unique=True) #: 'gestione_dipendenti', 'approva_ferie'
     descrizione=models.TextField()
-    # aggiungere una lista di permessi predefiniti?
+
+
+
 
 class Ruoli(models.Model):
     nome = models.CharField(max_length=50, unique=True)
     livello_accesso = models.IntegerField(validators=[MinValueValidator(1)]) #solo positivi
     descrizione = models.TextField()
-    permessi = models.ManyToManyField(Permessi)
+    autorizzazioni = models.ManyToManyField(Autorizzazioni)
+
 
 
 class Ferie(models.Model):
     
-
     STATI_CHOICES = [
         ('In attesa', 'In attesa'),
         ('Approvata', 'Approvata'),
@@ -70,36 +85,142 @@ class Ferie(models.Model):
     data_inizio=models.DateField()
     data_fine=models.DateField()
     stato = models.CharField(max_length=20, choices=STATI_CHOICES, default=STATI_CHOICES[0][0]) # DA TESTARE 
+    giorni_totali_previsti=models.IntegerField(default=0)
+    
+
+    def save(self, *args, **kwargs):
+        self.giorni_totali_previsti = calcola_giorni_totali(self.data_inizio, self.data_fine)
+        super().save(*args, **kwargs)
+
+    @property
+    def giorni_totali_approvati(self):
+        if self.stato == 'Approvata':
+            giorni_totali_approvati = calcola_giorni_totali(self.data_inizio, self.data_fine)
+        else:
+            giorni_totali_approvati = 0
+        return giorni_totali_approvati
 
 
+class ReportFerie(models.Model):
+    dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
+    mese =  models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
+    anno = models.IntegerField(validators=[MinValueValidator(2000)])
+    giorni_totali = models.DecimalField(max_digits=5, decimal_places=2)
+    
+    def save(self, *args, **kwargs):
+        giorni_totali = Ferie.objects.filter(
+            dipendente=self.dipendente,
+            data_inizio__year=self.anno,
+            data_inizio__month=self.mese
+        ).aggregate(Sum('giorni_totali_previsti'))['giorni_totali_previsti__sum'] or 0
 
-#DA TESTARE    
+        self.giorni_totali = giorni_totali 
+        super().save(*args, **kwargs)
+
+#---------------------------------------------------------------------------------------
+
+
+class Permessi(models.Model): 
+    
+    STATI_CHOICES = [
+        ('In attesa', 'In attesa'),
+        ('Approvata', 'Approvata'),
+        ('Rifiutata', 'Rifiutata'),
+    ]
+    
+    dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
+    data_ora_inizio=models.DateTimeField()
+    data_ora_fine=models.DateTimeField()
+    stato = models.CharField(max_length=20, choices=STATI_CHOICES, default=STATI_CHOICES[0][0]) # DA TESTARE 
+    retribuito=models.BooleanField()
+    motivo=models.TextField()
+    ore_totali_permesso_previste_float=models.FloatField() # in ore e giorni
+    
+    def save(self, *args, **kwargs):
+        self.ore_totali_permesso_previste_float = ore_lavorative_tra_date(self.data_ora_inizio, self.data_ora_fine)
+        super().save(*args, **kwargs)
+
+
+    @property
+    def ore_totali_permesso_approvate_float(self) -> float:
+        if self.stato == 'Approvata':
+            ore_totali_permesso_approvate = self.ore_totali_permesso_previste_float
+        else:
+            ore_totali_permesso_approvate = 0
+        return ore_totali_permesso_approvate
+    @property
+    def ore_totali_permesso_approvate(self) -> str:
+        return formatta_ore(self.ore_totali_permesso_approvate_float or 0)
+
+#BUG! Funziona solo se non sforo il mese @.@
+class ReportPermessi(models.Model):
+    dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
+    mese =  models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
+    anno = models.IntegerField(validators=[MinValueValidator(2000)])
+
+    ore_totali_permessi_float = models.DecimalField(max_digits=5, decimal_places=2) #999.99
+
+    def save(self, *args, **kwargs):
+        ore_totali_permessi = Permessi.objects.filter(
+            dipendente=self.dipendente,
+            data_ora_inizio__year=self.anno, 
+            data_ora_inizio__month=self.mese #BUG!
+        ).aggregate(Sum('ore_totali_permesso_approvate_float'))['ore_totali_permesso_approvate_float__sum'] or 0
+
+        self.ore_totali_permessi_float = ore_totali_permessi
+        super().save(*args, **kwargs)   
+    @property
+    def ore_totali_permessi(self):
+        return formatta_ore(self.ore_totali_permessi_float or 0)
+
+
 class Presenze(models.Model):
 
     data = models.DateField()
-    ora_ingresso=models.TimeField()
-    ora_uscita=models.TimeField(null=True)
+    ora_ingresso=models.TimeField()  #'14:30:00'
+    ora_uscita=models.TimeField(null=True,blank=True) #'17:30:00'
+    dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
+    ore_lavorate_float = models.FloatField(null=True, blank=True) 
 
+    def save(self, *args, **kwargs):
+        self.ore_lavorate_float = calcola_ore_lavorate(self.ora_ingresso, self.ora_uscita) 
+        #arrotondo a due decimali
+        self.ore_lavorate_float = round(self.ore_lavorate_float, 2)
+        super().save(*args, **kwargs)
     @property
     def ore_lavorate(self):
-        if self.ora_uscita and self.ora_ingresso:
-            delta = datetime.combine(date.min, self.ora_uscita) - datetime.combine(date.min, self.ora_ingresso)
-            return delta.total_seconds() / 3600  # Converti in ore
-        return None
-    
-class Bacheca(models.Model):
-    titolo=models.CharField(max_length=100)
-    messaggio=models.TextField()
-    data_pubblicazione=models.DateTimeField(auto_now_add=True)
+        return formatta_ore(self.ore_lavorate or 0)
 
 
 class ReportPresenze(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
     mese =  models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
     anno = models.IntegerField(validators=[MinValueValidator(2000)])
-    ore_totali = models.DecimalField(max_digits=5, decimal_places=2) #999.99
+    ore_totali_float = models.DecimalField(max_digits=5, decimal_places=2) #999.99
 
-    #BUG CONTROLLARE!!! SE POI QUANDO LE VADO A SOMMARE ROMPONO TUTTO sum(Presenze.ore_lavorate)
+    def save(self, *args, **kwargs):
+        # Calcola le ore totali direttamente dal DB
+        ore_lavorate = Presenze.objects.filter(
+            dipendente=self.dipendente,
+            data__year=self.anno,
+            data__month=self.mese
+        ).aggregate(Sum('ore_lavorate_float'))['ore_lavorate_float__sum'] or 0
+
+        self.ore_totali_float = round(ore_lavorate, 2)  # Arrotonda a due decimali
+        super().save(*args, **kwargs)  # Salva l'oggetto
+    @property
+    def ore_totali(self):
+        return formatta_ore(self.ore_totali_float or 0)
+
+
+
+class Bacheca(models.Model):
+    titolo=models.CharField(max_length=100)
+    messaggio=models.TextField()
+    data_pubblicazione=models.DateTimeField(auto_now_add=True)
+
+
+
 
 class BustePaga(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
@@ -107,13 +228,25 @@ class BustePaga(models.Model):
     anno = models.IntegerField(validators=[MinValueValidator(2000)])
     importo = models.DecimalField(max_digits=8, decimal_places=2) #max 999 999.99
     data_emissione=models.DateField(auto_now_add=True)
-    documento=models.BinaryField() #oppure filefield?
+    documento=models.FileField(upload_to='media/documenti_bustepaga/')
 
 class Notifiche(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
     messaggio=models.TextField()
     data_invio=models.DateTimeField(auto_now_add=True)
     letto=models.BooleanField(default=False)
+
+
+
+class Certificati(models.Model):
+    
+    nome= models.CharField(max_length=100)
+    descrizione=models.TextField()
+    documento=models.FileField(upload_to='media/documenti_certificati/')
+    data_emissione=models.DateField()
+    data_scadenza=models.DateField(null=True)
+    dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
+
 
     
 """ 

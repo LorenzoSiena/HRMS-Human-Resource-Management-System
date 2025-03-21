@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Dipendenti
+from .models import Dipendenti,Ruoli
 
 
 class RegisterForm(UserCreationForm):
@@ -11,6 +11,9 @@ class RegisterForm(UserCreationForm):
     cognome = forms.CharField(max_length=100)
     indirizzo_email = forms.EmailField(required=True)
 
+    #set null? 
+    #superiore = models.ForeignKey("Dipendenti", on_delete=models.SET_NULL, null=True)
+   
     data_assunzione = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     ruolo = forms.ModelChoiceField(queryset=Ruoli.objects.all(), required=False)
     stipendio = forms.DecimalField(max_digits=10, decimal_places=2)
