@@ -1,5 +1,47 @@
 {% extends 'hrms_app/base.html' %}
 {% block title %} Gestione Presenze {% endblock title %}
-{% block content %}    
+{% block content %}
+   
+    <form action="post"> 
+        <h3>Crea report mensile</h3>        
+        <div class="mb-3">
+            <input type="text" class="form-control" id="dipendente" placeholder="Dipendente">
+        </div>
+        <div class="mb-3">            
+            <input type="text" class="mese" id="mese" placeholder="Mese">
+        </div>        
+        <button type="button" class="btn btn-primary">Invia Richiesta</button>    
+    </form>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Dipendente</th>
+                <th>Ore</th>
+                <th>Ore Lavorate</th>
+                <th>Ore Ferie</th>
+                <th>Ore Permessi</th>
+                <th>Ore Permessi n. r.</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dipendente in dipendenti %}
+            <tr>                
+                <td>{{ dipendente.cognome }}</td>
+                <td>.........</td> <!-- Da sviluppare Totale ore lavorative del mese -->
+                <td>.........</td> <!-- Da sviluppare Totale ore lavorate del mese -->                
+                <td>.........</td> <!-- Da sviluppare Totale ore ferie del mese -->
+                <td>.........</td> <!-- Da sviluppare Totale ore permessi del mese -->
+                <td>.........</td> <!-- Da sviluppare Totale ore permessi n.r. del mese -->  
+            </tr>
+            {% endfor %}
+            <tr>
+                <td><strong>Totale</strong></td>
+                <td></td>
+                <td><strong>{{ totale }}</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
 
 {% endblock %}
