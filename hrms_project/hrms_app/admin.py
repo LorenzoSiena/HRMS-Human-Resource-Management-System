@@ -25,6 +25,7 @@ class DipendentiAdmin(UserAdmin):
     search_fields = ('email', 'nome', 'cognome')
     ordering = ('email',)
 
+#admin.site.register(Dipendenti, DipendentiAdmin)
 admin.site.register(Dipendenti)
 admin.site.register(Ruoli)
 admin.site.register(Autorizzazioni)
