@@ -7,13 +7,10 @@ from .models import Dipendenti,Ruoli
 
 
 class RegisterForm(UserCreationForm):
+    
     nome = forms.CharField(max_length=100)
     cognome = forms.CharField(max_length=100)
     indirizzo_email = forms.EmailField(required=True)
-
-    #set null? 
-    #superiore = models.ForeignKey("Dipendenti", on_delete=models.SET_NULL, null=True)
-   
     data_assunzione = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     ruolo = forms.ModelChoiceField(queryset=Ruoli.objects.all(), required=False)
     stipendio = forms.DecimalField(max_digits=10, decimal_places=2)

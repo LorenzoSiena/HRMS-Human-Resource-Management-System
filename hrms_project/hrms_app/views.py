@@ -5,8 +5,11 @@ from django.http import HttpRequest
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 
-#Model user 
-from django.contrib.auth.models import User
+
+
+from django.contrib.auth.models import User,Group
+from .models import *
+
 
 from .models import *
 
@@ -85,7 +88,7 @@ def elimina_dipendente(request: HttpRequest, id_dipendente):
     return redirect('dipendenti')
 
 def presenze(request:HttpRequest):
-    return render(request,'hrms_app/presenze.html')
+    return render(request,'hrms_app/presenza.html')
 
 
 def stipendi(request:HttpRequest):
@@ -233,6 +236,7 @@ def user_login(request: HttpRequest):
         email = request.POST.get("email")
         password = request.POST.get("password")
         user = authenticate(request,username=email,password=password)
+        
         if user is not None:
             login(request,user)
             return redirect('home')

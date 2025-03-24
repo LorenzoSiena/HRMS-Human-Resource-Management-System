@@ -39,6 +39,13 @@
                     </div>
                 </div>
 
+            </div>
+            <form class="d-flex ms-3" role="search" method="get">
+                <input class="form-control form-control-sm me-2" type="search" placeholder="Cerca..." aria-label="Search" name="query">
+                <button class="btn btn-outline-dark btn-sm me-5" type="submit">Cerca</button>
+            </form>
+
+
                 <!-- Messaggio di benvenuto e pulsante di logout-->
                 <div>                            
                     <span class="text-dark me-3">Benvenuto {{ user.first_name }} {{ user.last_name }}</span>
