@@ -1,6 +1,9 @@
+<<<<<<< Updated upstream
 # TODO: CONTROLLARE E ADATTARE
  
 
+=======
+>>>>>>> Stashed changes
 #Standard imports
 from django.shortcuts import render,redirect
 from django.http import HttpRequest
@@ -9,6 +12,7 @@ from django.shortcuts import get_object_or_404, redirect
 
 #Model user 
 from django.contrib.auth.models import User
+<<<<<<< Updated upstream
 from .models import Dipendenti
 from .models import Permessi
 from .models import Ruoli
@@ -18,6 +22,9 @@ from .models import Bacheca
 from .models import ReportPresenze
 from .models import BustePaga
 from .models import Notifiche
+=======
+from .models import *
+>>>>>>> Stashed changes
 
 #Form
 from .forms import RegisterForm
@@ -28,7 +35,8 @@ from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, 
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import PasswordResetForm
 
-
+#Date
+from datetime import datetime,date
 
 
 #User register,login and logout
@@ -42,9 +50,12 @@ def hrms_app(request: HttpRequest):
 def dipendenti(request:HttpRequest):
     return render(request,'hrms_app/dipendenti.html')
 
+<<<<<<< Updated upstream
 
 
 
+=======
+>>>>>>> Stashed changes
 def inserisci_dipendente(request: HttpRequest):
     if request.method == "POST":
         nome = request.POST.get('nome', '').strip()
@@ -68,9 +79,6 @@ def inserisci_dipendente(request: HttpRequest):
             messages.error(request, "⚠️ Tutti i campi sono obbligatori!")
 
     return redirect('dipendenti')
-   
-
-
 
 def modifica_dipendente(request: HttpRequest, id_dipendente):
     dipendente = get_object_or_404(Dipendenti, id=id_dipendente)
@@ -94,7 +102,6 @@ def modifica_dipendente(request: HttpRequest, id_dipendente):
             messages.success(request, f"✅ Dipendente '{nome} {cognome}' modificato con successo!")
         else:
             messages.error(request, "⚠️ Tutti i campi sono obbligatori!")
-
 
 def elimina_dipendente(request: HttpRequest, id_dipendente):
     dipendente = get_object_or_404(Dipendenti, id=id_dipendente)
@@ -124,9 +131,17 @@ def archivia_documenti():
 def notifiche_mail():
     pass
 
-def timbra_entrata():
-    pass
-
+def timbra_entrata(request: HttpRequest):
+    data_entrata = datetime.now()
+#    if request.method == "POST":
+#       data_entrata = request.POST.get('data_entrata').strip()
+#        if data_entrata:    
+#           Entrata.objects.create(data_entrata=data_entrata)
+#           messages.success(request,f"✅ Entrata aggiunta con successo!")
+#        else:
+#            messages.error(request,"⚠️ Data di entrata obbligatoria!") 
+#        return redirect('home')      
+    return redirect(request,'hrms_app/home.html', data_entrata)
 def timbra_uscita():
     pass
 
