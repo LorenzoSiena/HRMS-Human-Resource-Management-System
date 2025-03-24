@@ -8,9 +8,9 @@ Login
 
 <div class ="containerx">
 
-    <div class="login-container" style="background-color: white; padding: 50px">
+    <div class="login-container" style="background-color: white; padding: 40px; border-radius: 10px;">
         
-        <h2 class="text-center mb-4">Login</h2>
+        <h2 class="text-center mb-1 mt-0">Login</h2>
             
         {% if messages %}
         <div class="alert alert-danger">
@@ -22,25 +22,25 @@ Login
 
         <form method="post">
             {% csrf_token %}
-            <div class="mb-3">
-                <label for="email" class="form-label">Username</label>
-                <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+            <div class="mb-3 mt-4">
+                <!-- <label for="email" class="form-label">Username</label> -->
+                <input type="text" class="form-control" id="email" name="email" placeholder="Inserisci email" required>
             </div>
             
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                <!-- <label for="password" class="form-label">Password</label> -->
+                <input type="password" class="form-control" id="password" name="password" placeholder="Inserisci password" required>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+            <button type="submit" class="btn btn-outline-dark w-100 mb-4">Login</button>
         </form>
 
         <p class="text-center mt-2">
-            Don't have an account? <a href="{% url 'register' %}">Registrati</a>
+            Non hai un account? <a href="{% url 'register' %}" class="text-dark">Registrati</a>
         </p>
 
-        <p class="text-center mt-3">
-            <a href="{% url 'reset_password' %}">Forgot your password?</a>
+        <p class="text-center mt-2 mb-2">
+            <a href="{% url 'reset_password' %}" class="text-dark">Hai dimenticato la password?</a>
         </p>
 
     </div>
