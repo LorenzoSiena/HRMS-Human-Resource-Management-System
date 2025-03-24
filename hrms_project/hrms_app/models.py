@@ -18,12 +18,17 @@ from .utils import calcola_ore_lavorate,formatta_ore,calcola_giorni_totali,ore_l
 
 class Dipendenti(AbstractUser):
     #email == username!!!
+    #telefono
+
     telefono = models.CharField(max_length=20)
     data_assunzione = models.DateField(default=date.today)
     superiore = models.ForeignKey("Dipendenti", on_delete=models.SET_NULL, null=True,blank=True)
     ruolo = models.ForeignKey("Ruoli", on_delete=models.SET_NULL, null=True)
     stipendio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     documento_contratto = models.FileField( upload_to='media/documenti_contratti/', null=True, blank=True)
+
+    codice_fiscale = models.CharField(max_length=16,mnull=True, blank=True)
+    indirizzo_completo = models.CharField(max_length=128,null=True, blank=True)
 
     email = models.EmailField(unique=True)
     USERNAME_FIELD = 'email'  # Usiamo l'email come username
@@ -68,6 +73,8 @@ class Ruoli(models.Model):
     descrizione = models.TextField()
     autorizzazioni = models.ManyToManyField(Autorizzazioni)
 
+
+
 class Ferie(models.Model):
     
     STATI_CHOICES = [
@@ -92,6 +99,7 @@ class Ferie(models.Model):
         else:
             giorni_totali_approvati = 0
         return giorni_totali_approvati
+
 
 class ReportFerie(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
@@ -143,6 +151,10 @@ class Permessi(models.Model):
     @property
     def ore_totali_permesso_approvate(self) -> str:
         return formatta_ore(self.ore_totali_permesso_approvate_float or 0)
+
+    def __str__(self):
+        return  f" ({self.stato}) - ({self.data_ora_inizio} - {self.data_ora_fine} - sono previste {formatta_ore(self.ore_totali_permesso_previste_float)} ore)"
+
 
 #BUG! Funziona solo se non sforo il mese @.@
 class ReportPermessi(models.Model):
@@ -209,7 +221,8 @@ class Bacheca(models.Model):
     messaggio=models.TextField()
     data_pubblicazione=models.DateTimeField(auto_now_add=True)
 
-
+    def __str__(self):
+        return self.titolo 
 
 
 class BustePaga(models.Model):
@@ -219,6 +232,9 @@ class BustePaga(models.Model):
     importo = models.DecimalField(max_digits=8, decimal_places=2) #max 999 999.99
     data_emissione=models.DateField(auto_now_add=True)
     documento=models.FileField(upload_to='media/documenti_bustepaga/')
+
+    def __str__(self):
+        return f"{self.dipendente} - {self.mese}/{self.anno}"
 
 class Notifiche(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
@@ -237,7 +253,9 @@ class Certificati(models.Model):
     data_scadenza=models.DateField(null=True)
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
 
+    def __str__(self):
 
+        return f"{self.nome} - {self.dipendente}"
     
 """ 
 
