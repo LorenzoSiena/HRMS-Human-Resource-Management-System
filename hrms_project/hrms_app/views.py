@@ -15,7 +15,7 @@ from .models import *
 
 #Form
 from .forms import RegisterForm
-from django.contrib.auth import authenticate,login,logout,
+from django.contrib.auth import authenticate,login,logout
 
 #Password reset
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
