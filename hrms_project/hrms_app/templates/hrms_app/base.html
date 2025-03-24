@@ -34,61 +34,42 @@
                 <span style="margin-left: 5px">HRM</span>
             </a>
 
-            <button class="navbar-toggler ms-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon" style="width: 20px; height: 15px; background-size: 100% auto; margin-left: 0;"> </span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                <div class="navbar-nav">
-                    <a class="nav-link" href="#">Home</a>
-                    <div class="dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                          Area Personale
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Profilo</a></li>
-                            <li><a class="dropdown-item" href="#">I miei documenti</a></li>
-                            <li><a class="dropdown-item" href="#">Richiesta Ferie e Permessi</a></li>
-                            <li><a class="dropdown-item" href="#">Busta Paga</a></li>
-                        </ul>
-                    </div>
-
-                    <a class="nav-link" href="#">Bacheca</a>
-                    <a class="nav-link" href="#">Notifiche</a>
-
-                    <div class="dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                          Area Amministrativa
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Gestione Dipendenti</a></li>
-                            <li><a class="dropdown-item" href="#">Gestione Ferie e Permessi</a></li>
-                            <li><a class="dropdown-item" href="#">Gestione Buste Paga</a></li>
-                            <li><a class="dropdown-item" href="#">Consulta Documenti</a></li>
-                            <li><a class="dropdown-item" href="#">Report e Statistiche</a></li>
-                        </ul>
-
-
             <!-- Se l'autenticazione dell'utente è avvenuta con successo mostriamo il menù, il messaggio di benvenuto ed il pulsante di logout -->
-            {% if user.is_authenticated %} 
+            {% if user.is_authenticated %}
 
                 <!-- Menù hamburger -->
                 <button class="navbar-toggler ms-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon" style="width: 20px; height: 15px; background-size: 100% auto; margin-left: 0;"></span>
+                    <span class="navbar-toggler-icon" style="width: 20px; height: 15px; background-size: 100% auto; margin-left: 0;"> </span>
                 </button>
 
                 <!-- Menù di navigazione -->
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
-                        <!--<a class="nav-link active" href="#">HRM</a>-->
-                        <a class="nav-link active" href="#">Home</a>
-                        <a class="nav-link active" href="#">Notifiche</a>
+                        <a class="nav-link" href="#">Home</a>
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Area Personale
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Richiesta Ferie e Permessi</a></li>
+                                <li><a class="dropdown-item" href="#">Busta Paga</a></li>
+                            </ul>
+                        </div>
 
-                    </div>
+                        <a class="nav-link" href="#">Bacheca</a>
+                        <a class="nav-link" href="#">Notifiche</a>
+
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Gestione Dipendenti
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Gestione Ferie e Permessi</a></li>
+                                <li><a class="dropdown-item" href="#">Gestione Buste Paga</a></li>
+                                <li><a class="dropdown-item" href="#">Documenti</a></li>
+                                <li><a class="dropdown-item" href="#">Report</a></li>
+                            </ul>
                 </div>
-
-            </div>
-
 
                 <!-- Messaggio di benvenuto e pulsante di logout-->
                 <div>                            
