@@ -8,11 +8,13 @@ Login
 
 <div class ="containerx">
 
+
     <!-- Form di login -->
 
     <div class="login-container" style="background-color: white; padding: 15px 50px; opacity: 90%; border-radius: 20px">
+
         
-        <h2 class="text-center mb-4">Login</h2>
+        <h2 class="text-center mb-1 mt-0">Login</h2>
             
         {% if messages %}
         <div class="alert alert-danger">
@@ -24,20 +26,22 @@ Login
 
         <form method="post">
             {% csrf_token %}
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+
+            <div class="mb-3 mt-4">
+                <!-- <label for="email" class="form-label">Username</label> -->
+                <input type="text" class="form-control" id="email" name="email" placeholder="Inserisci email" required>
             </div>
             
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                <!-- <label for="password" class="form-label">Password</label> -->
+                <input type="password" class="form-control" id="password" name="password" placeholder="Inserisci password" required>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+            <button type="submit" class="btn btn-outline-dark w-100 mb-4">Login</button>
         </form>
 
         <p class="text-center mt-2">
+
             Non hai un account? <a href="{% url 'registrati' %}">Registrati</a>
 
         </p>
