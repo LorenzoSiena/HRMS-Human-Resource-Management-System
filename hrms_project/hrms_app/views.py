@@ -200,32 +200,32 @@ def visualizza_report_mensile(request:HttpRequest):
 
 
 #TODO: TESTARE!
-def registrati(request: HttpRequest):
-    if request.method == "POST":
-        form = RegisterForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect("login")  # Dopo la registrazione, reindirizza al login
-    else:
-        form = RegisterForm()
-    return render(request, "hrms_app/register.html", {"form": form})
-
-def register(request:HttpRequest):
-    return render( request,"hrms_app/register_forms.html") 
 # def registrati(request: HttpRequest):
 #     if request.method == "POST":
 #         form = RegisterForm(request.POST, request.FILES)
 #         if form.is_valid():
-#             user = form.save()  # Salva l'utente
-#             login(request, user)  # (Opzionale) Logga l'utente automaticamente
-#             messages.success(request, "Registrazione completata con successo!")
-#             return redirect("login")  
-#         else:
-#             messages.error(request, "Errore nella registrazione. Controlla i dati inseriti.")
+#             form.save()
+#             return redirect("login")  # Dopo la registrazione, reindirizza al login
 #     else:
-#         form = RegisterForm()  # Creazione di un form vuoto se è una GET
+#         form = RegisterForm()
+#     return render(request, "hrms_app/register.html", {"form": form})
 
-#     return render(request, "hrms_app/register_forms.html", {"form": form})
+# def register(request:HttpRequest):
+#     return render( request,"hrms_app/register_forms.html") 
+def registrati(request: HttpRequest):
+    if request.method == "POST":
+        form = RegisterForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = form.save()  # Salva l'utente
+            login(request, user)  # (Opzionale) Logga l'utente automaticamente
+            messages.success(request, "Registrazione completata con successo!")
+            return redirect("login")  
+        else:
+            messages.error(request, "Errore nella registrazione. Controlla i dati inseriti.")
+    else:
+        form = RegisterForm()  # Creazione di un form vuoto se è una GET
+
+    return render(request, "hrms_app/register_forms.html", {"form": form})
 """
 OLD REGISTER
 

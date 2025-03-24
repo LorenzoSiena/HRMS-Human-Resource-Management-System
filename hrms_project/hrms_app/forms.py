@@ -18,10 +18,11 @@ class RegisterForm(UserCreationForm):
     ruolo = forms.ModelChoiceField(queryset=Ruoli.objects.all(), required=False)
     stipendio = forms.DecimalField(max_digits=10, decimal_places=2)
     documento_contratto = forms.FileField(required=False)
+    
 
     class Meta:
         model = Dipendenti
-        fields = ['indirizzo_email', 'nome', 'cognome', 'password1', 'password2', 'data_assunzione', 'ruolo', 'stipendio', 'documento_contratto']
+        fields = ['nome', 'cognome','data_nascita','codice_fiscale','indirizzo_email','telefono','indirizzo_completo','data_assunzione', 'ruolo','superiore', 'stipendio', 'documento_contratto','password1', 'password2']
 
     def save(self, commit=True):
         user = super().save(commit=False)
