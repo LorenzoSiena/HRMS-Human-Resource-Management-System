@@ -2,13 +2,16 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    
+    
     path("home", views.hrms_app,name="home"),
 
     path("", views.user_login, name="login"),
-
-    
-    path("register", views.register, name="register"),
+    path("registrati",views.registrati,name="registrati"),
     path("logout", views.user_logout, name="logout"),
+
+
+
     path("presenza",views.presenze,name="presenze"),
     path("dipendenti",views.dipendenti,name="dipendenti"),
     path("stipendi",views.stipendi,name="stipendi"),

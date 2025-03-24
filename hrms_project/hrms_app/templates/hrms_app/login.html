@@ -8,7 +8,11 @@ Login
 
 <div class ="containerx">
 
-    <div class="login-container" style="background-color: white; padding: 40px; border-radius: 10px;">
+
+    <!-- Form di login -->
+
+    <div class="login-container" style="background-color: white; padding: 15px 50px; opacity: 90%; border-radius: 20px">
+
         
         <h2 class="text-center mb-1 mt-0">Login</h2>
             
@@ -22,6 +26,7 @@ Login
 
         <form method="post">
             {% csrf_token %}
+
             <div class="mb-3 mt-4">
                 <!-- <label for="email" class="form-label">Username</label> -->
                 <input type="text" class="form-control" id="email" name="email" placeholder="Inserisci email" required>
@@ -36,11 +41,13 @@ Login
         </form>
 
         <p class="text-center mt-2">
-            Non hai un account? <a href="{% url 'register' %}" class="text-dark">Registrati</a>
+
+            Non hai un account? <a href="{% url 'registrati' %}">Registrati</a>
+
         </p>
 
-        <p class="text-center mt-2 mb-2">
-            <a href="{% url 'reset_password' %}" class="text-dark">Hai dimenticato la password?</a>
+        <p class="text-center mt-3">
+            <a href="{% url 'reset_password' %}">Hai dimenticato la password?</a>
         </p>
 
     </div>

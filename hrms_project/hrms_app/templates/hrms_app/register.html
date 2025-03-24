@@ -6,8 +6,8 @@
 
 {% block content %}
 <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
-    <div class="card p-4" style="max-width: 400px; width: 100%; position: relative;">
-        <h2 class="text-center mb-4">Register</h2>
+    <div class="card p-4" style="max-width: 400px; width: 100%; ; position: relative;">
+        <h2 class="text-center mb-4">Registrati</h2>
         <form method="POST" novalidate> 
         {% csrf_token %}
         {% comment %} novalidate non si autocompila, non abbiamo action perchè è gestito da django {% endcomment %}
@@ -79,7 +79,7 @@
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary w-100">Register</button>
+        <button type="submit" class="btn btn-primary w-100">Registrati</button>
         </form>
         <p class="text-center mt-3">
             Already have an account? <a href="{% url 'login' %}">Login</a> 

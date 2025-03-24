@@ -152,4 +152,3 @@ def calcola_ore_lavorate(ora_ingresso, ora_uscita):
 
     return totale_ore.total_seconds() / 3600  # Converti in ore
 
-

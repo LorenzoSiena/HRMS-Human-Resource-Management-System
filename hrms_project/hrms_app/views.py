@@ -1,5 +1,3 @@
-# TODO: CONTROLLARE E ADATTARE
- 
 
 #Standard imports
 from django.shortcuts import render,redirect
@@ -7,17 +5,13 @@ from django.http import HttpRequest
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 
-#Model user 
-from django.contrib.auth.models import User
-from .models import Dipendenti
-from .models import Permessi
-from .models import Ruoli
-from .models import Ferie
-from .models import Presenze
-from .models import Bacheca
-from .models import ReportPresenze
-from .models import BustePaga
-from .models import Notifiche
+
+
+from django.contrib.auth.models import User,Group
+from .models import *
+
+
+from .models import *
 
 #Form
 from .forms import RegisterForm
@@ -28,11 +22,8 @@ from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, 
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import PasswordResetForm
 
-
-
-
-#User register,login and logout
-
+#Date
+from datetime import datetime,date
 
 def hrms_app(request: HttpRequest):
     if not request.user.is_authenticated:
@@ -41,8 +32,6 @@ def hrms_app(request: HttpRequest):
 
 def dipendenti(request:HttpRequest):
     return render(request,'hrms_app/dipendenti.html')
-
-
 
 
 def inserisci_dipendente(request: HttpRequest):
@@ -68,9 +57,6 @@ def inserisci_dipendente(request: HttpRequest):
             messages.error(request, "⚠️ Tutti i campi sono obbligatori!")
 
     return redirect('dipendenti')
-   
-
-
 
 def modifica_dipendente(request: HttpRequest, id_dipendente):
     dipendente = get_object_or_404(Dipendenti, id=id_dipendente)
@@ -95,7 +81,6 @@ def modifica_dipendente(request: HttpRequest, id_dipendente):
         else:
             messages.error(request, "⚠️ Tutti i campi sono obbligatori!")
 
-
 def elimina_dipendente(request: HttpRequest, id_dipendente):
     dipendente = get_object_or_404(Dipendenti, id=id_dipendente)
     dipendente.delete()
@@ -103,12 +88,16 @@ def elimina_dipendente(request: HttpRequest, id_dipendente):
     return redirect('dipendenti')
 
 def presenze(request:HttpRequest):
-    return render(request,'hrms_app/presenze.html')
+    return render(request,'hrms_app/presenza.html')
 
 
 def stipendi(request:HttpRequest):
     return render(request,'hrms_app/stipendi.html')
     
+
+
+
+
 def richiedi_ferie():
     pass
 
@@ -124,9 +113,17 @@ def archivia_documenti():
 def notifiche_mail():
     pass
 
-def timbra_entrata():
-    pass
-
+def timbra_entrata(request: HttpRequest):
+    data_entrata = datetime.now()
+#    if request.method == "POST":
+#       data_entrata = request.POST.get('data_entrata').strip()
+#        if data_entrata:    
+#           Entrata.objects.create(data_entrata=data_entrata)
+#           messages.success(request,f"✅ Entrata aggiunta con successo!")
+#        else:
+#            messages.error(request,"⚠️ Data di entrata obbligatoria!") 
+#        return redirect('home')      
+    return redirect(request,'hrms_app/home.html', data_entrata)
 def timbra_uscita():
     pass
 
@@ -183,23 +180,41 @@ def crea_busta_paga():
 def visualizza_busta_paga():
     pass
 
-def visualizza_report_mensile():
+
+
+
+
+def visualizza_report_presenze(request:HttpRequest):
+    pass
+
+def visualizza_report_ferie(request:HttpRequest):
+    pass
+
+def visualizza_report_permessi(request:HttpRequest):
+    pass
+
+
+
+def visualizza_report_mensile(request:HttpRequest):
     pass
 
 
 
 
-#TODO: TESTARE!
-def register(request: HttpRequest):
+def registrati(request: HttpRequest):
     if request.method == "POST":
         form = RegisterForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            return redirect("login")  # Dopo la registrazione, reindirizza al login
+            user = form.save()  # Salva l'utente
+            login(request, user)  # (Opzionale) Logga l'utente automaticamente
+            messages.success(request, "Registrazione completata con successo!")
+            return redirect("login")  
+        else:
+            messages.error(request, "Errore nella registrazione. Controlla i dati inseriti.")
     else:
-        form = RegisterForm()
-    return render(request, "register_test_debug.html", {"form": form})
+        form = RegisterForm()  # Creazione di un form vuoto se è una GET
 
+    return render(request, "hrms_app/register_forms.html", {"form": form})
 """
 OLD REGISTER
 
@@ -221,15 +236,15 @@ OLD REGISTER
 
 def user_login(request: HttpRequest):
     if request.method == "POST":
-
-        username = request.POST.get("username")
+        email = request.POST.get("email")
         password = request.POST.get("password")
-        user = authenticate(request,username=username,password=password)
+        user = authenticate(request,username=email,password=password)
+        
         if user is not None:
             login(request,user)
             return redirect('home')
         else:
-            messages.error(request,'Utente non trovato o password sbagliata')
+            messages.error(request,'Utente non trovato o password sbagliata:')
     return render(request,'hrms_app/login.html',{'login':login})
 
 def user_logout(request: HttpRequest):
