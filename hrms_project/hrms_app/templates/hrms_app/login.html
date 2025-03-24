@@ -8,7 +8,9 @@ Login
 
 <div class ="containerx">
 
-    <div class="login-container" style="background-color: white; padding: 50px">
+    <!-- Form di login -->
+
+    <div class="login-container" style="background-color: white; padding: 15px 50px; opacity: 90%; border-radius: 20px">
         
         <h2 class="text-center mb-4">Login</h2>
             
@@ -36,11 +38,12 @@ Login
         </form>
 
         <p class="text-center mt-2">
-            Don't have an account? <a href="{% url 'registrati' %}">Registrati</a>
+            Non hai un account? <a href="{% url 'registrati' %}">Registrati</a>
+
         </p>
 
         <p class="text-center mt-3">
-            <a href="{% url 'reset_password' %}">Forgot your password?</a>
+            <a href="{% url 'reset_password' %}">Hai dimenticato la password?</a>
         </p>
 
     </div>

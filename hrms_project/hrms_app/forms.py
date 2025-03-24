@@ -7,6 +7,7 @@ from .models import Dipendenti,Ruoli
 
 
 class RegisterForm(UserCreationForm):
+    
     nome = forms.CharField(max_length=100)
     cognome = forms.CharField(max_length=100)
     indirizzo_email = forms.EmailField(required=True)

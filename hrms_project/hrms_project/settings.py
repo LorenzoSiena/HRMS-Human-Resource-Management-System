@@ -138,6 +138,4 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' #inserire per t
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#AUTH_USER_MODEL = 'hrms_app.Dipendente'
-
 AUTH_USER_MODEL = 'hrms_app.Dipendenti'

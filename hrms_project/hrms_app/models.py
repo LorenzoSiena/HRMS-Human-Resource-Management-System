@@ -29,6 +29,8 @@ class Dipendenti(AbstractUser):
 
     codice_fiscale = models.CharField(max_length=16)
     indirizzo_completo = models.CharField(max_length=128)
+    data_nascita = models.DateField(null=True, blank=True)
+
 
     email = models.EmailField(unique=True)
     USERNAME_FIELD = 'email'  # Usiamo l'email come username
@@ -62,9 +64,10 @@ class Dipendenti(AbstractUser):
         return f"{self.nome} {self.cognome} ({self.email})"
 
 
-
 #Riconvertire in group e in permessi
 #https://docs.djangoproject.com/en/3.2/topics/auth/default/#default-permissions
+# LI DEVO TOGLIERE E SOSTITUIRE CON GROUP E PERMISSIONS
+
 
 class Autorizzazioni(models.Model):
     nome=models.CharField(max_length=100,unique=True) #: 'gestione_dipendenti', 'approva_ferie'
@@ -106,6 +109,10 @@ class Ferie(models.Model):
         else:
             giorni_totali_approvati = 0
         return giorni_totali_approvati
+    def __str__(self):
+        
+        return  f" ({self.stato}) - ({self.data_inizio} - {self.data_fine})"
+
 
 
 class ReportFerie(models.Model):
