@@ -218,7 +218,7 @@ def registrati(request: HttpRequest):
         form = RegisterForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()  # Salva l'utente
-            login(request, user)  # (Opzionale) Logga l'utente automaticamente
+            # login(request, user)  # (Opzionale) Logga l'utente automaticamente
             messages.success(request, "Registrazione completata con successo!")
             return redirect("login")  
         else:
