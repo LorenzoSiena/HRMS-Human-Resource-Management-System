@@ -1,4 +1,3 @@
-
 #Standard imports
 from django.shortcuts import render,redirect
 from django.http import HttpRequest
@@ -15,7 +14,7 @@ from .models import *
 
 #Form
 from .forms import RegisterForm
-from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth import authenticate, login, logout
 
 #Password reset
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
@@ -23,7 +22,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.forms import PasswordResetForm
 
 #Date
-from datetime import datetime,date
+from datetime import datetime ,date , time
 
 def hrms_app(request: HttpRequest):
     if not request.user.is_authenticated:
@@ -32,7 +31,6 @@ def hrms_app(request: HttpRequest):
 
 def dipendenti(request:HttpRequest):
     return render(request,'hrms_app/dipendenti.html')
-
 
 def inserisci_dipendente(request: HttpRequest):
     if request.method == "POST":
@@ -113,8 +111,22 @@ def archivia_documenti():
 def notifiche_mail():
     pass
 
+# Funzione per tibrare l'entrata
 def timbra_entrata(request: HttpRequest):
-    data_entrata = datetime.now()
+    data = date.today().strftime("%Y-%m-%d") # Data corrente
+    ora = datetime.now().strftime("%H:%M") # Orario corrente
+    user_id = request.user.id
+    # Verifico se esiste nel database un'entrata per user_id e data corrente
+    if Presenze.objects.filter(dipendente = user_id, data = data).first() is None:
+        # Procediamo con la creazione dell'entrata        
+        # Presenze.objects.create(dipendente = Dipendenti.objects.get(id = user_id), data = data, ora_ingresso = datetime.now().strftime("%H:%M"))
+        caption = "Timbra Entrata"
+        verifica = True
+    else:
+        # Non proseguiamo con la creazione dell'entrata e mandiamo un messaggio
+        messaggio = "Gia' entrato oggi"
+        verifica = False
+    
 #    if request.method == "POST":
 #       data_entrata = request.POST.get('data_entrata').strip()
 #        if data_entrata:    
@@ -123,7 +135,7 @@ def timbra_entrata(request: HttpRequest):
 #        else:
 #            messages.error(request,"⚠️ Data di entrata obbligatoria!") 
 #        return redirect('home')      
-    return redirect(request,'hrms_app/home.html', data_entrata)
+    return render(request, 'hrms_app/home.html', {'nome': user_id, 'caption': caption, 'verifica': verifica, 'entrata': ora})
 def timbra_uscita():
     pass
 
