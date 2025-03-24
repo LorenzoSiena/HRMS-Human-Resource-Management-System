@@ -198,20 +198,6 @@ def visualizza_report_mensile(request:HttpRequest):
 
 
 
-
-#TODO: TESTARE!
-# def registrati(request: HttpRequest):
-#     if request.method == "POST":
-#         form = RegisterForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             form.save()
-#             return redirect("login")  # Dopo la registrazione, reindirizza al login
-#     else:
-#         form = RegisterForm()
-#     return render(request, "hrms_app/register.html", {"form": form})
-
-# def register(request:HttpRequest):
-#     return render( request,"hrms_app/register_forms.html") 
 def registrati(request: HttpRequest):
     if request.method == "POST":
         form = RegisterForm(request.POST, request.FILES)

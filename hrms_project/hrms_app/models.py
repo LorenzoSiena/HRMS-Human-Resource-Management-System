@@ -27,8 +27,8 @@ class Dipendenti(AbstractUser):
     stipendio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     documento_contratto = models.FileField( upload_to='media/documenti_contratti/', null=True, blank=True)
 
-    codice_fiscale = models.CharField(max_length=16,mnull=True, blank=True)
-    indirizzo_completo = models.CharField(max_length=128,null=True, blank=True)
+    codice_fiscale = models.CharField(max_length=16)
+    indirizzo_completo = models.CharField(max_length=128)
 
     email = models.EmailField(unique=True)
     USERNAME_FIELD = 'email'  # Usiamo l'email come username
@@ -61,6 +61,11 @@ class Dipendenti(AbstractUser):
     def __str__(self):
         return f"{self.nome} {self.cognome} ({self.email})"
 
+
+
+#Riconvertire in group e in permessi
+#https://docs.djangoproject.com/en/3.2/topics/auth/default/#default-permissions
+
 class Autorizzazioni(models.Model):
     nome=models.CharField(max_length=100,unique=True) #: 'gestione_dipendenti', 'approva_ferie'
     descrizione=models.TextField()
@@ -72,6 +77,8 @@ class Ruoli(models.Model):
     livello_accesso = models.IntegerField(validators=[MinValueValidator(1)]) #solo positivi
     descrizione = models.TextField()
     autorizzazioni = models.ManyToManyField(Autorizzazioni)
+    def __str__(self):
+        return self.nome
 
 
 

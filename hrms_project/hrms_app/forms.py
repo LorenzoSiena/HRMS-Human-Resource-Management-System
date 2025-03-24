@@ -12,9 +12,11 @@ class RegisterForm(UserCreationForm):
     indirizzo_email = forms.EmailField(required=True)
     data_assunzione = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     ruolo = forms.ModelChoiceField(queryset=Ruoli.objects.all(), required=False)
-    stipendio = forms.DecimalField(max_digits=10, decimal_places=2)
+    stipendio = forms.DecimalField(max_digits=10, decimal_places=2,min_value=0)
     documento_contratto = forms.FileField(required=False)
-    superiore = forms.ModelChoiceField(queryset=Dipendenti.objects.all(), required=False)
+    
+    superiore = forms.ModelChoiceField(queryset=Dipendenti.objects.all(), required=False) #da filtrare
+
     telefono = forms.CharField(max_length=15)
     indirizzo_completo = forms.CharField(max_length=200)
     codice_fiscale = forms.CharField(max_length=16)
