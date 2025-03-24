@@ -61,7 +61,6 @@ class Dipendenti(AbstractUser):
         return f"{self.nome} {self.cognome} ({self.email})"
 
 
-
 # LI DEVO TOGLIERE E SOSTITUIRE CON GROUP E PERMISSIONS
 
 class Autorizzazioni(models.Model):
@@ -75,8 +74,6 @@ class Ruoli(models.Model):
     livello_accesso = models.IntegerField(validators=[MinValueValidator(1)]) #solo positivi
     descrizione = models.TextField()
     autorizzazioni = models.ManyToManyField(Autorizzazioni)
-    
-
 
 class Ferie(models.Model):
     
@@ -89,8 +86,7 @@ class Ferie(models.Model):
     data_inizio=models.DateField()
     data_fine=models.DateField()
     stato = models.CharField(max_length=20, choices=STATI_CHOICES, default=STATI_CHOICES[0][0]) # DA TESTARE 
-    giorni_totali_previsti=models.IntegerField(default=0)
-    
+    giorni_totali_previsti=models.IntegerField(default=0)    
 
     def save(self, *args, **kwargs):
         self.giorni_totali_previsti = calcola_giorni_totali(self.data_inizio, self.data_fine)
@@ -106,6 +102,7 @@ class Ferie(models.Model):
     def __str__(self):
         
         return  f" ({self.stato}) - ({self.data_inizio} - {self.data_fine})"
+
 
 class ReportFerie(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
@@ -183,7 +180,6 @@ class ReportPermessi(models.Model):
     def ore_totali_permessi(self):
         return formatta_ore(self.ore_totali_permessi_float or 0)
 
-
 class Presenze(models.Model):
 
     data = models.DateField()
@@ -200,7 +196,6 @@ class Presenze(models.Model):
     @property
     def ore_lavorate(self):
         return formatta_ore(self.ore_lavorate or 0)
-
 
 class ReportPresenze(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
