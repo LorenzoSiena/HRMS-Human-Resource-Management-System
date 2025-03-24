@@ -9,9 +9,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.models import User,Group
 from .models import *
 
-
-from .models import *
-
 #Form
 from .forms import RegisterForm
 from django.contrib.auth import authenticate, login, logout
@@ -115,11 +112,13 @@ def notifiche_mail():
 def timbra_entrata(request: HttpRequest):
     data = date.today().strftime("%Y-%m-%d") # Data corrente
     ora = datetime.now().strftime("%H:%M") # Orario corrente
-    user_id = request.user.id
+    dipendente = Dipendenti.objects.get(id=request.user.id) # Dipendente corrente, in questo caso e' il loggato.
+    caption=""
     # Verifico se esiste nel database un'entrata per user_id e data corrente
-    if Presenze.objects.filter(dipendente = user_id, data = data).first() is None:
-        # Procediamo con la creazione dell'entrata        
-        # Presenze.objects.create(dipendente = Dipendenti.objects.get(id = user_id), data = data, ora_ingresso = datetime.now().strftime("%H:%M"))
+    if Presenze.objects.filter(dipendente = dipendente, data = data).first() is None:
+        # Procediamo con la creazione dell'entrata
+        # Presenze.objects.create(dipendente = dipendente, data = data, ora_ingresso = datetime.now().strftime("%H:%M"))
+        messages.success(request,f"✅ Entrata aggiunta con successo!")
         caption = "Timbra Entrata"
         verifica = True
     else:
@@ -135,7 +134,7 @@ def timbra_entrata(request: HttpRequest):
 #        else:
 #            messages.error(request,"⚠️ Data di entrata obbligatoria!") 
 #        return redirect('home')      
-    return render(request, 'hrms_app/home.html', {'nome': user_id, 'caption': caption, 'verifica': verifica, 'entrata': ora})
+    return render(request, 'hrms_app/home.html', {'nome': dipendente, 'caption': caption, 'verifica': verifica, 'entrata': ora})
 def timbra_uscita():
     pass
 
