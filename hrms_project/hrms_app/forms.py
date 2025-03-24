@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .models import Dipendenti,Ruoli
-
+from random import randint
 
 class RegisterForm(UserCreationForm):
     nome = forms.CharField(max_length=100)
@@ -21,7 +21,7 @@ class RegisterForm(UserCreationForm):
     indirizzo_completo = forms.CharField(max_length=200)
     codice_fiscale = forms.CharField(max_length=16)
     data_nascita = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-
+    
     class Meta:
         model = Dipendenti
         fields = ['nome', 'cognome','data_nascita','codice_fiscale','indirizzo_email','telefono','indirizzo_completo','data_assunzione', 'ruolo','superiore', 'stipendio', 'documento_contratto','password1', 'password2']
@@ -42,7 +42,7 @@ class RegisterForm(UserCreationForm):
         dipendente.ruolo = self.cleaned_data.get('ruolo')
         dipendente.superiore = self.cleaned_data.get('superiore')
         dipendente.stipendio = self.cleaned_data['stipendio']
-
+        dipendente.username = dipendente.nome + "." + dipendente.cognome+ str(randint(0, 9999999999))
 
         # Gestione del file caricato
         if self.cleaned_data.get('documento_contratto'):

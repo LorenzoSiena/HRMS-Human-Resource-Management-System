@@ -20,7 +20,7 @@ class Dipendenti(AbstractUser):
     #email == username!!!
     
     #telefono
-    username = None  # Disabilitato perché usiamo `email` come username
+   
     telefono = models.CharField(max_length=20)
     data_assunzione = models.DateField(default=date.today)
     superiore = models.ForeignKey("Dipendenti", on_delete=models.SET_NULL, null=True,blank=True)
