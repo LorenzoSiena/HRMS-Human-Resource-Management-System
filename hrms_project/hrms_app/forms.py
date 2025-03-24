@@ -10,15 +10,15 @@ class RegisterForm(UserCreationForm):
     nome = forms.CharField(max_length=100)
     cognome = forms.CharField(max_length=100)
     indirizzo_email = forms.EmailField(required=True)
-
-    #set null? 
-    #superiore = models.ForeignKey("Dipendenti", on_delete=models.SET_NULL, null=True)
-   
     data_assunzione = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     ruolo = forms.ModelChoiceField(queryset=Ruoli.objects.all(), required=False)
     stipendio = forms.DecimalField(max_digits=10, decimal_places=2)
     documento_contratto = forms.FileField(required=False)
-    
+    superiore = forms.ModelChoiceField(queryset=Dipendenti.objects.all(), required=False)
+    telefono = forms.CharField(max_length=15)
+    indirizzo_completo = forms.CharField(max_length=200)
+    codice_fiscale = forms.CharField(max_length=16)
+    data_nascita = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
 
     class Meta:
         model = Dipendenti
@@ -35,10 +35,3 @@ class RegisterForm(UserCreationForm):
         return user
 
 
-
-""" <form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Registrati</button>
-</form>
- """
