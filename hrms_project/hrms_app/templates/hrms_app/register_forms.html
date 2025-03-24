@@ -1,0 +1,18 @@
+{% extends 'hrms_app/base.html' %}
+{% block title %} Gestione Presenze {% endblock title %}
+{% block content %}
+<div>
+    <div>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}  {# Rende il form con paragrafi  #}
+            <button type="submit">Registarti</button>
+        </form>
+    </div>
+    <div>
+        <p class="text-center mt-3">
+            Already have an account? <a href="{% url 'login' %}">Login</a> 
+        </p>
+    </div>
+</div>    
+{% endblock %}

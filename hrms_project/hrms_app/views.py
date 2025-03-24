@@ -201,17 +201,20 @@ def visualizza_report_mensile(request:HttpRequest):
 
 
 
-#TODO: TESTARE!
-def register(request: HttpRequest):
+def registrati(request: HttpRequest):
     if request.method == "POST":
         form = RegisterForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            return redirect("login")  # Dopo la registrazione, reindirizza al login
+            user = form.save()  # Salva l'utente
+            login(request, user)  # (Opzionale) Logga l'utente automaticamente
+            messages.success(request, "Registrazione completata con successo!")
+            return redirect("login")  
+        else:
+            messages.error(request, "Errore nella registrazione. Controlla i dati inseriti.")
     else:
-        form = RegisterForm()
-    return render(request, "register_test_debug.html", {"form": form})
+        form = RegisterForm()  # Creazione di un form vuoto se è una GET
 
+    return render(request, "hrms_app/register_forms.html", {"form": form})
 """
 OLD REGISTER
 

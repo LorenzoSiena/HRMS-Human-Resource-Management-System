@@ -13,12 +13,19 @@ class RegisterForm(UserCreationForm):
     indirizzo_email = forms.EmailField(required=True)
     data_assunzione = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     ruolo = forms.ModelChoiceField(queryset=Ruoli.objects.all(), required=False)
-    stipendio = forms.DecimalField(max_digits=10, decimal_places=2)
+    stipendio = forms.DecimalField(max_digits=10, decimal_places=2,min_value=0)
     documento_contratto = forms.FileField(required=False)
+    
+    superiore = forms.ModelChoiceField(queryset=Dipendenti.objects.all(), required=False) #da filtrare
+
+    telefono = forms.CharField(max_length=15)
+    indirizzo_completo = forms.CharField(max_length=200)
+    codice_fiscale = forms.CharField(max_length=16)
+    data_nascita = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
 
     class Meta:
         model = Dipendenti
-        fields = ['indirizzo_email', 'nome', 'cognome', 'password1', 'password2', 'data_assunzione', 'ruolo', 'stipendio', 'documento_contratto']
+        fields = ['nome', 'cognome','data_nascita','codice_fiscale','indirizzo_email','telefono','indirizzo_completo','data_assunzione', 'ruolo','superiore', 'stipendio', 'documento_contratto','password1', 'password2']
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -31,10 +38,3 @@ class RegisterForm(UserCreationForm):
         return user
 
 
-
-""" <form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Registrati</button>
-</form>
- """
