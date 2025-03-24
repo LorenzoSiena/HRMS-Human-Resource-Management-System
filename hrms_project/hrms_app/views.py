@@ -85,7 +85,7 @@ def elimina_dipendente(request: HttpRequest, id_dipendente):
     return redirect('dipendenti')
 
 def presenze(request:HttpRequest):
-    return render(request,'hrms_app/presenze.html')
+    return render(request,'hrms_app/presenza.html')
 
 
 def stipendi(request:HttpRequest):
