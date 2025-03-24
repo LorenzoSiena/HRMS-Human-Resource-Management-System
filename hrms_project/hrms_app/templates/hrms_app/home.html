@@ -24,7 +24,9 @@
         {% endif %}
     </a>
     <p>{{user.id}}: {{ verifica }} {{ entrata }} {{nome}}</p>
-    <!--<a href="{% url 'timbra_uscita' %}" class="btn btn-primary">Uscita</a>-->
+    {% for timratura in Presenze %}
+        <p>{{ timratura.dipendente }}: {{ timratura.data }} {{ timratura.ora_ingresso }} {{ timratura.ora_uscita }}</p>
+    {% endfor %}
 </div>
 
 <!-- TODO Definire come passare la data corrente per limitare di inputare una date passata -->
