@@ -5,14 +5,17 @@ from django.http import HttpRequest
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 
-#Model user 
-from django.contrib.auth.models import User
+
+
+from django.contrib.auth.models import User,Group
+from .models import *
+
 
 from .models import *
 
 #Form
 from .forms import RegisterForm
-from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth import authenticate,login,logout,
 
 #Password reset
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
@@ -233,6 +236,7 @@ def user_login(request: HttpRequest):
         email = request.POST.get("email")
         password = request.POST.get("password")
         user = authenticate(request,username=email,password=password)
+        
         if user is not None:
             login(request,user)
             return redirect('home')
