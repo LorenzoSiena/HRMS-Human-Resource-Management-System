@@ -198,8 +198,9 @@ def visualizza_report_mensile(request:HttpRequest):
 
 
 
+
 #TODO: TESTARE!
-def register(request: HttpRequest):
+def registrati(request: HttpRequest):
     if request.method == "POST":
         form = RegisterForm(request.POST, request.FILES)
         if form.is_valid():
@@ -207,8 +208,10 @@ def register(request: HttpRequest):
             return redirect("login")  # Dopo la registrazione, reindirizza al login
     else:
         form = RegisterForm()
-    return render(request, "register_test_debug.html", {"form": form})
+    return render(request, "register.html", {"form": form})
 
+def register(request:HttpRequest):
+    return render( request,"hrms_app/register.html") 
 """
 OLD REGISTER
 
