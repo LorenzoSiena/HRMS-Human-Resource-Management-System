@@ -3,7 +3,7 @@ from django.core.validators import MinValueValidator,MaxValueValidator
 from datetime import datetime,date
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-
+from django.contrib.auth.models import Group
 from django.db.models import Sum
 from .utils import calcola_ore_lavorate,formatta_ore,calcola_giorni_totali,ore_lavorative_tra_date  # Importiamo la funzione per il calcolo delle ore lavorate
 
@@ -69,13 +69,39 @@ class Dipendenti(AbstractUser):
 #https://docs.djangoproject.com/en/3.2/topics/auth/default/#default-permissions
 # LI DEVO TOGLIERE E SOSTITUIRE CON GROUP E PERMISSIONS
 
-
-class Autorizzazioni(models.Model):
+""" class Autorizzazioni(models.Model):
     nome=models.CharField(max_length=100,unique=True) #: 'gestione_dipendenti', 'approva_ferie'
     descrizione=models.TextField()
     def __str__(self): 
         return self.nome
+ """
+class Ruoli(models.Model):
+    ruolo = models.OneToOneField(Group, on_delete=models.CASCADE)  # Relazione 1 a 1 con Group
+    """
+    id	    AutoField	                    ID univoco
+    name	CharField	                    Nome del gruppo
+    permissions	ManyToManyField(Permission)	Permessi assegnati al gruppo 
+    """
+    livello_accesso = models.IntegerField(validators=[MinValueValidator(1)], default=1)
 
+
+    def __str__(self):
+        return f"{self.ruolo.name} (Livello: {self.livello_accesso})"
+
+
+""" Permission
+
+    id	            AutoField	            ID univoco
+    name	        CharField	            Nome del permesso
+    codename	    CharField	            Identificatore univoco del permesso
+    content_type	ForeignKey(ContentType)	Modello a cui si riferisce il permesso
+
+    !!!!Django genera automaticamente permessi add, change, delete e view per ogni modello.!!!
+
+"""
+
+
+""" 
 class Ruoli(models.Model):
     nome = models.CharField(max_length=50, unique=True)
     livello_accesso = models.IntegerField(validators=[MinValueValidator(1)]) #solo positivi
@@ -83,7 +109,7 @@ class Ruoli(models.Model):
     autorizzazioni = models.ManyToManyField(Autorizzazioni)
     def __str__(self):
         return self.nome
-
+ """
 
 
 class Ferie(models.Model):
