@@ -2,47 +2,168 @@
 {% block title %} Gestione Presenze {% endblock title %}
 {% block content %}
    
-    <form action="post"> 
-        <h3>Crea report mensile</h3>        
-        <div class="mb-3">
-            <input type="text" class="form-control" id="dipendente" placeholder="Dipendente">
+<!-- Card con lista persone e filtri -->
+<div class="container mt-5">
+    <div class="card" style="min-height: 600px;">
+        <div class="card-header text-center">
+            <h2>Lista delle Persone</h2>
         </div>
-        <div class="mb-3">            
-            <input type="text" class="mese" id="mese" placeholder="Mese">
-        </div>        
-        <button type="button" class="btn btn-primary">Invia Richiesta</button>    
-    </form>
+        <div class="card-body">
+            <!-- Form di ricerca -->
+            <form class="row g-3">
+                <!-- Barra di ricerca persona -->
+                <div class="col-md-4">
+                    <label for="searchPerson" class="form-label">Cerca Persona</label>
+                    <input type="text" class="form-control custom-input" id="searchPerson" placeholder="Cerca per nome...">
+                </div>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Dipendente</th>
-                <th>Ore</th>
-                <th>Ore Lavorate</th>
-                <th>Ore Ferie</th>
-                <th>Ore Permessi</th>
-                <th>Ore Permessi n. r.</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for dipendente in dipendenti %}
-            <tr>                
-                <td>{{ dipendente.cognome }}</td>
-                <td>.........</td> <!-- Da sviluppare Totale ore lavorative del mese -->
-                <td>.........</td> <!-- Da sviluppare Totale ore lavorate del mese -->                
-                <td>.........</td> <!-- Da sviluppare Totale ore ferie del mese -->
-                <td>.........</td> <!-- Da sviluppare Totale ore permessi del mese -->
-                <td>.........</td> <!-- Da sviluppare Totale ore permessi n.r. del mese -->  
-            </tr>
-            {% endfor %}
-            <tr>
-                <td><strong>Totale</strong></td>
-                <td></td>
-                <td><strong>{{ totale }}</strong></td>
-            </tr>
-        </tbody>
-    </table>
+                <!-- Barra di ricerca mese -->
+                <div class="col-md-3">
+                    <label for="searchMonth" class="form-label">Mese</label>
+                    <select class="form-select custom-input" id="searchMonth">
+                        <option selected>Seleziona mese</option>
+                        <option value="1">Gennaio</option>
+                        <option value="2">Febbraio</option>
+                        <option value="3">Marzo</option>
+                        <option value="4">Aprile</option>
+                        <option value="5">Maggio</option>
+                        <option value="6">Giugno</option>
+                        <option value="7">Luglio</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Settembre</option>
+                        <option value="10">Ottobre</option>
+                        <option value="11">Novembre</option>
+                        <option value="12">Dicembre</option>
+                    </select>
+                </div>
 
+                <!-- Barra di ricerca anno con massimo 5 opzioni visibili -->
+                <div class="col-md-3">
+                    <label for="searchYear" class="form-label">Anno</label>
+                    <select class="form-select custom-input" id="searchYear" size="3">
+                        <!-- Opzioni generate dinamicamente con JavaScript -->
+                    </select>
+                </div>
+            </form>
+
+            <!-- Lista delle persone con report -->
+            <div class="mt-4">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Report Ferie</th>
+                            <th>Report Permessi</th>
+                            <th>Ore Lavorative</th>
+                            <th>Ore di Permesso Non Retribuite</th> <!-- Nuova colonna -->
+                        </tr>
+                    </thead>
+                    <tbody id="personList">
+                        <tr data-month="1" data-year="2023">
+                            <td>Mario Rossi</td>
+                            <td>10 giorni (80 ore)</td>  
+                            <td>5 giorni (40 ore)</td>   
+                            <td>160 ore</td>
+                            <td>8 ore</td> <!-- Ore di permesso non retribuite -->
+                        </tr>
+                        <tr data-month="3" data-year="2023">
+                            <td>Anna Bianchi</td>
+                            <td>12 giorni (96 ore)</td>  
+                            <td>3 giorni (24 ore)</td>   
+                            <td>150 ore</td>
+                            <td>4 ore</td> <!-- Ore di permesso non retribuite -->
+                        </tr>
+                        <tr data-month="5" data-year="2024">
+                            <td>Giuseppe Verdi</td>
+                            <td>8 giorni (64 ore)</td>   
+                            <td>2 giorni (16 ore)</td>   
+                            <td>165 ore</td>
+                            <td>12 ore</td> <!-- Ore di permesso non retribuite -->
+                        </tr>
+                        <tr data-month="7" data-year="2024">
+                            <td>Laura Neri</td>
+                            <td>15 giorni (120 ore)</td> 
+                            <td>1 giorno (8 ore)</td>    
+                            <td>155 ore</td>
+                            <td>2 ore</td> <!-- Ore di permesso non retribuite -->
+                        </tr>
+                        <tr data-month="10" data-year="2025">
+                            <td>Paolo Gialli</td>
+                            <td>5 giorni (40 ore)</td>   
+                            <td>6 giorni (48 ore)</td>   
+                            <td>170 ore</td>
+                            <td>6 ore</td> <!-- Ore di permesso non retribuite -->
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<script>
+    // Funzione per generare dinamicamente gli anni da 20 anni prima fino a 20 anni dopo l'anno corrente
+    function generateYearOptions() {
+        var currentYear = new Date().getFullYear();
+        var startYear = currentYear - 5; // Inizia 5 anni prima dell'anno corrente
+        var endYear = currentYear ;  // Anno corrente
+
+        var yearSelect = document.getElementById("searchYear");
+        for (var year = startYear; year <= endYear; year++) {
+            var option = document.createElement("option");
+            option.value = year;
+            option.textContent = year;
+            yearSelect.appendChild(option);
+
+            // Imposta l'anno attuale come selezionato
+            if (year === currentYear) {
+                option.selected = true;
+            }
+        }
+    }
+
+    // Esegui la funzione per generare gli anni quando la pagina è caricata
+    document.addEventListener("DOMContentLoaded", function() {
+        generateYearOptions();
+    });
+
+    // Funzione per filtrare la lista di persone in base al nome, mese e anno
+    function filterList() {
+        var nameFilter = document.getElementById("searchPerson").value.toLowerCase();
+        var monthFilter = document.getElementById("searchMonth").value;
+        var yearFilter = document.getElementById("searchYear").value;
+        var tableRows = document.getElementById("personList").getElementsByTagName("tr");
+
+        // Contatore per il numero di righe visibili
+        var visibleCount = 0;
+
+        Array.from(tableRows).forEach(function(row) {
+            var name = row.cells[0].textContent.toLowerCase();
+            var month = row.getAttribute('data-month');
+            var year = row.getAttribute('data-year');
+
+            var isNameMatch = name.includes(nameFilter);
+            var isMonthMatch = monthFilter === "Seleziona mese" || month === monthFilter;
+            var isYearMatch = yearFilter === "" || year === yearFilter;
+
+            // Mostra o nasconde la riga in base ai filtri
+            if (isNameMatch && isMonthMatch && isYearMatch) {
+                visibleCount++;
+                row.style.display = visibleCount <= 10 ? "" : "none"; // Mostra solo le prime 10 righe
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
+
+    // Aggiungi eventi di input per i filtri
+    document.getElementById("searchPerson").addEventListener("input", filterList);
+    document.getElementById("searchMonth").addEventListener("change", filterList);
+    document.getElementById("searchYear").addEventListener("change", filterList);
+
+</script>
 
 {% comment %} Commento prova {% endcomment %}
 

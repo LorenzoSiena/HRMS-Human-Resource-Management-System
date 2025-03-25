@@ -9,7 +9,7 @@ from random import randint
 class RegisterForm(UserCreationForm):
     nome = forms.CharField(
         max_length=100,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'style': '', 'placeholder': 'Nome'})
     )
 
     cognome = forms.CharField(

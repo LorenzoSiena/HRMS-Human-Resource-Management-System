@@ -5,8 +5,10 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
     .card {
-        max-width: 500px;
-        border-radius: 15px;
+        max-height: 1200px; 
+        overflow-y: auto; 
+        max-width: 600px;
+        border-radius: 10px;
     }
     .card h2 {
         font-size: 24px; 
@@ -21,11 +23,12 @@
     .alert-danger {
         margin-top: 10px;
     }
+    footer {
+        margin-top: 5px; 
+    }
 </style>
-</head>
-<body>
 
-<div class="container d-flex justify-content-center align-items-center min-vh-100">
+<div class="container mt-5 d-flex justify-content-center  min-vh-100">
 <div class="card shadow-lg p-5 w-100">
     <h1 class="text-center mb-4">Crea il tuo account</h1>
     <form method="POST" enctype="multipart/form-data">
@@ -46,5 +49,5 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>  
- 
+
 {% endblock %}
