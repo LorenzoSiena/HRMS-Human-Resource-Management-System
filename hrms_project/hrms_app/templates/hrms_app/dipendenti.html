@@ -2,43 +2,6 @@
 {% block title %} Gestione dipendenti {% endblock title %}
 {% block content %}
 
-<style>
-    /* Rimuovi la classe btn dai dropdown e rendi il comportamento hover più scuro */
-    .navbar-nav .dropdown-menu {
-        background-color: white; /* Colore di sfondo del menu */
-    }
-
-    .navbar-nav .dropdown-item:hover {
-        background-color: #f1f1f1; /* Colore di sfondo al passaggio del mouse */
-    }
-
-    /* Imposta la navbar per essere sempre in cima */
-    .navbar {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        z-index: 10; /* In modo che sia sopra il contenuto */
-    }
-
-    /* Aggiungere un po' di spazio sopra la card */
-    .container.mt-5 {
-        margin-top: 70px; /* Spazio tra navbar e card */
-    }
-
-    /* Impostiamo un'altezza massima per la card e abilitiamo lo scroll */
-    .card-body {
-        max-height: 400px; /* Imposta l'altezza massima desiderata per la card */
-        overflow-y: auto;  /* Abilita lo scroll verticale */
-    }
-
-    /* Garantiamo che il footer stia sempre in fondo */
-    footer {
-        margin-top: 5px; /* Separazione dal contenuto */
-    }
-
-</style>
-
-
 <div class="container mt-5">
     <div class="card">
         <div class="card-header">
@@ -135,9 +98,6 @@
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
 
 
 {% endblock %} 
