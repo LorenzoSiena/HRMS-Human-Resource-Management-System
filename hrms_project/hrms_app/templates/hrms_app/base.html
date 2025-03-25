@@ -30,12 +30,13 @@
         <div class="container-fluid">
 
             <!-- Logo e pay-off -->
-            <a class="navbar-brand" href="#">
-                <img src="{% static 'img/logo.png' %}" alt="Logo" width="50" height="50" class="d-inline-block align-text-top" style="border-radius: 50%;">
-                
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'img/logo.png' %}" alt="Logo" width="50" height="50" class="d-inline-block align-text-top" style="border-radius: 50%;">                
             </a>
             <span style="margin-left: 2px; margin-right: 6px;"> <bold>HRMS</bold></span>
 
+            <!-- Se l'autenticazione dell'utente è avvenuta con successo mostriamo il menù, il messaggio di benvenuto ed il pulsante di logout -->
+            {% if user.is_authenticated %}
 
             <button class="navbar-toggler ms-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon" style="width: 20px; height: 15px; background-size: 100% auto; margin-left: 0;"> </span>
@@ -71,8 +72,7 @@
                         </ul>
                     </div>
                 </div>
-            <!-- Se l'autenticazione dell'utente è avvenuta con successo mostriamo il menù, il messaggio di benvenuto ed il pulsante di logout -->
-            {% if user.is_authenticated %}
+            
                 
                 <!-- Messaggio di benvenuto e pulsante di logout-->
                 <div class="d-flex ms-auto align-items-center">
