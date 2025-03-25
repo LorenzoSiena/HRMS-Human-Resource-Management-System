@@ -265,6 +265,9 @@ OLD REGISTER
 
 
 def user_login(request: HttpRequest):
+    if request.user.is_authenticated:   
+        return redirect('home')
+
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
