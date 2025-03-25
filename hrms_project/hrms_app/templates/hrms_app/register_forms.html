@@ -2,11 +2,12 @@
 {% block title %} Gestione Presenze {% endblock title %}
 {% block content %}
 <div>
-    <div>
+    <div class="login-container" style="background-color: white; padding: 15px 50px; opacity: 90%; border-radius: 20px">
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}  {# Rende il form con paragrafi  #}
-            <button type="submit">Registarti</button>
+            
+            <button type="submit" class="btn btn-primary w-100">Registrati</button>
         </form>
     </div>
     <div>
