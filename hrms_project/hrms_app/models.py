@@ -13,7 +13,7 @@ from .utils import calcola_ore_lavorate,formatta_ore,calcola_giorni_totali,ore_l
 #ReportPermessi
 #Funziona solo se non sforo il mese , altrimenti sballa il conto
 
-#utils.py viene usato ma
+#utils.py viene usato macodeium.enableCodeLens
 #calcola_ore_lavorate va letto bene se funziona
 
 class Dipendenti(AbstractUser):

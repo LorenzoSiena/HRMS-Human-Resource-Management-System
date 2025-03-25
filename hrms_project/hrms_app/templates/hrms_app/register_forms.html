@@ -1,19 +1,50 @@
 {% extends 'hrms_app/base.html' %}
 {% block title %} Gestione Presenze {% endblock title %}
 {% block content %}
-<div>
-    <div class="login-container" style="background-color: white; padding: 15px 50px; opacity: 90%; border-radius: 20px">
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}  {# Rende il form con paragrafi  #}
-            
-            <button type="submit" class="btn btn-primary w-100">Registrati</button>
-        </form>
-    </div>
-    <div>
-        <p class="text-center mt-3">
-            Already have an account? <a href="{% url 'login' %}">Login</a> 
-        </p>
-    </div>
-</div>    
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .card {
+        max-width: 500px;
+        border-radius: 15px;
+    }
+    .card h2 {
+        font-size: 24px; 
+    }
+    .text-center a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    .text-center a:hover {
+        text-decoration: underline;
+    }
+    .alert-danger {
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+<div class="card shadow-lg p-5 w-100">
+    <h1 class="text-center mb-4">Crea il tuo account</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        {{ form.as_p }}
+
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">Registrati</button>
+        </div>
+    </form>
+
+    <p class="text-center mt-3">
+        Hai già un account? <a href="{% url 'login' %}">Login</a>
+    </p>
+</div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>  
+ 
 {% endblock %}

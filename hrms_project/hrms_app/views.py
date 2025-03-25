@@ -64,6 +64,7 @@ def gestione_timbratura(request: HttpRequest):
 def dipendenti(request:HttpRequest):
     return render(request,'hrms_app/dipendenti.html')
 
+
 def inserisci_dipendente(request: HttpRequest):
     if request.method == "POST":
         nome = request.POST.get('nome', '').strip()
@@ -143,8 +144,35 @@ def archivia_documenti():
 def notifiche_mail():
     pass
 
-
-
+# Funzione per tibrare l'entrata
+def timbra_entrata(request: HttpRequest):
+    data = date.today().strftime("%Y-%m-%d") # Data corrente
+    ora = datetime.now().strftime("%H:%M") # Orario corrente
+    dipendente = Dipendenti.objects.get(id=request.user.id) # Dipendente corrente, in questo caso e' il loggato.
+    caption=""
+    # Verifico se esiste nel database un'entrata per user_id e data corrente
+    if Presenze.objects.filter(dipendente = dipendente, data = data).first() is None:
+        # Procediamo con la creazione dell'entrata
+        # Presenze.objects.create(dipendente = dipendente, data = data, ora_ingresso = datetime.now().strftime("%H:%M"))
+        messages.success(request,f"✅ Entrata aggiunta con successo!")
+        caption = "Timbra Entrata"
+        verifica = True
+    else:
+        # Non proseguiamo con la creazione dell'entrata e mandiamo un messaggio
+        messaggio = "Gia' entrato oggi"
+        verifica = False
+    
+#    if request.method == "POST":
+#       data_entrata = request.POST.get('data_entrata').strip()
+#        if data_entrata:    
+#           Entrata.objects.create(data_entrata=data_entrata)
+#           messages.success(request,f"✅ Entrata aggiunta con successo!")
+#        else:
+#            messages.error(request,"⚠️ Data di entrata obbligatoria!") 
+#        return redirect('home')      
+    return render(request, 'hrms_app/home.html', {'nome': dipendente, 'caption': caption, 'verifica': verifica, 'entrata': ora})
+def timbra_uscita():
+    pass
 
 def aggiungi_messaggio_bacheca(request:HttpRequest):
     if request.method == "POST":
@@ -163,13 +191,28 @@ def leggi_messaggio_bacheca(request:HttpRequest):
     messaggio = Bacheca.objects.all().order_by('data_pubblicazione')
     if not messaggio.exist():
       messages.info(request,f"La tua Bacheca è vuota!")
+      return render(request,"hrms_app/bacheca.html")
+                    
     else:
-        for msg in messaggio:
-         return render(request,f"[{msg.data_pubblicazione}] {msg.titolo}: {msg.messaggio}")
-        
+         return render(request,"hrms_app/bacheca.html",{'messaggi':messaggi})
 
-def modifica_messaggio_bacheca(request:HttpRequest,msg_id):
-    messaggio = get_object_or_404(Bacheca, id=msg_id)
+
+# def leggi_messaggio_bacheca(request:HttpRequest):
+#     messaggio = Bacheca.objects.all().order_by('data_pubblicazione')
+#     if not messaggio.exist():
+#       messages.info(request,f"La tua Bacheca è vuota!")
+#     else:
+#         for msg in messaggio:
+#          return render(request,f"[{msg.data_pubblicazione}] {msg.titolo}: {msg.messaggio}")
+
+def area_modifica_bacheca(request:HttpRequest,id):
+    messaggio = Bacheca.objects.get(id=id)
+    return render(request,'hrms_app/modifica_bacheca.html', {'messaggio': messaggio})
+
+
+
+def modifica_messaggio_bacheca(request:HttpRequest,id):
+    messaggio = Bacheca.objects.get(id=id)
     if request.method == "POST":
         nuovo_titolo = request.POST.get('titolo', '').strip()
         nuovo_messaggio = request.POST.get('messaggio', '').strip()
@@ -178,18 +221,33 @@ def modifica_messaggio_bacheca(request:HttpRequest,msg_id):
             messaggio.titolo = nuovo_titolo
             messaggio.messaggio = nuovo_messaggio
             messaggio.save()
-            messages.success(request, f"✏️ Messaggio '{msg_id}' modificato con successo!")
+            messages.success(request, "✏️ Messaggio  modificato con successo!")
+            return redirect('bacheca') # serve???
         else:
             messages.error(request, "⚠️ Titolo e messaggio sono obbligatori!")
 
-    return redirect('home')
+    return render(request, 'hrms_app/bacheca.html', {'messaggio': messaggio})
 
 
-def cancella_messaggio_bacheca(request: HttpRequest, msg_id):
-    messaggio = get_object_or_404(Bacheca, id=msg_id)
+
+def aggiungi_messaggio_bacheca(request:HttpRequest):
+    if request.method == "POST":
+        titolo=request.POST.get('titolo').strip()
+        messaggio=request.POST.get('messaggio').strip()
+        if titolo and messaggio:
+            Bacheca.objects.create(titolo=titolo, messaggio=messaggio)
+            messages.success(request,f"✅ Messaggio '{titolo}' aggiunto con successo!")
+        else:
+            messages.error(request,"⚠️ Titolo e messaggio sono obbligatori!") 
+            return render(request,'hrms_app/bacheca.html')        
+    return redirect('bacheca')
+
+
+def cancella_messaggio_bacheca(request: HttpRequest,id):
+    messaggio = Bacheca.objects.get(id=id)
     messaggio.delete()
-    messages.success(request, f"🗑️ Messaggio '{msg_id}' eliminato con successo!")
-    return redirect('home')
+    messages.success(request, "🗑️ Messaggio  eliminato con successo!")
+    return redirect('bacheca')
 
 
 
@@ -256,6 +314,9 @@ OLD REGISTER
 def user_login(request: HttpRequest):
     if request.user.is_authenticated:
         return redirect('home')
+    if request.user.is_authenticated:   
+        return redirect('home')
+
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
