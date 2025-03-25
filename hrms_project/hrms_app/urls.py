@@ -14,7 +14,7 @@ urlpatterns = [
 
 
     path("presenza",views.presenze,name="presenze"),
-    path("dipendenti",views.dipendenti,name="dipendenti"),
+    path("profilo",views.profilo,name="profilo"),
     path("stipendi",views.stipendi,name="stipendi"),
     path("gestione_timbratura",views.gestione_timbratura,name="gestione_timbratura"),
     path("richiedi_ferie",views.richiedi_ferie,name="richiedi_ferie"),

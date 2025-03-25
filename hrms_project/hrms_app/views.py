@@ -61,8 +61,8 @@ def gestione_timbratura(request: HttpRequest):
             messaggio_errore = f"⚠️ Errore nella creazione dell'uscita!, errore: " + str(e)
     return render(request, 'hrms_app/home.html', {'text_button': text_button, 'lista_presenze' : lista_presenze, 'messaggio_errore': messaggio_errore})
 
-def dipendenti(request:HttpRequest):
-    return render(request,'hrms_app/dipendenti.html')
+def profilo(request:HttpRequest):
+    return render(request,'hrms_app/profilo.html')
 
 
 def inserisci_dipendente(request: HttpRequest):
