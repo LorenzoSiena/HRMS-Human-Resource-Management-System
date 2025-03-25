@@ -21,10 +21,45 @@ from django.contrib.auth.forms import PasswordResetForm
 #Date
 from datetime import datetime ,date , time
 
+# Funzione per gestire il caricamento della HOME
 def hrms_app(request: HttpRequest):
     if not request.user.is_authenticated:
         return redirect('login')
-    return render(request,'hrms_app/home.html')
+    # Verifico se esiste una timbratura di sola entrata con la data odierna
+    dipendente = Dipendenti.objects.get(id = request.user.id)  # Dipendente loggato
+    # Se non esiste imposto per la timbrature di entrata
+    if Presenze.objects.filter(dipendente = dipendente, data = date.today(), ora_uscita = None).last() is None:
+        text_button = "Timbra Entrata"
+    # Se esiste imposto per la timbrature di uscita
+    else:
+        text_button = "Timbra Uscita"
+    # Lista delle timbrature da visualizzare - Solo quelle della data odierna
+    lista_presenze = Presenze.objects.filter(dipendente = dipendente, data = date.today()) # Lista timbrature odierna
+    return render(request,'hrms_app/home.html', {'text_button': text_button, 'lista_presenze' : lista_presenze})
+
+# Funzione per gestire le timbrature
+def gestione_timbratura(request: HttpRequest):    
+    dipendente = Dipendenti.objects.get(id = request.user.id) # Dipendente loggato
+    lista_presenze = Presenze.objects.filter(dipendente = dipendente, data = date.today()) # Lista timbrature odierna
+    messaggio_errore = ""
+    # Verifico se l'utente ha gia' timbrato l'entrata nella data corrente    
+    if Presenze.objects.filter(dipendente = dipendente, data = date.today(), ora_uscita = None).last() is None:
+        # Se l'utente non ha ancora timbrato nella data corrente, procedo con la inserimento dell'entrata
+        try:
+            Presenze.objects.create(data = date.today(), ora_ingresso = datetime.now().time(), dipendente = dipendente)
+            text_button = "Timbra Uscita"
+        except Exception as e:
+            messaggio_errore = f"⚠️ Errore nella creazione dell'entrata!, errore: " + str(e)
+    else:
+        # Se l'utente ha gia' timbrato nella data corrente, proseguo con l'inserimento della data di uscita
+        try:
+            presenza = Presenze.objects.filter(dipendente = dipendente, data = date.today()).last() # Prendo l'ultima riga generata con la data corrente
+            presenza.ora_uscita = datetime.now().time() # Aggiorno l'orario di uscita
+            presenza.save()
+            text_button = "Timbra Entrata"
+        except Exception as e:
+            messaggio_errore = f"⚠️ Errore nella creazione dell'uscita!, errore: " + str(e)
+    return render(request, 'hrms_app/home.html', {'text_button': text_button, 'lista_presenze' : lista_presenze, 'messaggio_errore': messaggio_errore})
 
 def dipendenti(request:HttpRequest):
     return render(request,'hrms_app/dipendenti.html')
@@ -139,10 +174,22 @@ def timbra_entrata(request: HttpRequest):
 def timbra_uscita():
     pass
 
+def aggiungi_messaggio_bacheca(request:HttpRequest):
+    if request.method == "POST":
+        titolo=request.POST.get('titolo').strip()
+        messaggio=request.POST.get('messaggio').strip()
+        if titolo and messaggio:
+            Bacheca.objects.create(titolo=titolo, messaggio=messaggio)
+            messages.success(request,f"✅ Messaggio '{titolo}' aggiunto con successo!")
+        else:
+            messages.error(request,"⚠️ Titolo e messaggio sono obbligatori!") 
+        return redirect('home')      
+    return redirect(request ,'hrms_app/home.html')
 
-def bacheca(request:HttpRequest):
-    messaggi = Bacheca.objects.all().order_by('data_pubblicazione')
-    if not messaggi.exists():
+
+def leggi_messaggio_bacheca(request:HttpRequest):
+    messaggio = Bacheca.objects.all().order_by('data_pubblicazione')
+    if not messaggio.exist():
       messages.info(request,f"La tua Bacheca è vuota!")
       return render(request,"hrms_app/bacheca.html")
                     
@@ -261,21 +308,22 @@ OLD REGISTER
     else:
         form = RegisterForm() 
     return render(request,'hrms_app/register.html',{'form':form})
- """
+"""
 
-
+# Login
 def user_login(request: HttpRequest):
+    if request.user.is_authenticated:
+        return redirect('home')
     if request.user.is_authenticated:   
         return redirect('home')
 
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
-        user = authenticate(request,username=email,password=password)
-        
+        user = authenticate(request,username=email,password=password)        
         if user is not None:
-            login(request,user)
-            return redirect('home')
+            login(request, user)            
+            return redirect('home')                  
         else:
             messages.error(request,'Utente non trovato o password sbagliata:')
     return render(request,'hrms_app/login.html',{'login':login})
@@ -283,10 +331,6 @@ def user_login(request: HttpRequest):
 def user_logout(request: HttpRequest):
     logout(request)
     return redirect('home')
-
-
-
-
 
 #RESETTO LA PASSWORD
 
