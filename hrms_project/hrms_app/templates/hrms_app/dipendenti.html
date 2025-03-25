@@ -2,85 +2,102 @@
 {% block title %} Gestione dipendenti {% endblock title %}
 {% block content %}
 
-    <div class="container mt-5">
-        <h3 class="text-center">Gestione Dipendente</h3>
-        <form method="POST" action="{% url 'inserisci_dipendente' %}">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="first_name" class="form-label">Nome</label>
-                    <input type="text" class="form-control custom-input" id="first_name" name="first_name" required>
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h3>Dettagli Dipendente</h3>
+        </div>
+        <div class="card-body">
+            <form>
+                <!-- Nome -->
+                <div class="mb-3 row">
+                    <label for="nome" class="col-sm-2 col-form-label">Nome</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="nome" value="Mario" disabled>
+                    </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label for="last_name" class="form-label">Cognome</label>
-                    <input type="text" class="form-control custom-input" id="last_name" name="last_name" required>
+                
+                <!-- Cognome -->
+                <div class="mb-3 row">
+                    <label for="cognome" class="col-sm-2 col-form-label">Cognome</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="cognome" value="Rossi" disabled>
+                    </div>
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="birthdate" class="form-label">Data di Nascita</label>
-                    <input type="date" class="form-control custom-input" id="birthdate" name="birthdate" required>
+                <div class="mb-3 row">
+                    <label for="data_nascita" class="col-sm-2 col-form-label">Data di Nascita</label>
+                    <div class="col-sm-10">
+                        <input type="date" class="form-control" id="data_nascita" value="1985-07-20" disabled>
+                    </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label for="fiscal_code" class="form-label">Codice Fiscale</label>
-                    <input type="text" class="form-control custom-input" id="fiscal_code" name="fiscal_code" pattern="[A-Za-z0-9]{16}" title="Il Codice Fiscale deve contenere 16 caratteri alfanumerici" required>
-                </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="address" class="form-label">Indirizzo</label>
-                    <input type="text" class="form-control custom-input" id="address" name="address" required>
+                <!-- Codice Fiscale -->
+                <div class="mb-3 row">
+                    <label for="codice_fiscale" class="col-sm-2 col-form-label">Codice Fiscale</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="codice_fiscale" value="RSSMRA85L20Z404K" disabled>
+                    </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label for="tel" class="form-label">Telefono</label>
-                    <input type="tel" class="form-control custom-input" id="tel" name="tel" required>
+
+                <!-- Email -->
+                <div class="mb-3 row">
+                    <label for="email" class="col-sm-2 col-form-label">Email</label>
+                    <div class="col-sm-10">
+                        <input type="email" class="form-control" id="email" value="mario.rossi@email.com" disabled>
+                    </div>
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control custom-input" id="email" name="email" required>
+                <div class="mb-3 row">
+                    <label for="indirizzo" class="col-sm-2 col-form-label">Indirizzo</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="indirizzo" value="Via Roma 123, Milano" disabled>
+                    </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label for="data_assunzione" class="form-label">Data Assunzione</label>
-                    <input type="date" class="form-control custom-input" id="data_assunzione" name="data_assunzione" required>
+
+                <!-- Telefono -->
+                <div class="mb-3 row">
+                    <label for="telefono" class="col-sm-2 col-form-label">Telefono</label>
+                    <div class="col-sm-10">
+                        <input type="tel" class="form-control" id="telefono" value="+39 02 12345678" disabled>
+                    </div>
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="ruolo" class="form-label">Ruolo</label>
-                    <input type="text" class="form-control custom-input" id="ruolo" name="ruolo" required>
+                <!-- Ruolo -->
+                <div class="mb-3 row">
+                    <label for="ruolo" class="col-sm-2 col-form-label">Ruolo</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="ruolo" value="Sviluppatore" disabled>
+                    </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label for="stipendio" class="form-label">Stipendio</label>
-                    <input type="number" class="form-control custom-input" id="stipendio" name="stipendio" required>
+
+                <!-- Responsabile -->
+                <div class="mb-3 row">
+                    <label for="responsabile" class="col-sm-2 col-form-label">Responsabile</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="responsabile" value="Luca Bianchi" disabled>
+                    </div>
                 </div>
-            </div> 
 
-            <div class="col-md-12 mb-3">
-                <label for="responsabile" class="form-label">Responsabile</label>
-                <input type="text" class="form-control custom-input" id="responsabile" name="responsabile" required>
-
-            </div>
-
-            <div class="row">
-                <div class="col-md-12 mb-3">
-                    <label for="documents" class="form-label">Carica Documenti</label>
-                    <input type="file" class="form-control custom-input" id="documents" name="documents" accept="application/pdf, image/*">
+                <!-- Data di assunzione -->
+                <div class="mb-3 row">
+                    <label for="data_assunzione" class="col-sm-2 col-form-label">Data di Assunzione</label>
+                    <div class="col-sm-10">
+                        <input type="date" class="form-control" id="data_assunzione" value="2020-01-15" disabled>
+                    </div>
                 </div>
-            </div>
 
-
-            <div class="text-center">
-                <button type="submit" class="btn btn-outline-success btn-sm">Aggiungi</button>
-                <button type="submit" class="btn btn-outline-primary btn-sm">Modifica</button>
-                <button type="submit" class="btn btn-outline-danger btn-sm">Elimina</button>
-            </div>
-        </form>
+                 <!-- Stipendio -->
+                <div class="mb-3 row">
+                    <label for="stipendio" class="col-sm-2 col-form-label">Stipendio</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="stipendio" value="1,500 €" disabled>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
 
 {% endblock %} 
