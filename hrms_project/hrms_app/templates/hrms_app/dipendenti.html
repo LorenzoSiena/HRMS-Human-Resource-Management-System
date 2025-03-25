@@ -2,7 +2,19 @@
 {% block title %} Gestione dipendenti {% endblock title %}
 {% block content %}
 
-<div class="container mt-5">
+<style>
+    /* Impostiamo un'altezza massima per la card e abilitiamo lo scroll */
+    .card-body {
+        max-height: 450px; /* Imposta l'altezza massima desiderata per la card */
+        overflow-y: auto;  /* Abilita lo scroll verticale */
+    }
+    /* Garantiamo che il footer stia sempre in fondo */
+    footer {
+        margin-top: 5px; /* Separazione dal contenuto */
+    }
+</style>
+
+<div class="container mt-2">
     <div class="card">
         <div class="card-header">
             <h3>Dettagli Dipendente</h3>
@@ -48,6 +60,7 @@
                     </div>
                 </div>
 
+                <!-- Indirizzo -->
                 <div class="mb-3 row">
                     <label for="indirizzo" class="col-sm-2 col-form-label">Indirizzo</label>
                     <div class="col-sm-10">

@@ -3,41 +3,16 @@
 {% block content %}
 
 <style>
-    /* Rimuovi la classe btn dai dropdown e rendi il comportamento hover più scuro */
-    .navbar-nav .dropdown-menu {
-        background-color: white; /* Colore di sfondo del menu */
-    }
-
-    .navbar-nav .dropdown-item:hover {
-        background-color: #f1f1f1; /* Colore di sfondo al passaggio del mouse */
-    }
-
-    /* Imposta la navbar per essere sempre in cima */
-    .navbar {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        z-index: 10; /* In modo che sia sopra il contenuto */
-    }
-
-    /* Aggiungere un po' di spazio sopra la card */
-    .container.mt-5 {
-        margin-top: 70px; /* Spazio tra navbar e card */
-    }
-
     /* Impostiamo un'altezza massima per la card e abilitiamo lo scroll */
     .card-body {
-        max-height: 400px; /* Imposta l'altezza massima desiderata per la card */
+        max-height: 450px; /* Imposta l'altezza massima desiderata per la card */
         overflow-y: auto;  /* Abilita lo scroll verticale */
     }
-
     /* Garantiamo che il footer stia sempre in fondo */
     footer {
         margin-top: 5px; /* Separazione dal contenuto */
     }
-
 </style>
-
 
 <div class="container mt-5">
     <div class="card">
@@ -85,6 +60,7 @@
                     </div>
                 </div>
 
+                <!-- Indirizzo -->
                 <div class="mb-3 row">
                     <label for="indirizzo" class="col-sm-2 col-form-label">Indirizzo</label>
                     <div class="col-sm-10">
