@@ -1,0 +1,18 @@
+{% extends "hrms_app/base_bacheca.html" %}
+{% block sezione %}
+<h3>Modifica il messaggio</h3>
+    <form method="post" action="{% url 'modifica_messaggio_bacheca' messaggio.id %}"> 
+        {% csrf_token %}
+        <div class="mb-3">
+
+
+            <label class="form-label">Titolo</label>
+            <input type="text" name="titolo" class="form-control" value="{{ messaggio.titolo }}" required> 
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Messaggio</label>
+            <textarea name="messaggio" class="form-control" rows="4"  required>{{ messaggio.messaggio }}</textarea> 
+        </div>
+        <button type="submit" class="btn btn-success">📩 Pubblica</button>
+    </form>
+{% endblock sezione %}
