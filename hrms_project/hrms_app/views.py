@@ -29,6 +29,7 @@ def hrms_app(request: HttpRequest):
 def dipendenti(request:HttpRequest):
     return render(request,'hrms_app/dipendenti.html')
 
+
 def inserisci_dipendente(request: HttpRequest):
     if request.method == "POST":
         nome = request.POST.get('nome', '').strip()
@@ -138,6 +139,16 @@ def timbra_entrata(request: HttpRequest):
 def timbra_uscita():
     pass
 
+
+def bacheca(request:HttpRequest):
+    messaggi = Bacheca.objects.all().order_by('data_pubblicazione')
+    if not messaggi.exists():
+      messages.info(request,f"La tua Bacheca è vuota!")
+      return render(request,"hrms_app/bacheca.html")
+                    
+    else:
+         return render(request,"hrms_app/bacheca.html",{'messaggi':messaggi})
+
 def aggiungi_messaggio_bacheca(request:HttpRequest):
     if request.method == "POST":
         titolo=request.POST.get('titolo').strip()
@@ -147,21 +158,21 @@ def aggiungi_messaggio_bacheca(request:HttpRequest):
             messages.success(request,f"✅ Messaggio '{titolo}' aggiunto con successo!")
         else:
             messages.error(request,"⚠️ Titolo e messaggio sono obbligatori!") 
-        return redirect('home')      
-    return redirect(request ,'hrms_app/home.html')
+            return render(request,'hrms_app/bacheca.html')        
+    return redirect(request ,'hrms_app/bacheca.html')
 
 
-def leggi_messaggio_bacheca(request:HttpRequest):
-    messaggio = Bacheca.objects.all().order_by('data_pubblicazione')
-    if not messaggio.exist():
-      messages.info(request,f"La tua Bacheca è vuota!")
-    else:
-        for msg in messaggio:
-         return render(request,f"[{msg.data_pubblicazione}] {msg.titolo}: {msg.messaggio}")
+# def leggi_messaggio_bacheca(request:HttpRequest):
+#     messaggio = Bacheca.objects.all().order_by('data_pubblicazione')
+#     if not messaggio.exist():
+#       messages.info(request,f"La tua Bacheca è vuota!")
+#     else:
+#         for msg in messaggio:
+#          return render(request,f"[{msg.data_pubblicazione}] {msg.titolo}: {msg.messaggio}")
         
 
-def modifica_messaggio_bacheca(request:HttpRequest,msg_id):
-    messaggio = get_object_or_404(Bacheca, id=msg_id)
+def modifica_messaggio_bacheca(request:HttpRequest,id):
+    messaggio = Bacheca.objects.get(id=id)
     if request.method == "POST":
         nuovo_titolo = request.POST.get('titolo', '').strip()
         nuovo_messaggio = request.POST.get('messaggio', '').strip()
@@ -170,18 +181,19 @@ def modifica_messaggio_bacheca(request:HttpRequest,msg_id):
             messaggio.titolo = nuovo_titolo
             messaggio.messaggio = nuovo_messaggio
             messaggio.save()
-            messages.success(request, f"✏️ Messaggio '{msg_id}' modificato con successo!")
+            messages.success(request, "✏️ Messaggio  modificato con successo!")
+            return redirect('bacheca')
         else:
             messages.error(request, "⚠️ Titolo e messaggio sono obbligatori!")
 
-    return redirect('home')
+    return render(request,'hrms_app/bacheca.html', {'messaggio': messaggio})
 
 
-def cancella_messaggio_bacheca(request: HttpRequest, msg_id):
-    messaggio = get_object_or_404(Bacheca, id=msg_id)
+def cancella_messaggio_bacheca(request: HttpRequest,id):
+    messaggio = Bacheca.objects.get(id=id)
     messaggio.delete()
-    messages.success(request, f"🗑️ Messaggio '{msg_id}' eliminato con successo!")
-    return redirect('home')
+    messages.success(request, "🗑️ Messaggio  eliminato con successo!")
+    return render(request,'hrms_app/bacheca.html')
 
 
 
