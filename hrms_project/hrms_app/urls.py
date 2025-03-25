@@ -26,10 +26,11 @@ urlpatterns = [
     path("inserisci_dipendente",views.inserisci_dipendente,name="inserisci_dipendente"),
     path("modifica_dipendente",views.modifica_dipendente,name="modifica_dipendente"),
     path("elimina_dipendente",views.elimina_dipendente,name="elimina_dipendente"),
+
+
     path("aggiungi_messaggio_bacheca",views.aggiungi_messaggio_bacheca,name="aggiungi_messaggio_bacheca"),
-    # path("leggi_messaggio_bacheca",views.leggi_messaggio_bacheca,name="leggi_messaggio_bacheca"),
-    path("modifica_messaggio_bacheca",views.modifica_messaggio_bacheca,name="modifica_messaggio_bacheca"),
-    path("cancella_messaggio_bacheca",views.cancella_messaggio_bacheca,name="cancella_messaggio_bacheca"),
+    path("modifica_messaggio_bacheca/<int:id>",views.modifica_messaggio_bacheca,name="modifica_messaggio_bacheca"),
+    path("cancella_messaggio_bacheca/<int:id>",views.cancella_messaggio_bacheca,name="cancella_messaggio_bacheca"),
     #path("visualizza_report_mensile",views.report_mensile,name="report_mensile"),
     
     # per resettare la password

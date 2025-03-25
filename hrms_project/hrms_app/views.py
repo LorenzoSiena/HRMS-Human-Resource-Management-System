@@ -159,7 +159,7 @@ def aggiungi_messaggio_bacheca(request:HttpRequest):
         else:
             messages.error(request,"⚠️ Titolo e messaggio sono obbligatori!") 
             return render(request,'hrms_app/bacheca.html')        
-    return redirect(request ,'hrms_app/bacheca.html')
+    return redirect('bacheca')
 
 
 # def leggi_messaggio_bacheca(request:HttpRequest):
@@ -186,14 +186,14 @@ def modifica_messaggio_bacheca(request:HttpRequest,id):
         else:
             messages.error(request, "⚠️ Titolo e messaggio sono obbligatori!")
 
-    return render(request,'hrms_app/bacheca.html', {'messaggio': messaggio})
+    return render(request, 'hrms_app/modifica_messaggio_bacheca.html', {'messaggio': messaggio})
 
 
 def cancella_messaggio_bacheca(request: HttpRequest,id):
     messaggio = Bacheca.objects.get(id=id)
     messaggio.delete()
     messages.success(request, "🗑️ Messaggio  eliminato con successo!")
-    return render(request,'hrms_app/bacheca.html')
+    return redirect('bacheca')
 
 
 
