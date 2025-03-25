@@ -1,5 +1,5 @@
 {% extends "hrms_app/base_bacheca.html" %}
-{% block aggiungi %}
+{% block sezione %}
  <!-- Finestra di visualizzazione messaggi -->
  <div class="card mb-4">
     <div class="card-body" style="height: 300px; overflow-y: auto; border: 1px solid #ccc;">
@@ -11,7 +11,7 @@
                     <small class="text-muted">Pubblicato il {{ msg.data_pubblicazione|date:"d/m/Y H:i" }}</small>
                     <br>
                     
-                    <form action="{% url 'modifica_messaggio_bacheca' msg.id %}" method="POST" style="display:inline;">
+                    <form action="{% url 'area_modifica_bacheca' msg.id %}" method="POST" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-primary btn-sm">✏️ Modifica</button>
                     </form>
@@ -43,4 +43,4 @@
     <button type="submit" class="btn btn-success">📩 Pubblica</button>
 </form>
 
-{% endblock aggiungi %}
+{% endblock sezione %}

@@ -1,45 +1,18 @@
 {% extends "hrms_app/base_bacheca.html" %}
-{% block modifica %}
- <!-- Finestra di visualizzazione messaggi -->
- <div class="card mb-4">
-    <div class="card-body" style="height: 300px; overflow-y: auto; border: 1px solid #ccc;">
-        {% if messaggi %}
-            {% for msg in messaggi %}
-                <div class="border-bottom mb-3 pb-2">
-                    <h4>{{ msg.titolo }}</h4>
-                    <p>{{ msg.messaggio }}</p>
-                    <small class="text-muted">Pubblicato il {{ msg.data_pubblicazione|date:"d/m/Y H:i" }}</small>
-                    <br>
-                    
-                    <form action="{% url 'modifica_messaggio_bacheca' msg.id %}" method="POST" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-primary btn-sm">✏️ Modifica</button>
-                    </form>
-
-                    
-                    <form action="{% url 'cancella_messaggio_bacheca' msg.id  %}" method="POST" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger btn-sm">🗑️ Elimina</button>
-                    </form>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p class="text-muted">Nessun messaggio disponibile.</p>
-        {% endif %}
-    </div>
-</div>
-
+{% block sezione %}
 <h3>Modifica il messaggio</h3>
-    <form method="post" action="{% url 'modifica_messaggio_bacheca' %}">
+    <form method="post" action="{% url 'modifica_messaggio_bacheca' messaggio.id %}"> 
         {% csrf_token %}
         <div class="mb-3">
+
+
             <label class="form-label">Titolo</label>
-            <input type="text" name="titolo" class="form-control" required>
+            <input type="text" name="titolo" class="form-control" value="{{ messaggio.titolo }}" required> 
         </div>
         <div class="mb-3">
             <label class="form-label">Messaggio</label>
-            <textarea name="messaggio" class="form-control" rows="4" required></textarea>
+            <textarea name="messaggio" class="form-control" rows="4"  required>{{ messaggio.messaggio }}</textarea> 
         </div>
         <button type="submit" class="btn btn-success">📩 Pubblica</button>
     </form>
-{% endblock modifica %}
+{% endblock sezione %}

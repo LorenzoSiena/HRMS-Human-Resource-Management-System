@@ -149,18 +149,6 @@ def bacheca(request:HttpRequest):
     else:
          return render(request,"hrms_app/bacheca.html",{'messaggi':messaggi})
 
-def aggiungi_messaggio_bacheca(request:HttpRequest):
-    if request.method == "POST":
-        titolo=request.POST.get('titolo').strip()
-        messaggio=request.POST.get('messaggio').strip()
-        if titolo and messaggio:
-            Bacheca.objects.create(titolo=titolo, messaggio=messaggio)
-            messages.success(request,f"✅ Messaggio '{titolo}' aggiunto con successo!")
-        else:
-            messages.error(request,"⚠️ Titolo e messaggio sono obbligatori!") 
-            return render(request,'hrms_app/bacheca.html')        
-    return redirect('bacheca')
-
 
 # def leggi_messaggio_bacheca(request:HttpRequest):
 #     messaggio = Bacheca.objects.all().order_by('data_pubblicazione')
@@ -169,7 +157,12 @@ def aggiungi_messaggio_bacheca(request:HttpRequest):
 #     else:
 #         for msg in messaggio:
 #          return render(request,f"[{msg.data_pubblicazione}] {msg.titolo}: {msg.messaggio}")
-        
+
+def area_modifica_bacheca(request:HttpRequest,id):
+    messaggio = Bacheca.objects.get(id=id)
+    return render(request,'hrms_app/modifica_bacheca.html', {'messaggio': messaggio})
+
+
 
 def modifica_messaggio_bacheca(request:HttpRequest,id):
     messaggio = Bacheca.objects.get(id=id)
@@ -182,11 +175,25 @@ def modifica_messaggio_bacheca(request:HttpRequest,id):
             messaggio.messaggio = nuovo_messaggio
             messaggio.save()
             messages.success(request, "✏️ Messaggio  modificato con successo!")
-            return redirect('bacheca')
+            return redirect('bacheca') # serve???
         else:
             messages.error(request, "⚠️ Titolo e messaggio sono obbligatori!")
 
-    return render(request, 'hrms_app/modifica_messaggio_bacheca.html', {'messaggio': messaggio})
+    return render(request, 'hrms_app/bacheca.html', {'messaggio': messaggio})
+
+
+
+def aggiungi_messaggio_bacheca(request:HttpRequest):
+    if request.method == "POST":
+        titolo=request.POST.get('titolo').strip()
+        messaggio=request.POST.get('messaggio').strip()
+        if titolo and messaggio:
+            Bacheca.objects.create(titolo=titolo, messaggio=messaggio)
+            messages.success(request,f"✅ Messaggio '{titolo}' aggiunto con successo!")
+        else:
+            messages.error(request,"⚠️ Titolo e messaggio sono obbligatori!") 
+            return render(request,'hrms_app/bacheca.html')        
+    return redirect('bacheca')
 
 
 def cancella_messaggio_bacheca(request: HttpRequest,id):
