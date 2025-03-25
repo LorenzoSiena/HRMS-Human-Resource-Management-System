@@ -13,7 +13,7 @@ urlpatterns = [
 
 
     path("presenza",views.presenze,name="presenze"),
-    path("dipendenti",views.dipendenti,name="dipendenti"),
+    path("profilo",views.profilo,name="profilo"),
     path("stipendi",views.stipendi,name="stipendi"),
     path("timbra_entrata",views.timbra_entrata,name="timbra_entrata"),
     path("timbra_uscita",views.timbra_uscita,name="timbra_uscita"),

@@ -26,8 +26,8 @@ def hrms_app(request: HttpRequest):
         return redirect('login')
     return render(request,'hrms_app/home.html')
 
-def dipendenti(request:HttpRequest):
-    return render(request,'hrms_app/dipendenti.html')
+def profilo(request:HttpRequest):
+    return render(request,'hrms_app/profilo.html')
 
 def inserisci_dipendente(request: HttpRequest):
     if request.method == "POST":
