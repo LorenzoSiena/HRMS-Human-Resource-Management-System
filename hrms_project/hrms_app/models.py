@@ -40,7 +40,8 @@ class Dipendenti(AbstractUser):
     # VERAMENTE NON POSSO AGGIUNGERE hrms_app.view_bacheca QUI???? AAAAAAA(DEVO FARLO PERSONALIZZATO PEFFOZZA??)
     class Meta:
         permissions = [
-            ("can_view_bachceca", "Puó visualizzare la bacheca"),  # Permesso personalizzato per visualizzare stipendio
+            ("can_view_bacheca", "Puó visualizzare la bacheca"),  # Permesso personalizzato per visualizzare stipendio
+            ("can_change_personal_info_limited", "Posso cambiare i miei dati anagrafici limitati,telefono,mail,via")              
         ]
 
 
