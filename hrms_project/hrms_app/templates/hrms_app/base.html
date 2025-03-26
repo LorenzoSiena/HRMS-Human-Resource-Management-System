@@ -17,7 +17,7 @@
         .navbar-nav .dropdown-item:hover {
             background-color: #f1f1f1; /* Colore di sfondo al passaggio del mouse */
         }
-       
+        
     </style>
 
     
@@ -30,12 +30,13 @@
         <div class="container-fluid">
 
             <!-- Logo e pay-off -->
-            <a class="navbar-brand" href="#">
-                <img src="{% static 'img/logo.png' %}" alt="Logo" width="50" height="50" class="d-inline-block align-text-top" style="border-radius: 50%;">
-                
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'img/logo.png' %}" alt="Logo" width="50" height="50" class="d-inline-block align-text-top" style="border-radius: 50%;">                
             </a>
-            <span style="margin-left: 2px; margin-right: 6px;"> <bold>HRM</bold></span>
+            <span style="margin-left: 2px; margin-right: 6px;"> <bold>HRMS</bold></span>
 
+            <!-- Se l'autenticazione dell'utente è avvenuta con successo mostriamo il menù, il messaggio di benvenuto ed il pulsante di logout -->
+            {% if user.is_authenticated %}
 
             <button class="navbar-toggler ms-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon" style="width: 20px; height: 15px; background-size: 100% auto; margin-left: 0;"> </span>
@@ -48,31 +49,30 @@
                           Area Personale
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Profilo</a></li>
-                            <li><a class="dropdown-item" href="#">I miei documenti</a></li>
-                            <li><a class="dropdown-item" href="#">Richiesta Ferie e Permessi</a></li>
-                            <li><a class="dropdown-item" href="#">Busta Paga</a></li>
+                            <li><a class="dropdown-item" href="{% url 'profilo'%}">Profilo</a></li>
+                            <li><a class="dropdown-item" href="{% url 'documenti_personali' %}">I miei documenti</a></li>
+                            <li><a class="dropdown-item" href="{% url 'assenze_personali' %}">Richiesta Ferie e Permessi</a></li>
+                            <li><a class="dropdown-item" href="{% url 'busta_paga' %}">Busta Paga</a></li>
                         </ul>
                     </div>
 
-                    <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
-                    <a class="nav-link" href="{% url "mostra_permessi" %}">Mostra permessi utente</a>
+                    <a class="nav-link" href="{% url 'bacheca' %}">Bacheca</a>
+                    <a class="nav-link" href="#">Notifiche</a>
 
                     <div class="dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                           Area Amministrativa
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Gestione Dipendenti</a></li>
-                            <li><a class="dropdown-item" href="#">Gestione Ferie e Permessi</a></li>
-                            <li><a class="dropdown-item" href="#">Gestione Buste Paga</a></li>
-                            <li><a class="dropdown-item" href="#">Consulta Documenti</a></li>
-                            <li><a class="dropdown-item" href="#">Report e Statistiche</a></li>
+                            <li><a class="dropdown-item" href="{% url 'gestione_dipendenti' %}">Gestione Dipendenti</a></li>
+                            <li><a class="dropdown-item" href="{% url 'gestione_assenze' %}">Gestione Ferie e Permessi</a></li>
+                            <li><a class="dropdown-item" href="{% url 'gestione_busta_paga' %}">Gestione Buste Paga</a></li>
+                            <li><a class="dropdown-item" href="{% url 'consulta_documenti' %}">Consulta Documenti</a></li>
+                            <li><a class="dropdown-item" href="{% url 'report'%}">Report e Statistiche</a></li>
                         </ul>
                     </div>
                 </div>
-            <!-- Se l'autenticazione dell'utente è avvenuta con successo mostriamo il menù, il messaggio di benvenuto ed il pulsante di logout -->
-            {% if user.is_authenticated %}
+            
                 
                 <!-- Messaggio di benvenuto e pulsante di logout-->
                 <div class="d-flex ms-auto align-items-center">
@@ -86,8 +86,8 @@
     </nav>
   
     <div class="container-fluid p-0">
-        <div class="d-flex justify-content-center align-items-center vh-100" 
-            style="position: relative; background-image: url({% static 'img/background_cleanup.png' %}); background-size: cover; background-position: center;">
+        <div class="d-flex" 
+            style="position: relative; background-image: url({% static 'img/background_cleanup.png' %}); background-size: cover; background-position: center; min-height: 100vh; padding: 20px">
     
             {% block content %} {% endblock  %}
 
@@ -96,7 +96,7 @@
     
 
     <!--FOOTER-->
-    <footer class="bg-white text-dark text-center py-4" style="position: relative; background-color: white; padding: 20px 0; font-size: 14px;">
+    <footer class="bg-white text-dark text-center py-4" style="position: relative; background-color: white; padding: 10px 0; font-size: 14px;">
         <div class="container">
             <p class="mb-1" style="font-size: 10px;">&copy; 2025 Tutti i diritti riservati.</p>
             <p class="mb-0">

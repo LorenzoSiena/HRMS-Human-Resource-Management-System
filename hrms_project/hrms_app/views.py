@@ -20,15 +20,60 @@ from django.contrib.auth.forms import PasswordResetForm
 #Date
 from datetime import datetime ,date , time
 
+# Funzione per gestire il caricamento della HOME
 def hrms_app(request: HttpRequest):
     if not request.user.is_authenticated:
         return redirect('login')
-    return render(request,'hrms_app/home.html')
+    # Verifico se esiste una timbratura di sola entrata con la data odierna
+    dipendente = Dipendenti.objects.get(id = request.user.id)  # Dipendente loggato
+    # Se non esiste imposto per la timbrature di entrata
+    if Presenze.objects.filter(dipendente = dipendente, data = date.today(), ora_uscita = None).last() is None:
+        text_button = "Timbra Entrata"
+    # Se esiste imposto per la timbrature di uscita
+    else:
+        text_button = "Timbra Uscita"
+    # Lista delle timbrature da visualizzare - Solo quelle della data odierna
+    lista_presenze = Presenze.objects.filter(dipendente = dipendente, data = date.today()) # Lista timbrature odierna
+    # Visualizza i messagi della bacheca
+    messaggi_bacheca = Bacheca.objects.all().order_by('data_pubblicazione')    
 
-def dipendenti(request:HttpRequest):
-    return render(request,'hrms_app/dipendenti.html')
+    return render(request,'hrms_app/home.html', {'text_button': text_button, 'lista_presenze': lista_presenze, 'messaggi_bacheca': messaggi_bacheca })
 
-def inserisci_dipendente(request: HttpRequest):
+# Funzione per gestire le timbrature
+def gestione_timbratura(request: HttpRequest):
+    if request.method == "POST":    
+        dipendente = Dipendenti.objects.get(id = request.user.id) # Dipendente loggato
+        lista_presenze = Presenze.objects.filter(dipendente = dipendente, data = date.today()) # Lista timbrature odierna
+        messaggio_errore = ""
+        # Verifico se l'utente ha gia' timbrato l'entrata nella data corrente    
+        if Presenze.objects.filter(dipendente = dipendente, data = date.today(), ora_uscita = None).last() is None:
+            # Se l'utente non ha ancora timbrato nella data corrente, procedo con la inserimento dell'entrata
+            try:
+                Presenze.objects.create(data = date.today(), ora_ingresso = datetime.now().time(), dipendente = dipendente)
+                text_button = "Timbra Uscita"
+            except Exception as e:
+                messaggio_errore = f"⚠️ Errore nella creazione dell'entrata!, errore: " + str(e)
+        else:
+            # Se l'utente ha gia' timbrato nella data corrente, proseguo con l'inserimento della data di uscita
+            try:
+                presenza = Presenze.objects.filter(dipendente = dipendente, data = date.today()).last() # Prendo l'ultima riga generata con la data corrente
+                presenza.ora_uscita = datetime.now().time() # Aggiorno l'orario di uscita
+                presenza.save()
+                text_button = "Timbra Entrata"
+            except Exception as e:
+                messaggio_errore = f"⚠️ Errore nella creazione dell'uscita!, errore: " + str(e)
+        return redirect('home')       
+    return render(request, 'hrms_app/home.html', {'text_button': text_button, 'lista_presenze' : lista_presenze, 'messaggio_errore': messaggio_errore})
+   
+
+def profilo(request:HttpRequest):
+    return render(request,'hrms_app/profilo.html')
+
+def visualizza_dipendenti(request: HttpRequest):
+    dipendenti = Dipendenti.objects.all().values('nome', 'cognome')
+    return render(request, 'hrms_app/visualizza_dipendenti.html', {'dipendenti': dipendenti})
+
+def crea_dipendente(request: HttpRequest):
     if request.method == "POST":
         nome = request.POST.get('nome', '').strip()
         cognome = request.POST.get('cognome', '').strip()
@@ -81,8 +126,10 @@ def elimina_dipendente(request: HttpRequest, id_dipendente):
     messages.success(request, f"🗑️ Dipendente '{dipendente.nome} {dipendente.cognome}' eliminato con successo!")
     return redirect('dipendenti')
 
-def presenze(request:HttpRequest):
-    return render(request,'hrms_app/presenza.html')
+
+
+def report(request:HttpRequest):
+    return render(request,'hrms_app/report.html')
 
 
 def stipendi(request:HttpRequest):
@@ -107,35 +154,37 @@ def archivia_documenti():
 def notifiche_mail():
     pass
 
-# Funzione per tibrare l'entrata
-def timbra_entrata(request: HttpRequest):
-    data = date.today().strftime("%Y-%m-%d") # Data corrente
-    ora = datetime.now().strftime("%H:%M") # Orario corrente
-    dipendente = Dipendenti.objects.get(id=request.user.id) # Dipendente corrente, in questo caso e' il loggato.
-    caption=""
-    # Verifico se esiste nel database un'entrata per user_id e data corrente
-    if Presenze.objects.filter(dipendente = dipendente, data = data).first() is None:
-        # Procediamo con la creazione dell'entrata
-        # Presenze.objects.create(dipendente = dipendente, data = data, ora_ingresso = datetime.now().strftime("%H:%M"))
-        messages.success(request,f"✅ Entrata aggiunta con successo!")
-        caption = "Timbra Entrata"
-        verifica = True
+def bacheca(request:HttpRequest):
+    messaggi = Bacheca.objects.all().order_by('data_pubblicazione')
+    if not messaggi.exists():
+      messages.info(request,f"La tua Bacheca è vuota!")
+      return render(request,"hrms_app/bacheca.html")
+                    
     else:
-        # Non proseguiamo con la creazione dell'entrata e mandiamo un messaggio
-        messaggio = "Gia' entrato oggi"
-        verifica = False
-    
-#    if request.method == "POST":
-#       data_entrata = request.POST.get('data_entrata').strip()
-#        if data_entrata:    
-#           Entrata.objects.create(data_entrata=data_entrata)
-#           messages.success(request,f"✅ Entrata aggiunta con successo!")
-#        else:
-#            messages.error(request,"⚠️ Data di entrata obbligatoria!") 
-#        return redirect('home')      
-    return render(request, 'hrms_app/home.html', {'nome': dipendente, 'caption': caption, 'verifica': verifica, 'entrata': ora})
-def timbra_uscita():
-    pass
+         return render(request,"hrms_app/bacheca.html",{'messaggi':messaggi})
+
+def area_modifica_bacheca(request:HttpRequest,id):
+    messaggio = Bacheca.objects.get(id=id)
+    return render(request,'hrms_app/modifica_bacheca.html', {'messaggio': messaggio})
+
+def modifica_messaggio_bacheca(request:HttpRequest,id):
+    messaggio = Bacheca.objects.get(id=id)
+    if request.method == "POST":
+        nuovo_titolo = request.POST.get('titolo', '').strip()
+        nuovo_messaggio = request.POST.get('messaggio', '').strip()
+
+        if nuovo_titolo and nuovo_messaggio:
+            messaggio.titolo = nuovo_titolo
+            messaggio.messaggio = nuovo_messaggio
+            messaggio.save()
+            messages.success(request, "✏️ Messaggio  modificato con successo!")
+            return redirect('bacheca') # serve???
+        else:
+            messages.error(request, "⚠️ Titolo e messaggio sono obbligatori!")
+
+    return render(request, 'hrms_app/bacheca.html', {'messaggio': messaggio})
+
+
 
 def aggiungi_messaggio_bacheca(request:HttpRequest):
     if request.method == "POST":
@@ -146,43 +195,15 @@ def aggiungi_messaggio_bacheca(request:HttpRequest):
             messages.success(request,f"✅ Messaggio '{titolo}' aggiunto con successo!")
         else:
             messages.error(request,"⚠️ Titolo e messaggio sono obbligatori!") 
-        return redirect('home')      
-    return redirect(request ,'hrms_app/home.html')
+            return render(request,'hrms_app/bacheca.html')        
+    return redirect('bacheca')
 
 
-def leggi_messaggio_bacheca(request:HttpRequest):
-    messaggio = Bacheca.objects.all().order_by('data_pubblicazione')
-    if not messaggio.exist():
-      messages.info(request,f"La tua Bacheca è vuota!")
-    else:
-        for msg in messaggio:
-         return render(request,f"[{msg.data_pubblicazione}] {msg.titolo}: {msg.messaggio}")
-        
-
-def modifica_messaggio_bacheca(request:HttpRequest,msg_id):
-    messaggio = get_object_or_404(Bacheca, id=msg_id)
-    if request.method == "POST":
-        nuovo_titolo = request.POST.get('titolo', '').strip()
-        nuovo_messaggio = request.POST.get('messaggio', '').strip()
-
-        if nuovo_titolo and nuovo_messaggio:
-            messaggio.titolo = nuovo_titolo
-            messaggio.messaggio = nuovo_messaggio
-            messaggio.save()
-            messages.success(request, f"✏️ Messaggio '{msg_id}' modificato con successo!")
-        else:
-            messages.error(request, "⚠️ Titolo e messaggio sono obbligatori!")
-
-    return redirect('home')
-
-
-def cancella_messaggio_bacheca(request: HttpRequest, msg_id):
-    messaggio = get_object_or_404(Bacheca, id=msg_id)
+def cancella_messaggio_bacheca(request: HttpRequest,id):
+    messaggio = Bacheca.objects.get(id=id)
     messaggio.delete()
-    messages.success(request, f"🗑️ Messaggio '{msg_id}' eliminato con successo!")
-    return redirect('home')
-
-
+    messages.success(request, "🗑️ Messaggio  eliminato con successo!")
+    return redirect('bacheca')
 
 def crea_busta_paga():
     pass
@@ -208,7 +229,20 @@ def visualizza_report_permessi(request:HttpRequest):
 def visualizza_report_mensile(request:HttpRequest):
     pass
 
+def aggiungi_dipendente(request:HttpRequest):
+    if request.method == "POST":
+        form = RegisterForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, "Creazione completata con successo!")
+            return redirect("gestione_dipendenti")  
+        else:
+            messages.error(request, "Errore nella creazione. Controlla i dati inseriti.")
+    else:
+        form = RegisterForm()  # Creazione di un form vuoto se è una GET
 
+    return render(request, "hrms_app/aggiungi_dipendente.html", {"form": form})
+    
 
 
 def registrati(request: HttpRequest):
@@ -241,7 +275,6 @@ OLD REGISTER
     else:
         form = RegisterForm() 
     return render(request,'hrms_app/register.html',{'form':form})
- """
 
 @login_required
 def mostra_permessi(request):
@@ -262,20 +295,20 @@ def vai_all_admin(request):
 
 
 
-
-
+# Login
 def user_login(request: HttpRequest):
+    if request.user.is_authenticated:
+        return redirect('home')
     if request.user.is_authenticated:   
         return redirect('home')
 
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
-        user = authenticate(request,username=email,password=password)
-        
+        user = authenticate(request,username=email,password=password)        
         if user is not None:
-            login(request,user)
-            return redirect('home')
+            login(request, user)            
+            return redirect('home')                  
         else:
             messages.error(request,'Utente non trovato o password sbagliata:')
     return render(request,'hrms_app/login.html',{'login':login})
@@ -284,9 +317,10 @@ def user_logout(request: HttpRequest):
     logout(request)
     return redirect('home')
 
-
-
-
+def richiesta_permessi_ferie(request: HttpRequest):
+    if request.method == "POST":       
+        scelta = request.POST.get("scelta", "Nessuna selezione")  # Prende il valore dal form
+        return render(request, 'hrms_app/home.html', {"scelta": scelta})
 
 #RESETTO LA PASSWORD
 
@@ -308,4 +342,26 @@ class CustomPasswordResetCompleteView(PasswordResetCompleteView):
     template_name = 'hrms_app/reset_password_complete.html'  # Messaggio di avvenuto reset
 
 
+#-------------------------navigazione e render delle pagine---------------------------------------------------------------------
+
+def documenti_personali(request:HttpRequest):
+    return render(request,'hrms_app/documenti_personali.html')
+
+def assenze_personali(request:HttpRequest):
+    return render(request,'hrms_app/assenze_personali.html')
+
+def busta_paga(request:HttpRequest):
+    return render(request,'hrms_app/busta_paga.html')
+
+def gestione_dipendenti(request:HttpRequest):
+    return render(request,'hrms_app/gestione_dipendenti.html')
+
+def gestione_assenze(request:HttpRequest):
+    return render(request,'hrms_app/gestione_assenze.html')
+
+def gestione_busta_paga(request:HttpRequest):
+    return render(request,'hrms_app/gestione_busta_paga.html')
+
+def consulta_documenti(request:HttpRequest):
+    return render(request,'hrms_app/consulta_documenti.html')
 

@@ -1,0 +1,131 @@
+{% extends 'hrms_app/base.html' %}
+{% block title %} Profilo Dipendente {% endblock title %}
+{% block content %}
+
+<style>
+
+/* Impostiamo un'altezza massima per la card e abilitiamo lo scroll */
+.card-body {
+    max-height: 800px; /* Imposta l'altezza massima desiderata per la card */
+    overflow-y: auto;  /* Abilita lo scroll verticale */
+}
+
+/* Allungare il contenitore per dare più spazio */
+.container.mt-2 {
+    width: 100%; /* Assicuriamo che la larghezza sia del 100% */
+    padding: 15px; /* Un po' di padding per evitare che il contenuto si tocchi ai bordi */
+    box-sizing: border-box; /* Assicura che il padding venga considerato nella larghezza */
+    display: flex;
+    justify-content: center; /* Centra orizzontalmente */
+    align-items: center; /* Centra verticalmente */
+    
+}
+
+/* Impostiamo un massimo per la larghezza della card */
+.card {
+    max-width: 600px; /* Aggiungi una larghezza massima alla card */
+    width: 100%; /* La card si adatta al contenitore */
+}
+
+</style>
+
+<div class="container mt-2">
+    <div class="card">
+        <div class="card-header">
+            <h3>Profilo Dipendente</h3>
+        </div>
+        <div class="card-body">
+            <form>
+                <!-- Nome -->
+                <div class="mb-3 row">
+                    <label for="nome" class="col-sm-2 col-form-label">Nome</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="nome" value="Mario" disabled>
+                    </div>
+                </div>
+                
+                <!-- Cognome -->
+                <div class="mb-3 row">
+                    <label for="cognome" class="col-sm-2 col-form-label">Cognome</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="cognome" value="Rossi" disabled>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label for="data_nascita" class="col-sm-2 col-form-label">Data di Nascita</label>
+                    <div class="col-sm-10">
+                        <input type="date" class="form-control" id="data_nascita" value="1985-07-20" disabled>
+                    </div>
+                </div>
+
+                <!-- Codice Fiscale -->
+                <div class="mb-3 row">
+                    <label for="codice_fiscale" class="col-sm-2 col-form-label">Codice Fiscale</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="codice_fiscale" value="RSSMRA85L20Z404K" disabled>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3 row">
+                    <label for="email" class="col-sm-2 col-form-label">Email</label>
+                    <div class="col-sm-10">
+                        <input type="email" class="form-control" id="email" value="mario.rossi@email.com" disabled>
+                    </div>
+                </div>
+
+                <!-- Indirizzo -->
+                <div class="mb-3 row">
+                    <label for="indirizzo" class="col-sm-2 col-form-label">Indirizzo</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="indirizzo" value="Via Roma 123, Milano" disabled>
+                    </div>
+                </div>
+
+                <!-- Telefono -->
+                <div class="mb-3 row">
+                    <label for="telefono" class="col-sm-2 col-form-label">Telefono</label>
+                    <div class="col-sm-10">
+                        <input type="tel" class="form-control" id="telefono" value="+39 02 12345678" disabled>
+                    </div>
+                </div>
+
+                <!-- Ruolo -->
+                <div class="mb-3 row">
+                    <label for="ruolo" class="col-sm-2 col-form-label">Ruolo</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="ruolo" value="Sviluppatore" disabled>
+                    </div>
+                </div>
+
+                <!-- Responsabile -->
+                <div class="mb-3 row">
+                    <label for="responsabile" class="col-sm-2 col-form-label">Responsabile</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="responsabile" value="Luca Bianchi" disabled>
+                    </div>
+                </div>
+
+                <!-- Data di assunzione -->
+                <div class="mb-3 row">
+                    <label for="data_assunzione" class="col-sm-2 col-form-label">Data di Assunzione</label>
+                    <div class="col-sm-10">
+                        <input type="date" class="form-control" id="data_assunzione" value="2020-01-15" disabled>
+                    </div>
+                </div>
+
+                 <!-- Stipendio -->
+                <div class="mb-3 row">
+                    <label for="stipendio" class="col-sm-2 col-form-label">Stipendio</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="stipendio" value="1,500 €" disabled>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %} 

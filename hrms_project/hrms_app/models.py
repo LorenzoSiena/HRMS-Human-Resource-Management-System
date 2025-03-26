@@ -242,7 +242,6 @@ class Presenze(models.Model):
     def ore_lavorate(self):
         return formatta_ore(self.ore_lavorate_float or 0)
 
-
 class ReportPresenze(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
     mese =  models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])

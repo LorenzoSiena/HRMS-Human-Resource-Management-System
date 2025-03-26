@@ -30,20 +30,17 @@
 
 <div class="container mt-5 d-flex justify-content-center  min-vh-100">
 <div class="card shadow-lg p-5 w-100">
-    <h1 class="text-center mb-4">Crea il tuo account</h1>
-    <form method="POST" enctype="multipart/form-data">
+    <h1 class="text-center mb-4">Aggiungi un nuovo dipendente</h1>
+    <form method="POST" enctype="multipart/form-data" >
         {% csrf_token %}
-        
         {{ form.as_p }}
 
         <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary btn-lg">Registrati</button>
+            <button type="submit" class="btn btn-primary btn-lg">Crea dipendente</button>
         </div>
     </form>
 
-    <p class="text-center mt-3">
-        Hai già un account? <a href="{% url 'login' %}">Login</a>
-    </p>
+
 </div>
 </div>
 

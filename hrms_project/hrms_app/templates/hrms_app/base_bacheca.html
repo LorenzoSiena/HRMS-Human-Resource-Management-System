@@ -1,0 +1,24 @@
+{% extends "hrms_app/base.html" %}
+{% block title %} Bacheca {% endblock title %}
+
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center">📢 Bacheca Comunicazioni Aziendali</h2>
+
+    <!-- Messaggi di notifica -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+   
+
+<!-- Form per aggiungere un nuovo messaggio -->
+
+ {% block sezione %}{% endblock sezione %}
+</div>
+{% endblock %}

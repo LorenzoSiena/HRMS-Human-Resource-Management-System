@@ -1,0 +1,94 @@
+{% extends 'hrms_app/base.html' %}
+{% block title %} Gestione Dipendenti {% endblock title %}
+{% block content %}
+
+<style>
+    /* Impostiamo un'altezza massima per la card e abilitiamo lo scroll */
+    .card-body {
+        max-height: 450px; /* Imposta l'altezza massima desiderata per la card */
+        overflow-y: auto;  /* Abilita lo scroll verticale */
+    }
+    /* Garantiamo che il footer stia sempre in fondo */
+    footer {
+        margin-top: 5px; /* Separazione dal contenuto */
+    }
+</style>
+
+    <title>Lista Dipendenti</title>
+
+    <!-- Card con lista persone -->
+
+
+    <div class="container mt-5">
+        <br>
+        {% if messages %}
+        <div class="alert alert-danger">
+            {% for m in messages %}
+                <p>{{m}}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <br>
+        <div class="card">
+            <div class="card-header text-center">
+                <h3>Lista dipendenti</h3>
+            </div>
+                    <!-- Barra di ricerca e pulsante "Crea Dipendente" -->
+                    <div class="d-flex justify-content-between mb-4">
+                        <!-- Form di ricerca con larghezza dimezzata -->
+                        <div class="me-2 col-md-6">
+                            <label for="searchPerson" class="form-label">Cerca Dipendente</label>
+                            <input type="text" class="form-control" id="searchPerson" placeholder="Cerca per nome...">
+                        </div>
+                        <!-- Pulsante "Crea Dipendente" -->
+                        <a href="{% url 'aggiungi_dipendente' %}" class="btn btn-primary align-self-end">➕Aggiungi Dipendente</a>
+                    </div>
+
+                <!-- Lista delle persone in due colonne -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <ul class="list-group" id="personList1">
+                            {% for dipendente in dipendenti|slice:":10" %}
+                                <li class="list-group-item" href= "{% url 'visualizza_dipendenti' %}" >
+                                    <a href="{% url 'profilo' %}" > {{dipendenti.nome}} {{ dipendente.cognome }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+        
+                    <div class="col-md-6">
+                        <ul class="list-group" id="personList2">
+                            {% for dipendente in dipendenti|slice:"10:" %}
+                                <li class="list-group-item"href= "{% url 'visualizza_dipendenti' %}" >
+                                    <a href="{% url 'profilo' %}" >{{ dipendente.nome }} {{ dipendente.cognome }}</a>
+                                </li>
+                            {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        // Funzione per filtrare la lista di persone in base al nome
+        document.getElementById("searchPerson").addEventListener("input", function() {
+            var filter = this.value.toLowerCase();
+            var listItems1 = document.getElementById("personList1").getElementsByTagName("li");
+            var listItems2 = document.getElementById("personList2").getElementsByTagName("li");
+
+            // Filtra la lista nella prima colonna
+            Array.from(listItems1).forEach(function(item) {
+                var text = item.textContent || item.innerText;
+                item.style.display = text.toLowerCase().includes(filter) ? "" : "none";
+            });
+
+            // Filtra la lista nella seconda colonna
+            Array.from(listItems2).forEach(function(item) {
+                var text = item.textContent || item.innerText;
+                item.style.display = text.toLowerCase().includes(filter) ? "" : "none";
+            });
+        });
+    </script>
+
+{% endblock %} 

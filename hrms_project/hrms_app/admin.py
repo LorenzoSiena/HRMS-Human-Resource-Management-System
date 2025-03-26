@@ -5,7 +5,8 @@ admin.site.register(Dipendenti) """
 #Test e debug!
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Dipendenti,Ruoli
+
+from .models import Dipendenti,Ruoli,Bacheca
 
 class DipendentiAdmin(UserAdmin):
     model = Dipendenti
@@ -35,3 +36,4 @@ class DipendentiAdmin(UserAdmin):
 
 admin.site.register(Dipendenti, DipendentiAdmin)
 admin.site.register(Ruoli)
+
