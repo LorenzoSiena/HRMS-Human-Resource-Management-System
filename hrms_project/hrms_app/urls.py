@@ -19,14 +19,17 @@ urlpatterns = [
     path("gestione_assenze",views.gestione_assenze,name="gestione_assenze"),
     path("gestione_busta_paga",views.gestione_busta_paga,name="gestione_busta_paga"),
     path("consulta_documenti",views.consulta_documenti,name="consulta_documenti"),
+    path("aggiungi_dipendente",views.aggiungi_dipendente,name="aggiungi_dipendente"),
 #----azioni---------------------------------------------------------------------
+    path("visualizza_dipendenti",views.visualizza_dipendenti,name="visualizza_dipendenti"),
+    
     path("gestione_timbratura",views.gestione_timbratura,name="gestione_timbratura"),
     path("richiedi_ferie",views.richiedi_ferie,name="richiedi_ferie"),
     path("accetta_ferie",views.accetta_ferie,name="accetta_ferie"),
     path("rifiuta_ferie",views.rifiuta_ferie,name="rifiuta_ferie"),
     path("visualizza_busta_paga",views.visualizza_busta_paga,name="visualizza_busta_paga"),
     path("crea_busta_paga",views.crea_busta_paga,name="crea_busta_paga"),
-    path("inserisci_dipendente",views.inserisci_dipendente,name="inserisci_dipendente"),
+    path("crea_dipendente",views.crea_dipendente,name="crea_dipendente"),
     path("modifica_dipendente",views.modifica_dipendente,name="modifica_dipendente"),
     path("elimina_dipendente",views.elimina_dipendente,name="elimina_dipendente"),
 
