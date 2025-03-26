@@ -37,6 +37,14 @@ class Dipendenti(AbstractUser):
     USERNAME_FIELD = 'email'  # Usiamo l'email come username
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']  # Campi obbligatori oltre a email
 
+    # VERAMENTE NON POSSO AGGIUNGERE hrms_app.view_bacheca QUI???? AAAAAAA(DEVO FARLO PERSONALIZZATO PEFFOZZA??)
+    class Meta:
+        permissions = [
+            ("can_view_salary", "Can view salary"),  # Permesso personalizzato per visualizzare stipendio
+        ]
+
+
+
     #Per comoditá [username->email]  [first_name->nome] [last_name->cognome]
     @property
     def nome(self):
