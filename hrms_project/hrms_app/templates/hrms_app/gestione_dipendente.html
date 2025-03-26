@@ -3,13 +3,14 @@
 {% block content %}
 
 <style>
-    /* Personalizzazione della card */
-    .card-header {
-        font-weight: bold;
-        background-color: #f8f9fa;
-    }
+    /* Impostiamo un'altezza massima per la card e abilitiamo lo scroll */
     .card-body {
-        padding: 1rem;
+        max-height: 450px; /* Imposta l'altezza massima desiderata per la card */
+        overflow-y: auto;  /* Abilita lo scroll verticale */
+    }
+    /* Garantiamo che il footer stia sempre in fondo */
+    footer {
+        margin-top: 5px; /* Separazione dal contenuto */
     }
 </style>
 
