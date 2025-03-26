@@ -25,7 +25,7 @@ class Dipendenti(AbstractUser):
     data_assunzione = models.DateField(default=date.today)
     superiore = models.ForeignKey("Dipendenti", on_delete=models.SET_NULL, null=True,blank=True)
     ruolo = models.ForeignKey("Ruoli", on_delete=models.SET_NULL, null=True)
-    stipendio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    stipendio = models.DecimalField(max_digits=10, decimal_places=2, default=0,validators=[MinValueValidator(0)])
     documento_contratto = models.FileField( upload_to='media/documenti_contratti/', null=True, blank=True)
 
     codice_fiscale = models.CharField(max_length=16)
@@ -35,7 +35,7 @@ class Dipendenti(AbstractUser):
 
     email = models.EmailField(unique=True)
     USERNAME_FIELD = 'email'  # Usiamo l'email come username
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']  # Campi obbligatori oltre a `email`
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']  # Campi obbligatori oltre a email
 
     #Per comoditá [username->email]  [first_name->nome] [last_name->cognome]
     @property
@@ -83,8 +83,6 @@ class Ruoli(models.Model):
     permissions	ManyToManyField(Permission)	Permessi assegnati al gruppo 
     """
     livello_accesso = models.IntegerField(validators=[MinValueValidator(1)], default=1)
-
-
     def __str__(self):
         return f"{self.ruolo.name} (Livello: {self.livello_accesso})"
 
@@ -99,6 +97,7 @@ class Ruoli(models.Model):
     !!!!Django genera automaticamente permessi add, change, delete e view per ogni modello.!!!
 
 """
+
 
 
 """ 

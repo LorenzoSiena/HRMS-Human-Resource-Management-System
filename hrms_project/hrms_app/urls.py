@@ -31,6 +31,13 @@ urlpatterns = [
     path("cancella_messaggio_bacheca",views.cancella_messaggio_bacheca,name="cancella_messaggio_bacheca"),
     #path("visualizza_report_mensile",views.report_mensile,name="report_mensile"),
     
+    # gestione permessi e ruoli
+
+    path("mostra_permessi",views.mostra_permessi,name="mostra_permessi"),
+
+
+
+
     # per resettare la password
     path('reset_password/', views.CustomPasswordResetView.as_view(), name='reset_password'),
     path('hrms_app/reset_password_done', views.CustomPasswordResetDoneView.as_view(), name='password_reset_done'),

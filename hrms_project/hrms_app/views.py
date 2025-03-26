@@ -1,9 +1,8 @@
 #Standard imports
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpRequest
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
-
+from django.contrib.auth.decorators import login_required
 
 
 from django.contrib.auth.models import User,Group
@@ -243,6 +242,26 @@ OLD REGISTER
         form = RegisterForm() 
     return render(request,'hrms_app/register.html',{'form':form})
  """
+
+@login_required
+def mostra_permessi(request):
+    permessi_individuali = request.user.get_all_permissions()  # Restituisce un set di permessi (app_label.codename)
+
+    permessi_ruolo = set()
+    ruolo=request.user.ruolo
+    if ruolo:  # Se l'utente ha un ruolo assegnato
+        permessi_ruolo = set(request.user.ruolo.ruolo.permissions.values_list('codename', flat=True))
+    
+    
+    return render(request, 'hrms_app/debug_permessi.html', {'permessi_individuali': permessi_individuali, 'permessi_ruolo':permessi_ruolo,'ruolo': ruolo})
+
+from django.urls import reverse
+
+def vai_all_admin(request):
+    return redirect(reverse('admin:index'))  # Ricava l'URL dinamicamente
+
+
+
 
 
 def user_login(request: HttpRequest):
