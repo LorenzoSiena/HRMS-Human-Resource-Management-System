@@ -86,8 +86,8 @@
     </nav>
   
     <div class="container-fluid p-0">
-        <div class="d-flex justify-content-center vh-100" 
-            style="position: relative; background-image: url({% static 'img/background_cleanup.png' %}); background-size: cover; background-position: center;">
+        <div class="d-flex" 
+            style="position: relative; background-image: url({% static 'img/background_cleanup.png' %}); background-size: cover; background-position: center; min-height: 100vh; padding: 20px">
     
             {% block content %} {% endblock  %}
 
