@@ -259,22 +259,6 @@ def registrati(request: HttpRequest):
         form = RegisterForm()  # Creazione di un form vuoto se è una GET
 
     return render(request, "hrms_app/register_forms.html", {"form": form})
-"""
-OLD REGISTER
-
- def register(request: HttpRequest):
-    if request.method == 'POST':
-        form = RegisterForm(request.POST)
-        email = request.POST.get('email')
-        if User.objects.filter(email=email).exists():
-            form.add_error('email','Questa mail è già in uso')
-        if form.is_valid():
-            user = form.save() #salva l'user e ne crea una copia dummy
-            login(request,user) #Effettua il login automatico
-            return redirect('home')
-    else:
-        form = RegisterForm() 
-    return render(request,'hrms_app/register.html',{'form':form})
 
 @login_required
 def mostra_permessi(request):
