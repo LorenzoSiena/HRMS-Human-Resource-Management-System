@@ -118,8 +118,8 @@ def elimina_dipendente(request: HttpRequest, id_dipendente):
     messages.success(request, f"🗑️ Dipendente '{dipendente.nome} {dipendente.cognome}' eliminato con successo!")
     return redirect('dipendenti')
 
-def presenze(request:HttpRequest):
-    return render(request,'hrms_app/presenza.html')
+def report(request:HttpRequest):
+    return render(request,'hrms_app/report.html')
 
 
 def stipendi(request:HttpRequest):
@@ -296,4 +296,25 @@ class CustomPasswordResetCompleteView(PasswordResetCompleteView):
     template_name = 'hrms_app/reset_password_complete.html'  # Messaggio di avvenuto reset
 
 
+#-------------------------navigazione e render delle pagine---------------------------------------------------------------------
 
+def documenti_personali(request:HttpRequest):
+    return render(request,'hrms_app/documenti_personali.html')
+
+def assenze_personali(request:HttpRequest):
+    return render(request,'hrms_app/assenze_personali.html')
+
+def busta_paga(request:HttpRequest):
+    return render(request,'hrms_app/busta_paga.html')
+
+def gestione_dipendenti(request:HttpRequest):
+    return render(request,'hrms_app/gestione_dipendenti.html')
+
+def gestione_assenze(request:HttpRequest):
+    return render(request,'hrms_app/gestione_assenze.html')
+
+def gestione_busta_paga(request:HttpRequest):
+    return render(request,'hrms_app/gestione_busta_paga.html')
+
+def consulta_documenti(request:HttpRequest):
+    return render(request,'hrms_app/consulta_documenti.html')
