@@ -3,15 +3,30 @@
 {% block content %}
 
 <style>
-    /* Impostiamo un'altezza massima per la card e abilitiamo lo scroll */
-    .card-body {
-        max-height: 450px; /* Imposta l'altezza massima desiderata per la card */
-        overflow-y: auto;  /* Abilita lo scroll verticale */
-    }
-    /* Garantiamo che il footer stia sempre in fondo */
-    footer {
-        margin-top: 5px; /* Separazione dal contenuto */
-    }
+
+/* Impostiamo un'altezza massima per la card e abilitiamo lo scroll */
+.card-body {
+    max-height: 800px; /* Imposta l'altezza massima desiderata per la card */
+    overflow-y: auto;  /* Abilita lo scroll verticale */
+}
+
+/* Allungare il contenitore per dare più spazio */
+.container.mt-2 {
+    width: 100%; /* Assicuriamo che la larghezza sia del 100% */
+    padding: 15px; /* Un po' di padding per evitare che il contenuto si tocchi ai bordi */
+    box-sizing: border-box; /* Assicura che il padding venga considerato nella larghezza */
+    display: flex;
+    justify-content: center; /* Centra orizzontalmente */
+    align-items: center; /* Centra verticalmente */
+    
+}
+
+/* Impostiamo un massimo per la larghezza della card */
+.card {
+    max-width: 600px; /* Aggiungi una larghezza massima alla card */
+    width: 100%; /* La card si adatta al contenitore */
+}
+
 </style>
 
 <div class="container mt-2">
