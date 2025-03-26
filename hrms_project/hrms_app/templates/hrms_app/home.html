@@ -26,7 +26,6 @@
 
         <form action="{% url 'gestione_timbratura' %}" method="POST">
             {% csrf_token %}       
-            <!--<a href="{% url 'gestione_timbratura' %}" class="btn btn-primary btn-large" style="margin-bottom: 15px; font-weight: bold">--> 
             <button type="submit" class="btn btn-primary btn-large" style="margin-bottom: 15px; font-weight: bold">   
                 {{ text_button }}
             </button>
@@ -66,26 +65,34 @@
         <form action="{% url 'richiesta_permessi_ferie' %}" method="POST">
             {% csrf_token %} 
             <h3>Richiesta Assenze</h3>
-
-            <input type="radio" id="ferie" name="tipo_permesso" value="ferie" checked>
-            <label for="html">Ferie</label><br>
-            <input type="radio" id="permesso" name="tipo_permesso" value="permesso">
-            <label for="css">Permesso</label><br>
-            <input type="radio" id="permesso_nr" name="tipo_permesso" value="Permesso_nr">
-            <label for="javascript">Permesso non retribuito</label>
+            
+            <div class="form-check">
+                <input class="form-check-input" type="radio" id="flexRadioDefault1" name="tipo_permesso" value="ferie" checked>
+                <label class="form-check-label" for="flexRadioDefault1">Ferie</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" id="flexRadioDefault2" name="tipo_permesso" value="permesso">
+                <label class="form-check-label" for="flexRadioDefault2">Permesso</label>
+            </div>
+            <div class="form-check">            
+                <input class="form-check-input" type="radio" id="flexRadioDefault3" name="tipo_permesso" value="Permesso_nr">
+                <label class="form-check-label" for="flexRadioDefault3">Permesso non retribuito</label>
+            </div>                     
 
             <div class="mb-3">
                 <label for="data_inizio" class="form-label">Data inizio</label>
-                <input type="date" class="form-control" id="data_inizio" placeholder="Data di inzio ferie" min={% now "Y-m-d" %}>
+                <input type="date" class="form-control" id="data_inizio" min={% now "Y-m-d" %} required>
+                <input type="time" class="form-control" id="ora_inizio" min="09:00" max="18:00" required>
             </div>            
             <div class="mb-3">
                 <label for="data_fine" class="form-label">Data fine</label>
-                <input type="date" class="form-control" id="data_fine" placeholder="Data di fine ferie" min={% now "Y-m-d" %}>
+                <input type="date" class="form-control" id="data_fine" placeholder="Data di fine ferie" min={% now "Y-m-d" %} required>
+                <input type="time" class="form-control" id="ora_fine" min="09:00" max="18:00" required>
             </div>
             <input class="form-control" type="text" placeholder="Motivo della richiesta" aria-label="default input example">
-            <button type="submit" class="btn btn-primary">Invia Richiesta</button>    
+            <button type="submit" class="btn btn-primary">Invia Richiesta</button>
         </form>
-        <p>{{ scelta }}</p>
+        <p>{{ tipo_permesso }} {{ data_inizio }} {{ ora_inizio }} {{ data_fine }} {{ ora_fine }} {{ motivo }} {{ dipendente }}</p>
     </div>
 
     -->
@@ -118,44 +125,24 @@
 
 <script>
 
-    
+    // Funzione per generare l'orologio delle timbrature
 
     function aggiornaOrologio() {
-
-        // Funzione per generare un orologio;
-
-        var now = new Date();
-        var giorno = now.getDate();
-        var mese = now.toLocaleString("it-IT", { month: "long" });  // Nome del mese
-        var anno = now.getFullYear();
-        var ore = now.getHours().toString().padStart(2, '0');
-        var minuti = now.getMinutes().toString().padStart(2, '0');
-        var secondi = now.getSeconds().toString().padStart(2, '0');
-        var data = `${giorno} ${mese} ${anno}`;
-        var ora = `${ore}:${minuti}:${secondi}`;
+        let now = new Date();
+        let giorno = now.getDate();
+        let mese = now.toLocaleString("it-IT", { month: "long" });  // Nome del mese
+        let anno = now.getFullYear();
+        let ore = now.getHours().toString().padStart(2, '0');
+        let minuti = now.getMinutes().toString().padStart(2, '0');
+        let secondi = now.getSeconds().toString().padStart(2, '0');
+        let data = `${giorno} ${mese} ${anno}`;
+        let ora = `${ore}:${minuti}:${secondi}`;
         document.getElementById("ora").textContent = `${ora}`;
         document.getElementById("data").textContent = `${data}`;
     }
 
     setInterval(aggiornaOrologio, 1000); // Aggiorna ogni secondo
-    aggiornaOrologio(); // Imposta subito l'ora senza aspettare
-
-    
-
-    function controllaRadio() {
-
-        // Funzione che restituisce il radio button selezionato;
-
-        return document.querySelector('input[name="tipo_permesso"]:checked');
-
-        // let risultato = document.getElementById("risultato");
-
-        // if (selezionato) {
-        //     risultato.innerText = "Hai selezionato: " + selezionato.value;
-        // } else {
-        //     risultato.innerText = "Nessuna opzione selezionata!";
-        // }
-    }
+    aggiornaOrologio(); // Imposta subito l'ora senza aspettare   
 
 </script>
 
