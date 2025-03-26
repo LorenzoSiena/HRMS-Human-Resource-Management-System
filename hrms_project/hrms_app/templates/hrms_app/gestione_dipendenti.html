@@ -28,17 +28,33 @@
         </div>
         {% endif %}
         <br>
+
+
         <div class="card">
+
             <div class="card-header text-center">
                 <h3>Lista dipendenti</h3>
             </div>
-                    <!-- Barra di ricerca e pulsante "Crea Dipendente" -->
+            
+            
+            <!-- Barra di ricerca e pulsante "Crea Dipendente" -->
                     <div class="d-flex justify-content-between mb-4">
                         <!-- Form di ricerca con larghezza dimezzata -->
-                        <div class="me-2 col-md-6">
-                            <label for="searchPerson" class="form-label">Cerca Dipendente</label>
-                            <input type="text" class="form-control" id="searchPerson" placeholder="Cerca per nome...">
-                        </div>
+
+                        
+
+                        <form method="POST" action="{% url 'gestione_dipendenti' %}">
+                            {% csrf_token %}
+                            <div class="me-2 col-md-6">
+                                <label for="searchPerson" class="form-label">Cerca Dipendente</label>
+                                <input type="text" class="form-control" id="searchPerson" name="dipendente" placeholder="Cerca per nome...">
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block">Cerca</button>
+                        </form>
+
+
+                        
+                        
                         <!-- Pulsante "Crea Dipendente" -->
                         <a href="{% url 'aggiungi_dipendente' %}" class="btn btn-primary align-self-end">➕Aggiungi Dipendente</a>
                     </div>
@@ -49,7 +65,9 @@
                         <ul class="list-group" id="personList1">
                             {% for dipendente in dipendenti|slice:":10" %}
                                 <li class="list-group-item" href= "{% url 'visualizza_dipendenti' %}" >
-                                    <a href="{% url 'profilo' %}" > {{dipendenti.nome}} {{ dipendente.cognome }}</a>
+
+                                    <a href="{% url 'modifica_dipendente' %}" > {{dipendente.nome}} {{ dipendente.cognome }}</a>
+ 
                                 </li>
                             {% endfor %}
                         </ul>
@@ -59,12 +77,15 @@
                         <ul class="list-group" id="personList2">
                             {% for dipendente in dipendenti|slice:"10:" %}
                                 <li class="list-group-item"href= "{% url 'visualizza_dipendenti' %}" >
-                                    <a href="{% url 'profilo' %}" >{{ dipendente.nome }} {{ dipendente.cognome }}</a>
+                                    <a href="{% url 'modifica_dipendente' %}" >{{ dipendente.nome }} {{ dipendente.cognome }}</a>
                                 </li>
                             {% endfor %}
                 </div>
             </div>
         </div>
+
+
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -72,21 +93,47 @@
     <script>
         // Funzione per filtrare la lista di persone in base al nome
         document.getElementById("searchPerson").addEventListener("input", function() {
-            var filter = this.value.toLowerCase();
-            var listItems1 = document.getElementById("personList1").getElementsByTagName("li");
-            var listItems2 = document.getElementById("personList2").getElementsByTagName("li");
+            console.log("ciao")
+
+/*
+            fetch("{% url 'gestione_dipendenti' %}", {
+                method: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            })
+ 
+            let filter = this.value.toLowerCase();
+            let listItems1 = document.getElementById("personList1").getElementsByTagName("li");
+            let listItems2 = document.getElementById("personList2").getElementsByTagName("li");
 
             // Filtra la lista nella prima colonna
             Array.from(listItems1).forEach(function(item) {
-                var text = item.textContent || item.innerText;
+                let text = item.textContent || item.innerText;
                 item.style.display = text.toLowerCase().includes(filter) ? "" : "none";
             });
 
+
+
+
+
+
+
             // Filtra la lista nella seconda colonna
             Array.from(listItems2).forEach(function(item) {
-                var text = item.textContent || item.innerText;
+                let text = item.textContent || item.innerText;
                 item.style.display = text.toLowerCase().includes(filter) ? "" : "none";
             });
+            
+
+ */
+
         });
     </script>
 
