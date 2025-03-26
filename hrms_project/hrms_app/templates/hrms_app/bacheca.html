@@ -1,46 +1,92 @@
 {% extends "hrms_app/base_bacheca.html" %}
 {% block sezione %}
- <!-- Finestra di visualizzazione messaggi -->
- <div class="card mb-4">
-    <div class="card-body" style="height: 300px; overflow-y: auto; border: 1px solid #ccc;">
-        {% if messaggi %}
-            {% for msg in messaggi %}
-                <div class="border-bottom mb-3 pb-2">
-                    <h4>{{ msg.titolo }}</h4>
-                    <p>{{ msg.messaggio }}</p>
-                    <small class="text-muted">Pubblicato il {{ msg.data_pubblicazione|date:"d/m/Y H:i" }}</small>
-                    <br>
-                    
-                    <form action="{% url 'area_modifica_bacheca' msg.id %}" method="POST" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-primary btn-sm">✏️ Modifica</button>
-                    </form>
+<style>
+    /* CSS personalizzato per il contenuto */
+body, html {
+    height: 80%;
+    margin: 0;
+}
 
-                    
-                    <form action="{% url 'cancella_messaggio_bacheca' msg.id  %}" method="POST" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger btn-sm">🗑️ Elimina</button>
-                    </form>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p class="text-muted">Nessun messaggio disponibile.</p>
-        {% endif %}
-    </div>
-</div> 
+/* Aggiungere spazio per il contenuto */
+.main-content {
+    min-height: calc(100vh - 100px); /* altezza totale della pagina meno la navbar e il footer */
+    padding: 20px;
+    box-sizing: border-box;
+}
 
-<h3>Aggiungi un nuovo messaggio</h3>
-<form method="post" action="{% url 'aggiungi_messaggio_bacheca' %}">
-    {% csrf_token %}
-    <div class="mb-3">
-        <label class="form-label">Titolo</label>
-        <input type="text" name="titolo" class="form-control" required>
+/* Aggiungere un po' di margine sopra il form */
+form {
+    margin-top: 30px;
+}
+
+/* Animazione per la card */
+.card {
+    transition: box-shadow 0.3s ease-in-out;
+    overflow-y: auto;
+}
+
+.card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Layout con il footer in fondo alla pagina */
+footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    padding: 10px;
+    background-color: #f8f9fa;
+    text-align: center;
+    margin-top: 5px;
+}
+
+</style>
+
+<!-- Contenitore per la pagina -->
+<div class="main-content">
+
+    <!-- Finestra di visualizzazione messaggi -->
+    <div class="card mb-4 shadow-sm rounded">
+        <div class="card-body" style="max-height: 300px; border: 1px solid #ddd;">
+            {% if messaggi %}
+                {% for msg in messaggi %}
+                    <div class="border-bottom mb-3 pb-2">
+                        <h4 class="text-primary">{{ msg.titolo }}</h4>
+                        <p>{{ msg.messaggio }}</p>
+                        <small class="text-muted">Pubblicato il {{ msg.data_pubblicazione|date:"d/m/Y H:i" }}</small>
+                        <div class="mt-2">
+                            <!-- Modifica Messaggio -->
+                            <form action="{% url 'area_modifica_bacheca' msg.id %}" method="POST" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-warning btn-sm">✏️ Modifica</button>
+                            </form>
+                            <!-- Elimina Messaggio -->
+                            <form action="{% url 'cancella_messaggio_bacheca' msg.id  %}" method="POST" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">🗑️ Elimina</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">Nessun messaggio disponibile.</p>
+            {% endif %}
+        </div>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Messaggio</label>
-        <textarea name="messaggio" class="form-control" rows="4" required></textarea>
-    </div>
-    <button type="submit" class="btn btn-success">📩 Pubblica</button>
-</form>
+
+    <h3 class="mt-5">Aggiungi un nuovo messaggio</h3>
+    <form method="post" action="{% url 'aggiungi_messaggio_bacheca' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Titolo</label>
+            <input type="text" name="titolo" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Messaggio</label>
+            <textarea name="messaggio" class="form-control" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-success btn-block">📩 Pubblica</button>
+    </form>
+</div>
 
 {% endblock sezione %}
