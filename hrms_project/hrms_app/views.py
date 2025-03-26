@@ -64,8 +64,11 @@ def gestione_timbratura(request: HttpRequest):
 def profilo(request:HttpRequest):
     return render(request,'hrms_app/profilo.html')
 
+def visualizza_dipendenti(request: HttpRequest):
+    dipendenti = Dipendenti.objects.all().values('nome', 'cognome')
+    return render(request, 'hrms_app/visualizza_dipendenti.html', {'dipendenti': dipendenti})
 
-def inserisci_dipendente(request: HttpRequest):
+def crea_dipendente(request: HttpRequest):
     if request.method == "POST":
         nome = request.POST.get('nome', '').strip()
         cognome = request.POST.get('cognome', '').strip()
@@ -117,6 +120,8 @@ def elimina_dipendente(request: HttpRequest, id_dipendente):
     dipendente.delete()
     messages.success(request, f"🗑️ Dipendente '{dipendente.nome} {dipendente.cognome}' eliminato con successo!")
     return redirect('dipendenti')
+
+
 
 def report(request:HttpRequest):
     return render(request,'hrms_app/report.html')
@@ -219,7 +224,20 @@ def visualizza_report_permessi(request:HttpRequest):
 def visualizza_report_mensile(request:HttpRequest):
     pass
 
+def aggiungi_dipendente(request:HttpRequest):
+    if request.method == "POST":
+        form = RegisterForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, "Creazione completata con successo!")
+            return redirect("gestione_dipendenti")  
+        else:
+            messages.error(request, "Errore nella creazione. Controlla i dati inseriti.")
+    else:
+        form = RegisterForm()  # Creazione di un form vuoto se è una GET
 
+    return render(request, "hrms_app/aggiungi_dipendente.html", {"form": form})
+    
 
 
 def registrati(request: HttpRequest):
@@ -318,3 +336,6 @@ def gestione_busta_paga(request:HttpRequest):
 
 def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')
+
+# def aggiungi_dipendente(request:HttpRequest):
+#     return render(request,'hrms_app/aggiungi_dipendente.html')
