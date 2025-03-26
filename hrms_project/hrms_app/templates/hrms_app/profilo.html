@@ -3,30 +3,60 @@
 {% block content %}
 
 <style>
-
-/* Impostiamo un'altezza massima per la card e abilitiamo lo scroll */
+/* Modifica della card per farla più lunga */
 .card-body {
-    max-height: 800px; /* Imposta l'altezza massima desiderata per la card */
-    overflow-y: auto;  /* Abilita lo scroll verticale */
+    max-height: none; 
+    overflow-y: auto;  
 }
 
 /* Allungare il contenitore per dare più spazio */
 .container.mt-2 {
-    width: 100%; /* Assicuriamo che la larghezza sia del 100% */
-    padding: 15px; /* Un po' di padding per evitare che il contenuto si tocchi ai bordi */
-    box-sizing: border-box; /* Assicura che il padding venga considerato nella larghezza */
+    width: 100%; 
+    padding: 15px;
+    box-sizing: border-box; 
     display: flex;
-    justify-content: center; /* Centra orizzontalmente */
-    align-items: center; /* Centra verticalmente */
-    
+    justify-content: center; 
+    align-items: center;
 }
 
 /* Impostiamo un massimo per la larghezza della card */
 .card {
-    max-width: 600px; /* Aggiungi una larghezza massima alla card */
-    width: 100%; /* La card si adatta al contenitore */
+    max-width: 800px;
+    width: 100%;
+    min-height: 600px;  
 }
 
+/* Gestione del formato per lo stipendio */
+.stipendio-input {
+    display: flex;
+    align-items: center;
+}
+
+.stipendio-input input {
+    width: 80%; 
+    padding-right: 50px; 
+}
+
+/* Centra il titolo */
+.card-header h3 {
+    text-align: center; /* Centra il titolo */
+}
+
+/* Cambia il colore di bordo al passaggio del mouse con il colore primary */
+input:hover, select:hover, textarea:hover {
+    border-color: #007bff !important;  /* Colore primary di Bootstrap */
+}
+
+/* Cambia il colore del bordo e aggiungi un'ombra al focus */
+input:focus, select:focus, textarea:focus {
+    border-color: #007bff !important;  /* Colore primary di Bootstrap */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);  /* Effetto ombra */
+}
+
+/* Cambia il colore di sfondo al passaggio del mouse */
+input:hover, select:hover, textarea:hover {
+    background-color: #f1f1f1;  /* Un leggero cambio di sfondo al passaggio del mouse */
+}
 </style>
 
 <div class="container mt-2">
@@ -115,11 +145,11 @@
                     </div>
                 </div>
 
-                 <!-- Stipendio -->
+                <!-- Stipendio senza simbolo euro -->
                 <div class="mb-3 row">
-                    <label for="stipendio" class="col-sm-2 col-form-label">Stipendio</label>
+                    <label for="stipendio" class="col-sm-2 col-form-label">Stipendio €</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="stipendio" value="1,500 €" disabled>
+                        <input type="text" class="form-control" id="stipendio" value="1500.00" disabled>
                     </div>
                 </div>
             </form>
@@ -127,5 +157,17 @@
     </div>
 </div>
 
+<script>
+    // JavaScript per formattare lo stipendio con due decimali
+    window.onload = function() {
+        var stipendioInput = document.getElementById('stipendio');
+        
+        // Formatta il valore come numero con due decimali
+        var stipendioValue = parseFloat(stipendioInput.value).toFixed(2);
+        
+        // Aggiorna il campo con il valore formattato
+        stipendioInput.value = stipendioValue;
+    }
+</script>
 
-{% endblock %} 
+{% endblock %}
