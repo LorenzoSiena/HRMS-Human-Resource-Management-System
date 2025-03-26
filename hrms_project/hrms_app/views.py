@@ -35,31 +35,37 @@ def hrms_app(request: HttpRequest):
         text_button = "Timbra Uscita"
     # Lista delle timbrature da visualizzare - Solo quelle della data odierna
     lista_presenze = Presenze.objects.filter(dipendente = dipendente, data = date.today()) # Lista timbrature odierna
-    return render(request,'hrms_app/home.html', {'text_button': text_button, 'lista_presenze' : lista_presenze})
+    # Visualizza i messagi della bacheca
+    messaggi_bacheca = Bacheca.objects.all().order_by('data_pubblicazione')    
+
+    return render(request,'hrms_app/home.html', {'text_button': text_button, 'lista_presenze': lista_presenze, 'messaggi_bacheca': messaggi_bacheca })
 
 # Funzione per gestire le timbrature
-def gestione_timbratura(request: HttpRequest):    
-    dipendente = Dipendenti.objects.get(id = request.user.id) # Dipendente loggato
-    lista_presenze = Presenze.objects.filter(dipendente = dipendente, data = date.today()) # Lista timbrature odierna
-    messaggio_errore = ""
-    # Verifico se l'utente ha gia' timbrato l'entrata nella data corrente    
-    if Presenze.objects.filter(dipendente = dipendente, data = date.today(), ora_uscita = None).last() is None:
-        # Se l'utente non ha ancora timbrato nella data corrente, procedo con la inserimento dell'entrata
-        try:
-            Presenze.objects.create(data = date.today(), ora_ingresso = datetime.now().time(), dipendente = dipendente)
-            text_button = "Timbra Uscita"
-        except Exception as e:
-            messaggio_errore = f"⚠️ Errore nella creazione dell'entrata!, errore: " + str(e)
-    else:
-        # Se l'utente ha gia' timbrato nella data corrente, proseguo con l'inserimento della data di uscita
-        try:
-            presenza = Presenze.objects.filter(dipendente = dipendente, data = date.today()).last() # Prendo l'ultima riga generata con la data corrente
-            presenza.ora_uscita = datetime.now().time() # Aggiorno l'orario di uscita
-            presenza.save()
-            text_button = "Timbra Entrata"
-        except Exception as e:
-            messaggio_errore = f"⚠️ Errore nella creazione dell'uscita!, errore: " + str(e)
+def gestione_timbratura(request: HttpRequest):
+    if request.method == "POST":    
+        dipendente = Dipendenti.objects.get(id = request.user.id) # Dipendente loggato
+        lista_presenze = Presenze.objects.filter(dipendente = dipendente, data = date.today()) # Lista timbrature odierna
+        messaggio_errore = ""
+        # Verifico se l'utente ha gia' timbrato l'entrata nella data corrente    
+        if Presenze.objects.filter(dipendente = dipendente, data = date.today(), ora_uscita = None).last() is None:
+            # Se l'utente non ha ancora timbrato nella data corrente, procedo con la inserimento dell'entrata
+            try:
+                Presenze.objects.create(data = date.today(), ora_ingresso = datetime.now().time(), dipendente = dipendente)
+                text_button = "Timbra Uscita"
+            except Exception as e:
+                messaggio_errore = f"⚠️ Errore nella creazione dell'entrata!, errore: " + str(e)
+        else:
+            # Se l'utente ha gia' timbrato nella data corrente, proseguo con l'inserimento della data di uscita
+            try:
+                presenza = Presenze.objects.filter(dipendente = dipendente, data = date.today()).last() # Prendo l'ultima riga generata con la data corrente
+                presenza.ora_uscita = datetime.now().time() # Aggiorno l'orario di uscita
+                presenza.save()
+                text_button = "Timbra Entrata"
+            except Exception as e:
+                messaggio_errore = f"⚠️ Errore nella creazione dell'uscita!, errore: " + str(e)
+        return redirect('home')       
     return render(request, 'hrms_app/home.html', {'text_button': text_button, 'lista_presenze' : lista_presenze, 'messaggio_errore': messaggio_errore})
+   
 
 def profilo(request:HttpRequest):
     return render(request,'hrms_app/profilo.html')
@@ -276,6 +282,11 @@ def user_logout(request: HttpRequest):
     logout(request)
     return redirect('home')
 
+def richiesta_permessi_ferie(request: HttpRequest):
+    if request.method == "POST":       
+        scelta = request.POST.get("scelta", "Nessuna selezione")  # Prende il valore dal form
+        return render(request, 'hrms_app/home.html', {"scelta": scelta})
+
 #RESETTO LA PASSWORD
 
 class CustomPasswordResetView(PasswordResetView):
@@ -294,6 +305,7 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 
 class CustomPasswordResetCompleteView(PasswordResetCompleteView):
     template_name = 'hrms_app/reset_password_complete.html'  # Messaggio di avvenuto reset
+
 
 
 
