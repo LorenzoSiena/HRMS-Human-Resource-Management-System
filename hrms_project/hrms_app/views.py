@@ -284,8 +284,16 @@ def user_logout(request: HttpRequest):
 
 def richiesta_permessi_ferie(request: HttpRequest):
     if request.method == "POST":       
-        scelta = request.POST.get("scelta", "Nessuna selezione")  # Prende il valore dal form
-        return render(request, 'hrms_app/home.html', {"scelta": scelta})
+        # tipo_permesso = request.POST.get("tipo_permesso", "Nessuna selezione") # Prende il valore dal radio button selezionato nel form
+        tipo_permesso=""
+        data_inizio = request.POST.get("data_inizio", "nessuna selezione") # Prende il valore dal input del form
+        ora_inizio = request.POST.get("ora_inizio") # Prende il valore dal input del form
+        data_fine = request.POST.get("data_fine") # Prende il valore dal input del form
+        ora_fine = request.POST.get("ora_fine") # Prende il valore dal input del form
+        motivo = request.POST.get("motivo") # Prende il valore dal input del form
+        dipendente = Dipendenti.objects.get(id = request.user.id) # Dipendente loggato
+
+        return render(request, 'hrms_app/home.html', {"tipo_permesso": tipo_permesso, "data_inizio": data_inizio, "ora_inizio": ora_inizio, "data_fine": data_fine, "ora_fine": ora_fine, "motivo": motivo, "dipendente": dipendente})
 
 #RESETTO LA PASSWORD
 
