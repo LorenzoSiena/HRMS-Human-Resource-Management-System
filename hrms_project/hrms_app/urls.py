@@ -45,7 +45,7 @@ urlpatterns = [
     path("richieste_permessi_ferie", views.richiesta_permessi_ferie, name="richiesta_permessi_ferie"),
     
     # gestione permessi e ruoli
-
+    path("crea_ruolo",views.crea_ruolo,name="crea_ruolo"),
     path("mostra_permessi",views.mostra_permessi,name="mostra_permessi"),
 
 

@@ -382,5 +382,37 @@ def sviluppo(request:HttpRequest):
 # def aggiungi_dipendente(request:HttpRequest):
 #     return render(request,'hrms_app/aggiungi_dipendente.html')
 
+
 def gestione_ruoli(request:HttpRequest):
     return render(request,'hrms_app/gestione_ruoli.html')
+
+
+
+def crea_ruolo(request: HttpRequest):
+
+def crea_ruolo_no_form(request: HttpRequest):
+    if request.method == "POST":
+        ruolo = request.POST.get("ruolo")
+        livello_accesso = request.POST.get("livello_accesso")
+
+        if not ruolo or not livello_accesso:
+            messages.error(request, "Errore nella creazione del ruolo. Controlla i dati inseriti.")
+            return redirect("gestione_ruoli")
+
+        # Controlla se esiste già un Group con quel nome
+        gruppo_esistente = Group.objects.filter(name=ruolo).first()
+        if gruppo_esistente and Ruoli.objects.filter(ruolo=gruppo_esistente).exists():
+            messages.error(request, "Ruolo già esistente.")
+            return redirect("gestione_ruoli")
+
+        # Crea il gruppo se non esiste
+        if not gruppo_esistente:
+            gruppo_esistente = Group.objects.create(name=ruolo)
+
+        # Crea il ruolo associato
+        Ruoli.objects.create(ruolo=gruppo_esistente, livello_accesso=int(livello_accesso))
+
+        messages.success(request, f"Creazione ruolo {ruolo} avvenuta con successo!")
+        return redirect("gestione_ruoli")
+
+    return redirect("gestione_ruoli")
