@@ -78,22 +78,22 @@
 </style>
 
 <div class="container mt-2">
-    <div class="card">
-        <div class="card-header">
+   <div class="card"> 
+        <div class="card-header text-center">
             <h3>Lista Dipendenti</h3>
-            <button class="btn btn-primary" href="{% url 'aggiungi_dipendente' %}" type="submit">Aggiungi Dipendente</button>
+            <a href="{% url 'aggiungi_dipendente' %}" class="btn btn-primary" type="submit">Aggiungi Dipendente</a>
             
         </div>
 
-        {% endif %}
+        
         <br>
 
 
         <div class="card">
 
-            <div class="card-header text-center">
+            <!-- <div class="card-header text-center">
                 <h3>Lista dipendenti</h3>
-            </div>
+            </div> -->
             
             
             <!-- Barra di ricerca e pulsante "Crea Dipendente" -->
@@ -113,13 +113,7 @@
                           
                             <button type="submit" class="btn btn-primary">Cerca</button>
                         </form>
-                      
-   
-
-                        
-                        
-                        <!-- Pulsante "Crea Dipendente" -->
-                        #<a href="{% url 'aggiungi_dipendente' %}" class="btn btn-primary align-self-end">➕Aggiungi Dipendente</a>
+                       
                     </div>
 
                 <!-- Lista delle persone in due colonne -->
@@ -127,26 +121,16 @@
                     <div class="col-md-6">
                         <ul class="list-group" id="personList1">
                             {% for dipendente in dipendenti|slice:":10" %}
-                                <li class="list-group-item" href= "{% url 'visualizza_dipendenti' %}" >
+                                <li class="dipendente-list" href= "{% url 'visualizza_dipendenti' %}" >
 
-                                    <a href="{% url 'modifica_dipendente' %}" > {{dipendente.nome}} {{ dipendente.cognome }}</a>
+                                    <a href="{% url 'modifica_dipendente' %}" > <strong>{{dipendente.nome}} {{ dipendente.cognome }}</strong> {{ dipendente.ruolo }}</a>
  
                                 </li>
                             {% endfor %}
                         </ul>
-                    </div>
-        
-                    <div class="col-md-6">
-                        <ul class="list-group" id="personList2">
-                            {% for dipendente in dipendenti|slice:"10:" %}
-                                <li class="list-group-item"href= "{% url 'visualizza_dipendenti' %}" >
-                                    <a href="{% url 'modifica_dipendente' %}" >{{ dipendente.nome }} {{ dipendente.cognome }}</a>
-                                </li>
-                            {% endfor %}
+                    </div>          
                 </div>
-
-            </div>
-            
+                
             <!-- Lista dei dipendenti -->
             <ul class="dipendente-list" id="dipendenteList">
                 <!-- Questo sarà riempito dinamicamente con i dipendenti -->
@@ -168,48 +152,5 @@
     </div>
 </div>
 
-<script>
-    // Funzione per filtrare la lista dei dipendenti
-    function filterEmployees(searchTerm) {
-        const dipendenti = [
-            { nome: "Mario Rossi", ruolo: "Sviluppatore" },
-            { nome: "Luca Bianchi", ruolo: "HR Manager" },
-            { nome: "Giulia Verdi", ruolo: "Designer" },
-            // Aggiungi altri dipendenti alla lista qui
-        ];
-
-        const filteredDipendenti = dipendenti.filter(dipendente => {
-            return dipendente.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                dipendente.ruolo.toLowerCase().includes(searchTerm.toLowerCase());
-        });
-
-        return filteredDipendenti;
-    }
-
-    document.getElementById('searchButton').addEventListener('click', function() {
-        const searchTerm = document.getElementById('searchInput').value;
-        const dipendenteList = document.getElementById('dipendenteList');
-        
-        // Pulisce la lista
-        dipendenteList.innerHTML = '';
-
-        // Filtra i dipendenti in base alla ricerca
-        const filteredDipendenti = filterEmployees(searchTerm);
-
-
-    #<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
-    
-
-        // Aggiungi i dipendenti filtrati alla lista
-        filteredDipendenti.forEach(dipendente => {
-            const li = document.createElement('li');
-            li.innerHTML = `<strong>${dipendente.nome}</strong> - ${dipendente.ruolo}`;
-            dipendenteList.appendChild(li);
-
-        });
-   
-    
-</script>
 
 {% endblock %}
