@@ -145,7 +145,6 @@
                     <button type="button" class="btn btn-warning" id="btn-modifica">Modifica</button>
                     <button type="submit" class="btn btn-success" id="btn-aggiorna"  style="display:none;">Aggiorna</button>
                 </form>
-                    {% comment %} <a href="{% url 'elimina_dipendente' dipendente.id %}" type="button" class="btn btn-danger" id="btn-elimina">Elimina</a> {% endcomment %}
                     <a href="{% url 'elimina_dipendente' dipendente.id %}" type="button" class="btn btn-danger" id="btn-elimina">Elimina</a>
                 </div>
             
@@ -174,7 +173,6 @@ document.getElementById('btn-elimina').addEventListener('click', function (event
 
 // Funzione per aggiornare i dati
 document.getElementById('btn-aggiorna').addEventListener('click', function () {
-    // Qui aggiungi la logica per inviare i dati aggiornati al server (ad esempio con una chiamata AJAX)
     alert("Modifiche aggiornate correttamente!");
    
 });
