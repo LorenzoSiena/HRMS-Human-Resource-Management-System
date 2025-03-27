@@ -381,3 +381,5 @@ def sviluppo(request:HttpRequest):
 # def aggiungi_dipendente(request:HttpRequest):
 #     return render(request,'hrms_app/aggiungi_dipendente.html')
 
+def gestione_ruoli(request:HttpRequest):
+    return render(request,'hrms_app/gestione_ruoli.html')
