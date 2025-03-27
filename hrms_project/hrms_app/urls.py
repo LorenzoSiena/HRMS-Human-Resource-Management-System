@@ -22,7 +22,6 @@ urlpatterns = [
     path("consulta_documenti",views.consulta_documenti,name="consulta_documenti"),
     path("aggiungi_dipendente",views.aggiungi_dipendente,name="aggiungi_dipendente"),
 #----azioni---------------------------------------------------------------------
-    path("visualizza_dipendenti",views.visualizza_dipendenti,name="visualizza_dipendenti"),
     
     path("gestione_timbratura",views.gestione_timbratura,name="gestione_timbratura"),
     path("richiedi_ferie",views.richiedi_ferie,name="richiedi_ferie"),
@@ -33,10 +32,7 @@ urlpatterns = [
     path("crea_dipendente",views.crea_dipendente,name="crea_dipendente"),
 
 
-    
-    path("modifica_dipendente",views.sviluppo,name="modifica_dipendente"),
-
-   #path("modifica_dipendente/<int:id>",views.modifica_dipendente,name="modifica_dipendente"),
+    path("modifica_dipendente/<int:id>",views.modifica_dipendente,name="modifica_dipendente"),
     path("elimina_dipendente/<int:id>",views.elimina_dipendente,name="elimina_dipendente"),
 
 #----azioni Bacheca---------------------------------------------------------------------    

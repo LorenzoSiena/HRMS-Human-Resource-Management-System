@@ -13,7 +13,7 @@ from django.contrib.auth.models import User,Group
 from .models import *
 
 #Form
-from .forms import RegisterForm
+from .forms import RegisterForm,EditUserForm
 from django.contrib.auth import authenticate, login, logout
 
 #Password reset
@@ -73,9 +73,6 @@ def gestione_timbratura(request: HttpRequest):
 def profilo(request:HttpRequest):
     return render(request,'hrms_app/profilo.html')
 
-def visualizza_dipendenti(request: HttpRequest):
-    dipendenti = Dipendenti.objects.all().values('nome', 'cognome')
-    return render(request, 'hrms_app/visualizza_dipendenti.html', {'dipendenti': dipendenti})
 
 def crea_dipendente(request: HttpRequest):
     if request.method == "POST":
@@ -101,34 +98,8 @@ def crea_dipendente(request: HttpRequest):
 
     return redirect('dipendenti')
 
-def modifica_dipendente(request: HttpRequest, id_dipendente):
-    dipendente = get_object_or_404(Dipendenti, id=id_dipendente)
 
-    if request.method == "POST":
-        nome = request.POST.get('nome', '').strip()
-        cognome = request.POST.get('cognome', '').strip()
-        email = request.POST.get('email', '').strip()
-        ruolo = request.POST.get('ruolo', '').strip()
-        data_assunzione = request.POST.get('data_assunzione', '').strip()
-        livello_accesso = request.POST.get('livello_accesso', '').strip()
 
-        if nome and cognome and email and ruolo and data_assunzione and livello_accesso:
-            dipendente.nome = nome
-            dipendente.cognome = cognome
-            dipendente.email = email
-            dipendente.ruolo = ruolo
-            dipendente.data_assunzione = data_assunzione
-            dipendente.livello_accesso = livello_accesso
-            dipendente.save()
-            messages.success(request, f"✅ Dipendente '{nome} {cognome}' modificato con successo!")
-        else:
-            messages.error(request, "⚠️ Tutti i campi sono obbligatori!")
-
-def elimina_dipendente(request: HttpRequest, id_dipendente):
-    dipendente = get_object_or_404(Dipendenti, id=id_dipendente)
-    dipendente.delete()
-    messages.success(request, f"🗑️ Dipendente '{dipendente.nome} {dipendente.cognome}' eliminato con successo!")
-    return redirect('dipendenti')
 
 
 
@@ -182,7 +153,7 @@ def modifica_messaggio_bacheca(request:HttpRequest,id):
             messaggio.messaggio = nuovo_messaggio
             messaggio.save()
             messages.success(request, "✏️ Messaggio  modificato con successo!")
-            return redirect('bacheca') # serve???
+            return redirect('bacheca') 
         else:
             messages.error(request, "⚠️ Titolo e messaggio sono obbligatori!")
 
@@ -247,6 +218,36 @@ def aggiungi_dipendente(request:HttpRequest):
 
     return render(request, "hrms_app/aggiungi_dipendente.html", {"form": form})
     
+
+def modifica_dipendente(request: HttpRequest, id):
+    dipendente = Dipendenti.objects.get(id=id)  # Recupera l'utente esistente
+    if request.method == "POST":
+        form = EditUserForm(request.POST, request.FILES, instance=dipendente)  # Passa l'istanza
+        if form.is_valid():
+            form.save()  # Modifica solo i campi cambiati
+            messages.success(request,f" Dipendente '{dipendente.nome} {dipendente.cognome}' modificato con successo!")
+            return redirect('gestione_dipendenti')
+        else:
+            messages.error(request,f" Campi errati!",)
+
+
+    else:
+        form = EditUserForm(instance=dipendente)  # Precompila il form
+    return render(request, 'hrms_app/modifica_dipendente.html', {'form': form, 'dipendente': dipendente})
+
+
+
+
+
+
+def elimina_dipendente(request: HttpRequest, id):
+    dipendente = get_object_or_404(Dipendenti, id=id)
+    dipendente.delete()
+    messages.success(request, f"🗑️ Dipendente '{dipendente.nome} {dipendente.cognome}' eliminato con successo!")
+    return redirect('gestione_dipendenti')
+
+
+
 
 
 def registrati(request: HttpRequest):

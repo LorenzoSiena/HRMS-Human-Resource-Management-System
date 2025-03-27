@@ -6,16 +6,19 @@ admin.site.register(Dipendenti) """
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Dipendenti,Ruoli,Bacheca
+from .models import Dipendenti,Ruoli
+
+
 
 class DipendentiAdmin(UserAdmin):
     model = Dipendenti
-    list_display = ('email', 'first_name', 'last_name', 'ruolo', 'is_staff', 'is_active')
+    list_display = ('email','username', 'first_name', 'last_name', 'ruolo', 'is_staff', 'is_active')
 
 
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Informazioni personali', {'fields': ('first_name', 'last_name', 'telefono', 'data_assunzione', 'ruolo', 'stipendio', 'documento_contratto')}),
+        ('Informazioni personali', {'fields': ('username','first_name', 'last_name','codice_fiscale','indirizzo_completo','data_nascita','telefono', 'data_assunzione', 'ruolo', 'stipendio', 'documento_contratto')}),
+        #('Informazioni personali', {'fields': ('first_name', 'last_name','telefono', 'data_assunzione', 'ruolo', 'stipendio', 'documento_contratto')}),
         ('Permessi', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')}),
         ('Date e Log', {'fields': ('last_login', 'date_joined')}),
     )
