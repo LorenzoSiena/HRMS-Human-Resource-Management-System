@@ -2,7 +2,330 @@
 
 {% block title %}
 Consulta_documenti
-{% endblock%}
+{% endblock %}
 
 {% block content %}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    h1 {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .card {
+        padding: 20px;
+    }
+    .search-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    .search-container input[type="search"] {
+        flex-grow: 1;
+        margin-right: 10px;
+    }
+    .search-container button {
+        width: auto;
+        padding: 6px 12px;
+    }
+    .card-footer {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+    .file-input {
+        display: none;
+    }
+    .file-list {
+        margin-top: 10px;
+        max-height: 150px;
+        overflow-y: auto;
+        padding: 5px;
+        border: 1px solid #ddd;
+    }
+    .file-item {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 8px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .file-item:last-child {
+        border-bottom: none;
+    }
+    .file-item .file-name {
+        font-size: 0.9em;
+        color: #333;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+    .file-item .file-checkbox {
+        margin-right: 10px;
+    }
+    #file-options-container {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    #file-options-container button {
+        margin: 10px;
+    }
+    #file-options-container .d-flex {
+        justify-content: center;
+    }
+    #close-iframe-btn {
+        margin-top: 20px;
+    }
+    /* Stile per il pannello di visualizzazione */
+    #view-panel {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        border: 2px solid #ddd;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 80%;
+        max-width: 800px;
+        height: 80%;
+        overflow: hidden;
+    }
+    #view-panel iframe {
+        width: 100%;
+        height: 100%;
+    }
+    #close-view-panel-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: red;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+    }
+    /* Stile per i risultati della ricerca */
+    .search-results {
+        margin-top: 10px;
+        border: 1px solid #ddd;
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 5px;
+    }
+    .search-results ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    .search-results li {
+        padding: 8px;
+        cursor: pointer;
+    }
+    .search-results li:hover {
+        background-color: #f0f0f0;
+    }
+</style>
+
+<div class="container">
+    <h1>Gestione Documentazione</h1>
+
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <form method="POST" action="{% url 'gestione_dipendenti' %}">
+                {% csrf_token %}
+                <div class="search-container">
+                    <label for="searchPerson" class="form-label">Cerca Dipendente: </label>
+                    <input type="search" class="form-control me-2" id="searchPerson" name="dipendente" placeholder="Cerca per nome..." aria-label="Search">
+                    <button type="submit" class="btn btn-primary">Cerca Dipendente</button>
+                </div>
+            </form>
+
+            <!-- Risultati della ricerca -->
+            <div class="search-results" id="searchResults" style="display:none;">
+                <ul id="resultsList"></ul>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <!-- Card 1: Contratto -->
+                <div class="col">
+                    <div class="card text-center p-3">
+                        <h5 class="card-title">Contratto</h5>
+                        <div class="card-footer">
+                            <button class="btn btn-success" onclick="openFileInput('contratto')">Carica</button>
+                            <button class="btn btn-danger" onclick="deleteSelectedFiles('contratto')">Elimina Selezionati</button>
+                            <input type="file" id="file-input-contratto" class="file-input" onchange="handleFileUpload(event, 'contratto')">
+                        </div>
+                        <!-- Lista dei documenti caricati -->
+                        <div id="file-list-contratto" class="file-list"></div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Certificati -->
+                <div class="col">
+                    <div class="card text-center p-3">
+                        <h5 class="card-title">Certificati</h5>
+                        <div class="card-footer">
+                            <button class="btn btn-success" onclick="openFileInput('certificati')">Carica</button>
+                            <button class="btn btn-danger" onclick="deleteSelectedFiles('certificati')">Elimina Selezionati</button>
+                            <input type="file" id="file-input-certificati" class="file-input" onchange="handleFileUpload(event, 'certificati')">
+                        </div>
+                        <div id="file-list-certificati" class="file-list"></div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Documenti Legali -->
+                <div class="col">
+                    <div class="card text-center p-3">
+                        <h5 class="card-title">Documenti Legali</h5>
+                        <div class="card-footer">
+                            <button class="btn btn-success" onclick="openFileInput('documenti-legali')">Carica</button>
+                            <button class="btn btn-danger" onclick="deleteSelectedFiles('documenti-legali')">Elimina Selezionati</button>
+                            <input type="file" id="file-input-documenti-legali" class="file-input" onchange="handleFileUpload(event, 'documenti-legali')">
+                        </div>
+                        <div id="file-list-documenti-legali" class="file-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pannello di visualizzazione documento -->
+<div id="view-panel">
+    <button id="close-view-panel-btn" onclick="closeViewPanel()">Chiudi</button>
+    <iframe id="view-frame" src="" frameborder="0"></iframe>
+</div>
+
+<script>
+    // Funzione per aprire l'input del file
+    function openFileInput(documentType) {
+        const fileInput = document.getElementById(`file-input-${documentType}`);
+        fileInput.click();
+    }
+
+    // Funzione per gestire il caricamento del file
+    function handleFileUpload(event, documentType) {
+        const file = event.target.files[0];
+        if (file) {
+            const fileListElement = document.getElementById(`file-list-${documentType}`);
+            
+            const fileItem = document.createElement('div');
+            fileItem.classList.add('file-item');
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.classList.add('file-checkbox');
+            checkbox.dataset.documentType = documentType;
+            checkbox.dataset.fileName = file.name;
+
+            const fileName = document.createElement('span');
+            fileName.classList.add('file-name');
+            fileName.textContent = file.name;
+
+            fileName.onclick = function() {
+                openViewPanel(file);
+            };
+
+            fileItem.appendChild(checkbox);
+            fileItem.appendChild(fileName);
+
+            const fileListItems = fileListElement.querySelectorAll('.file-item');
+            if (fileListItems.length >= 10) {
+                alert("Puoi caricare solo 10 documenti.");
+                return;
+            }
+
+            fileListElement.appendChild(fileItem);
+        } else {
+            alert("Nessun file selezionato.");
+        }
+    }
+
+    // Funzione per aprire il pannello di visualizzazione del documento
+    function openViewPanel(file) {
+        const panel = document.getElementById('view-panel');
+        const iframe = document.getElementById('view-frame');
+
+        const reader = new FileReader();
+        reader.onload = function() {
+            iframe.src = reader.result;
+            panel.style.display = 'block';
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    // Funzione per chiudere il pannello di visualizzazione
+    function closeViewPanel() {
+        const panel = document.getElementById('view-panel');
+        const iframe = document.getElementById('view-frame');
+        iframe.src = ""; // Clear the iframe content
+        panel.style.display = 'none';
+    }
+
+    // Funzione per eliminare i file selezionati
+    function deleteSelectedFiles(documentType) {
+        const fileListElement = document.getElementById(`file-list-${documentType}`);
+        const checkboxes = fileListElement.querySelectorAll('.file-checkbox:checked');
+
+        if (checkboxes.length === 0) {
+            alert("Seleziona almeno un documento da eliminare.");
+            return;
+        }
+
+        if (confirm("Sei sicuro di voler eliminare i documenti selezionati?")) {
+            checkboxes.forEach(checkbox => {
+                checkbox.parentElement.remove();
+            });
+            alert("Documenti eliminati con successo.");
+        }
+    }
+
+    // Funzione per gestire la ricerca e visualizzare i risultati sotto la barra di ricerca
+    document.getElementById('searchPerson').addEventListener('input', function() {
+        const query = this.value;
+        const resultsContainer = document.getElementById('searchResults');
+        const resultsList = document.getElementById('resultsList');
+
+        if (query) {
+            // Simulazione di un array di dipendenti (in un'app reale verrebbe fatto tramite una chiamata al backend)
+            const dipendenti = [
+                { nome: 'Mario Rossi' },
+                { nome: 'Luigi Bianchi' },
+                { nome: 'Giovanni Verdi' },
+                { nome: 'Francesca Neri' },
+                { nome: 'Antonio Gallo' },
+                { nome: 'Paola Lippi' }
+            ];
+
+            // Filtro per risultati che corrispondono alla query (limite 5 risultati)
+            const filteredResults = dipendenti.filter(dipendente => dipendente.nome.toLowerCase().includes(query.toLowerCase()));
+            const limitedResults = filteredResults.slice(0, 5);
+
+            if (limitedResults.length > 0) {
+                resultsList.innerHTML = limitedResults.map(dipendente => `<li>${dipendente.nome}</li>`).join('');
+                resultsContainer.style.display = 'block';
+            } else {
+                resultsContainer.style.display = 'none';
+            }
+        } else {
+            resultsContainer.style.display = 'none';
+        }
+    });
+</script>
+
 {% endblock %}
