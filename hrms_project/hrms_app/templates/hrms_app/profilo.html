@@ -70,7 +70,7 @@ input:hover, select:hover, textarea:hover {
                 <div class="mb-3 row">
                     <label for="nome" class="col-sm-2 col-form-label">Nome</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="nome" value="Mario" disabled>
+                        <input type="text" class="form-control" id="nome" value="{{ user.nome }}" disabled>
                     </div>
                 </div>
                 
@@ -78,14 +78,14 @@ input:hover, select:hover, textarea:hover {
                 <div class="mb-3 row">
                     <label for="cognome" class="col-sm-2 col-form-label">Cognome</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="cognome" value="Rossi" disabled>
+                        <input type="text" class="form-control" id="cognome" value=" {{ user.cognome }} " disabled>
                     </div>
                 </div>
 
                 <div class="mb-3 row">
                     <label for="data_nascita" class="col-sm-2 col-form-label">Data di Nascita</label>
                     <div class="col-sm-10">
-                        <input type="date" class="form-control" id="data_nascita" value="1985-07-20" disabled>
+                        <input type="text" class="form-control" id="data_nascita" value="{{ user.data_nascita|date:'d-m-Y' }}"  disabled>
                     </div>
                 </div>
 
@@ -93,7 +93,7 @@ input:hover, select:hover, textarea:hover {
                 <div class="mb-3 row">
                     <label for="codice_fiscale" class="col-sm-2 col-form-label">Codice Fiscale</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="codice_fiscale" value="RSSMRA85L20Z404K" disabled>
+                        <input type="text" class="form-control" id="codice_fiscale" value= "{{ user.codice_fiscale}}" disabled>                    
                     </div>
                 </div>
 
@@ -101,7 +101,7 @@ input:hover, select:hover, textarea:hover {
                 <div class="mb-3 row">
                     <label for="email" class="col-sm-2 col-form-label">Email</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="email" value="mario.rossi@email.com" disabled>
+                        <input type="email" class="form-control" id="email" value= "{{ user.email}}" disabled>
                     </div>
                 </div>
 
@@ -109,7 +109,7 @@ input:hover, select:hover, textarea:hover {
                 <div class="mb-3 row">
                     <label for="indirizzo" class="col-sm-2 col-form-label">Indirizzo</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="indirizzo" value="Via Roma 123, Milano" disabled>
+                        <input type="text" class="form-control" id="indirizzo" value= "{{ user.indirizzo_completo }}" disabled>
                     </div>
                 </div>
 
@@ -117,7 +117,7 @@ input:hover, select:hover, textarea:hover {
                 <div class="mb-3 row">
                     <label for="telefono" class="col-sm-2 col-form-label">Telefono</label>
                     <div class="col-sm-10">
-                        <input type="tel" class="form-control" id="telefono" value="+39 02 12345678" disabled>
+                        <input type="tel" class="form-control" id="telefono" value= "{{ user.telefono }}"disabled>
                     </div>
                 </div>
 
@@ -125,7 +125,7 @@ input:hover, select:hover, textarea:hover {
                 <div class="mb-3 row">
                     <label for="ruolo" class="col-sm-2 col-form-label">Ruolo</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="ruolo" value="Sviluppatore" disabled>
+                        <input type="text" class="form-control" id="ruolo" value= "{{ user.ruolo }}" disabled>
                     </div>
                 </div>
 
@@ -133,7 +133,7 @@ input:hover, select:hover, textarea:hover {
                 <div class="mb-3 row">
                     <label for="responsabile" class="col-sm-2 col-form-label">Responsabile</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="responsabile" value="Luca Bianchi" disabled>
+                        <input type="text" class="form-control" id="responsabile" value= "{{ user.superiore }}" disabled>
                     </div>
                 </div>
 
@@ -141,7 +141,7 @@ input:hover, select:hover, textarea:hover {
                 <div class="mb-3 row">
                     <label for="data_assunzione" class="col-sm-2 col-form-label">Data di Assunzione</label>
                     <div class="col-sm-10">
-                        <input type="date" class="form-control" id="data_assunzione" value="2020-01-15" disabled>
+                        <input type="text" class="form-control" id="data_assunzione" value="{{ user.data_assunzione|date:'d-m-Y' }}" disabled>
                     </div>
                 </div>
 
@@ -149,7 +149,7 @@ input:hover, select:hover, textarea:hover {
                 <div class="mb-3 row">
                     <label for="stipendio" class="col-sm-2 col-form-label">Stipendio €</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="stipendio" value="1500.00" disabled>
+                        <input type="text" class="form-control" id="stipendio" value= "{{ user.stipendio }}" disabled>
                     </div>
                 </div>
             </form>
@@ -157,17 +157,6 @@ input:hover, select:hover, textarea:hover {
     </div>
 </div>
 
-<script>
-    // JavaScript per formattare lo stipendio con due decimali
-    window.onload = function() {
-        var stipendioInput = document.getElementById('stipendio');
-        
-        // Formatta il valore come numero con due decimali
-        var stipendioValue = parseFloat(stipendioInput.value).toFixed(2);
-        
-        // Aggiorna il campo con il valore formattato
-        stipendioInput.value = stipendioValue;
-    }
-</script>
+
 
 {% endblock %}
