@@ -68,6 +68,11 @@ class RegisterForm(UserCreationForm):
         model = Dipendenti
         fields = ['nome', 'cognome','data_nascita','codice_fiscale','indirizzo_email','telefono','indirizzo_completo','data_assunzione', 'ruolo','superiore', 'stipendio', 'documento_contratto','password1', 'password2']
 
+
+
+    
+
+
     def save(self, commit=True):
         # Creiamo l'istanza del modello senza salvarla nel database
         dipendente: Dipendenti = super().save(commit=False)
@@ -122,6 +127,65 @@ class EditUserForm(forms.ModelForm):
         model = Dipendenti
         #fields = [field for field in RegisterForm.Meta.fields if field not in ['password1', 'password2']]
         fields = ['first_name', 'last_name','data_nascita','codice_fiscale','email','telefono','indirizzo_completo','data_assunzione', 'ruolo','superiore', 'stipendio', 'documento_contratto']
+
+
+    first_name = forms.CharField(  
+        max_length=100,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'style': '', 'placeholder': 'Nome'})
+    )
+
+    last_name = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Cognome'})
+    )
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'})
+        
+    )
+                                       
+    data_assunzione = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control','type': 'date'}))
+
+    ruolo = forms.ModelChoiceField(
+        queryset=Ruoli.objects.all(), 
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    stipendio = forms.DecimalField(
+        max_digits=10, 
+        decimal_places=2,
+        min_value=0,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Stipendio'})
+    )
+    documento_contratto = forms.FileField(
+        required=False,
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
+    )
+    
+    superiore = forms.ModelChoiceField(
+        queryset=Dipendenti.objects.all(), 
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    ) #da filtrare
+
+    telefono = forms.CharField(
+        max_length=15,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefono'})
+    )
+    indirizzo_completo = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Indirizzo Completo'})
+    )
+    
+    codice_fiscale = forms.CharField(max_length=16,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Codice Fiscale'})
+    )
+    
+    data_nascita = forms.DateField(
+        widget=forms.DateInput(attrs={'class': 'form-control','type': 'date'})
+    )
+
 
     def save(self, commit=True):
         dipendente: Dipendenti = super().save(commit=False)
