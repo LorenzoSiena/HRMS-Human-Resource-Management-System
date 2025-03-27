@@ -19,8 +19,7 @@
             margin-bottom: 1rem;
         }
     </style>
-</head>
-<body>
+
 
 <div class="container mt-5">
     <!-- Sezione 1: Aggiungi Ruolo a Dipendente -->
@@ -39,10 +38,6 @@
                 <button type="submit" class="btn btn-primary">Cerca Dipendente</button>
             </form>
 
-
-                
-            
-
                 <!-- Risultati della ricerca -->
                 <div id="risultati-ricerca" class="mb-3">
                     <!-- I dipendenti trovati saranno mostrati qui -->
@@ -56,11 +51,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="livello" class="form-label">Livello Ruolo</label>
-                    <select class="form-select" id="livello">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                    </select>
+                    <input type="number" class="form-control" id="livello" min="1" max="100" placeholder="Inserisci livello">
                 </div>
                 <button type="submit" class="btn btn-primary">Aggiungi Ruolo</button>
             </form>
@@ -77,7 +68,7 @@
       <form id="form-permessi">
           <!-- Sezione di ricerca dipendente -->
           <div class="mb-3">
-              <label for="ricerca-dipendente-permesso" class="form-label">Ricerca Dipendente</label>
+              <label for="ricerca-dipendente-permesso" class="form-label">Ricerca Ruolo</label>
               <input type="text" class="form-control" id="ricerca-dipendente-permesso" placeholder="Cerca per nome..." oninput="ricercaDipendentiPermessi()">
               <div id="suggerimenti-permessi" class="list-group mt-2" style="display: none;"></div>
           </div>
@@ -150,16 +141,13 @@
                 <h6>Crea un nuovo ruolo</h6>
                 <form id="form-crea-ruolo">
                     <div class="mb-3">
-                        <label for="nuovo-ruolo" class="form-label">Nome del Ruolo</label>
                         <input type="text" class="form-control" id="nuovo-ruolo" placeholder="Nome del ruolo">
                     </div>
                     <div class="mb-3">
-                        <label for="nuovo-livello" class="form-label">Livello del Ruolo</label>
-                        <select class="form-select" id="nuovo-livello">
-                            <option value="1">Junior</option>
-                            <option value="2">Medio</option>
-                            <option value="3">Senior</option>
-                        </select>
+                        <div class="mb-3">
+                            <label for="creazioneLivello" class="form-label">Creazione Nuovo Livello</label>
+                            <input type="number" class="form-control" id="creazioneLivello" min="1" max="100" placeholder="Inserisci valore numerico per il ruolo">
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Conferma</button>
                 </form>
@@ -335,29 +323,33 @@ function eliminaRuolo() {
 }
 
 
+    
     // Funzione per aggiungere un nuovo ruolo
-    document.getElementById('form-crea-ruolo').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const nuovoRuolo = document.getElementById('nuovo-ruolo').value;
-        const nuovoLivello = document.getElementById('nuovo-livello').value;
+document.getElementById('form-crea-ruolo').addEventListener('submit', function(e) {
+    e.preventDefault(); // Impedisce l'invio del form in modo tradizionale
 
-        if (nuovoRuolo) {
-            // Controlla se il ruolo esiste già
-            const ruoloEsistente = ruoli.find(r => r.nome.toLowerCase() === nuovoRuolo.toLowerCase());
-            if (ruoloEsistente) {
-                mostraAvviso('Errore', ', il ruolo inserito esiste già!');
-                return;
-            }
+    const nuovoRuolo = document.getElementById('nuovo-ruolo').value;
+    const nuovoLivello = document.getElementById('creazioneLivello').value;
 
-            const idRuolo = ruoli.length + 1;
-            ruoli.push({ id: idRuolo, nome: nuovoRuolo, livello: nuovoLivello });
-            aggiornaDipendenti();
-            mostraAvviso('Ruolo creato con successo! ', 'Il nuovo ruolo è stato aggiunto.');
-            document.getElementById('nuovo-ruolo').value = ''; // Pulisce il campo
-        } else {
-            mostraAvviso('Errore', ', per favore inserisci un nome per il nuovo ruolo.');
+    if (nuovoRuolo) {
+        // Controlla se il ruolo esiste già
+        const ruoloEsistente = ruoli.find(r => r.nome.toLowerCase() === nuovoRuolo.toLowerCase());
+        if (ruoloEsistente) {
+            mostraAvviso('Errore', ', il ruolo inserito esiste già!');
+            return;
         }
-    });
+
+        const idRuolo = ruoli.length + 1;
+        ruoli.push({ id: idRuolo, nome: nuovoRuolo, livello: nuovoLivello });
+        aggiornaDipendenti();
+        mostraAvviso('Ruolo creato con successo! ', 'Il nuovo ruolo è stato aggiunto.');
+        document.getElementById('nuovo-ruolo').value = ''; // Pulisce il campo
+        document.getElementById('creazioneLivello').value = ''; // Pulisce il campo livello
+    } else {
+        mostraAvviso('Errore', ', per favore inserisci un nome per il nuovo ruolo.');
+    }
+});
+
 
     // Funzione per mostrare l'alert di successo o errore
     function mostraAvviso(titolo, messaggio) {
