@@ -113,3 +113,35 @@ class RegisterForm(UserCreationForm):
                     field.widget.attrs.update({'class': 'form-control', 'type': 'date'})
                 elif isinstance(field.widget, forms.FileInput):
                     field.widget.attrs.update({'class': 'form-control'})
+
+
+
+class EditUserForm(RegisterForm):
+    class Meta:
+        model = Dipendenti
+        #fields = [field for field in RegisterForm.Meta.fields if field not in ['password1', 'password2']]
+        fields = ['first_name', 'last_name','data_nascita','codice_fiscale','email','telefono','indirizzo_completo','data_assunzione', 'ruolo','superiore', 'stipendio', 'documento_contratto']
+
+    def save(self, commit=True):
+        dipendente: Dipendenti = super().save(commit=False)
+
+        # Se commit è True, salva le modifiche nel database
+        if commit:
+            dipendente.save()
+
+        return dipendente
+
+    def __init__(self, *args, **kwargs):
+        super(EditUserForm, self).__init__(*args, **kwargs)
+
+        # Aggiunge classi Bootstrap ai campi per uniformare lo stile con RegisterForm
+        for field_name, field in self.fields.items():
+            if isinstance(field.widget, forms.TextInput) or isinstance(field.widget, forms.EmailInput):
+                field.widget.attrs.update({'class': 'form-control'})
+            elif isinstance(field.widget, forms.Select):
+                field.widget.attrs.update({'class': 'form-select'})
+            elif isinstance(field.widget, forms.DateInput):
+                field.widget.attrs.update({'class': 'form-control', 'type': 'date'})
+            elif isinstance(field.widget, forms.FileInput):
+                field.widget.attrs.update({'class': 'form-control'})
+

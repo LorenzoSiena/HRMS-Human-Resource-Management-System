@@ -5,7 +5,6 @@
 <style>
     /* Impostiamo un'altezza massima per la card e abilitiamo lo scroll */
     .card-body {
-        max-height: 450px; /* Imposta l'altezza massima desiderata per la card */
         overflow-y: auto;  /* Abilita lo scroll verticale */
     }
     /* Garantiamo che il footer stia sempre in fondo */
@@ -14,6 +13,15 @@
     }
 </style>
 
+{% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
 <div class="container mt-5">
     <div class="card">
         <div class="card-header">
@@ -21,11 +29,12 @@
         </div>
         <div class="card-body">
             <form>
+                {% csrf_token %}
                 <!-- Nome -->
                 <div class="mb-3 row">
                     <label for="nome" class="col-sm-2 col-form-label">Nome</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="nome" value="Mario" disabled>
+                        {{ form.first_name}}
                     </div>
                 </div>
                 
@@ -33,14 +42,14 @@
                 <div class="mb-3 row">
                     <label for="cognome" class="col-sm-2 col-form-label">Cognome</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="cognome" value="Rossi" disabled>
+                        {{ form.last_name}}
                     </div>
                 </div>
 
                 <div class="mb-3 row">
                     <label for="data_nascita" class="col-sm-2 col-form-label">Data di Nascita</label>
                     <div class="col-sm-10">
-                        <input type="date" class="form-control" id="data_nascita" value="1985-07-20" disabled>
+                        {{ form.data_nascita}}
                     </div>
                 </div>
 
@@ -48,7 +57,7 @@
                 <div class="mb-3 row">
                     <label for="codice_fiscale" class="col-sm-2 col-form-label">Codice Fiscale</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="codice_fiscale" value="RSSMRA85L20Z404K" disabled>
+                        {{ form.codice_fiscale}}
                     </div>
                 </div>
 
@@ -56,7 +65,7 @@
                 <div class="mb-3 row">
                     <label for="email" class="col-sm-2 col-form-label">Email</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="email" value="mario.rossi@email.com" disabled>
+                        {{ form.email}}
                     </div>
                 </div>
 
@@ -64,7 +73,7 @@
                 <div class="mb-3 row">
                     <label for="indirizzo" class="col-sm-2 col-form-label">Indirizzo</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="indirizzo" value="Via Roma 123, Milano" disabled>
+                        {{ form.indirizzo_completo}}
                     </div>
                 </div>
 
@@ -72,7 +81,7 @@
                 <div class="mb-3 row">
                     <label for="telefono" class="col-sm-2 col-form-label">Telefono</label>
                     <div class="col-sm-10">
-                        <input type="tel" class="form-control" id="telefono" value="+39 02 12345678" disabled>
+                        {{ form.telefono}}
                     </div>
                 </div>
 
@@ -80,7 +89,7 @@
                 <div class="mb-3 row">
                     <label for="ruolo" class="col-sm-2 col-form-label">Ruolo</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="ruolo" value="Sviluppatore" disabled>
+                        {{ form.ruolo }}
                     </div>
                 </div>
 
@@ -88,7 +97,7 @@
                 <div class="mb-3 row">
                     <label for="responsabile" class="col-sm-2 col-form-label">Responsabile</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="responsabile" value="Luca Bianchi" disabled>
+                        {{ form.superiore }}
                     </div>
                 </div>
 
@@ -96,7 +105,7 @@
                 <div class="mb-3 row">
                     <label for="data_assunzione" class="col-sm-2 col-form-label">Data di Assunzione</label>
                     <div class="col-sm-10">
-                        <input type="date" class="form-control" id="data_assunzione" value="2020-01-15" disabled>
+                        {{ form.data_assunzione }}
                     </div>
                 </div>
 
@@ -104,7 +113,7 @@
                 <div class="mb-3 row">
                     <label for="stipendio" class="col-sm-2 col-form-label">Stipendio</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="stipendio" value="1,500 €" disabled>
+                        {{ form.stipendio }}
                     </div>
                 </div>
 
