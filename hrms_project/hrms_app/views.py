@@ -226,16 +226,22 @@ def modifica_dipendente(request: HttpRequest, id):
         if form.is_valid():
             form.save()  # Modifica solo i campi cambiati
             messages.success(request,f" Dipendente '{dipendente.nome} {dipendente.cognome}' modificato con successo!")
-            return redirect('modifica_dipendente')
+            return redirect('gestione_dipendenti')
         else:
-            messages.error(request,f" Campi errati!")
+            messages.error(request,f" Campi errati!",)
+
+
     else:
         form = EditUserForm(instance=dipendente)  # Precompila il form
-    return render(request, 'hrms_app/modifica_dipendente.html', {'form': form})
+    return render(request, 'hrms_app/modifica_dipendente.html', {'form': form, 'dipendente': dipendente})
 
 
-def elimina_dipendente(request: HttpRequest, id_dipendente):
-    dipendente = get_object_or_404(Dipendenti, id=id_dipendente)
+
+
+
+
+def elimina_dipendente(request: HttpRequest, id):
+    dipendente = get_object_or_404(Dipendenti, id=id)
     dipendente.delete()
     messages.success(request, f"🗑️ Dipendente '{dipendente.nome} {dipendente.cognome}' eliminato con successo!")
     return redirect('gestione_dipendenti')

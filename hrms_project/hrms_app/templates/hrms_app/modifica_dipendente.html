@@ -21,6 +21,26 @@
         {% endfor %}
     {% endif %}
 
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <strong>Errore!</strong>
+        <ul>
+            {% for field in form %}
+                {% if field.errors %}
+                    <li><strong>{{ field.label }}:</strong>
+                        <ul>
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+
 
 <div class="container mt-5">
     <div class="card">
@@ -28,7 +48,9 @@
             <h3>Dettagli Dipendente</h3>
         </div>
         <div class="card-body">
-            <form>
+             <h1> {{dipendente.id}} </h1>
+            {% comment %} <form method="post" action="{% url 'modifica_dipendente' %}" enctype="multipart/form-data" > {% endcomment %} 
+            <form method="post" action="{% url 'modifica_dipendente' dipendente.id %}"  > 
                 {% csrf_token %}
                 <!-- Nome -->
                 <div class="mb-3 row">
@@ -114,16 +136,19 @@
                     <label for="stipendio" class="col-sm-2 col-form-label">Stipendio</label>
                     <div class="col-sm-10">
                         {{ form.stipendio }}
+                        
                     </div>
                 </div>
 
                 <!-- Pulsanti per modifica e eliminazione -->
                 <div class="text-center mt-3">
                     <button type="button" class="btn btn-warning" id="btn-modifica">Modifica</button>
-                    <button type="button" class="btn btn-success" id="btn-aggiorna" style="display:none;">Aggiorna</button>
-                    <button type="button" class="btn btn-danger" id="btn-elimina">Elimina</button>
+                    <button type="submit" class="btn btn-success" id="btn-aggiorna"  style="display:none;">Aggiorna</button>
+                </form>
+                    {% comment %} <a href="{% url 'elimina_dipendente' dipendente.id %}" type="button" class="btn btn-danger" id="btn-elimina">Elimina</a> {% endcomment %}
+                    <a href="{% url 'elimina_dipendente' dipendente.id %}" type="button" class="btn btn-danger" id="btn-elimina">Elimina</a>
                 </div>
-            </form>
+            
         </div>
     </div>
 </div>
@@ -131,7 +156,7 @@
 
 <script>
  document.getElementById('btn-modifica').addEventListener('click', function () {
-    const inputs = document.querySelectorAll('input');
+    const inputs = document.querySelectorAll('input, select');
     inputs.forEach(input => {
         input.disabled = false;
     });
@@ -139,18 +164,11 @@
     document.getElementById('btn-modifica').style.display = 'none'; // Nasconde il bottone "Modifica"
 });
 
-// Funzione per eliminare il dipendente e pulire i campi
-document.getElementById('btn-elimina').addEventListener('click', function () {
-    if (confirm("Sei sicuro di voler eliminare questo dipendente?")) {
-        // Pulisce i campi
-        const inputs = document.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.value = ''; // Pulisce il valore del campo
-            input.disabled = true; // Disabilita i campi
-        });
 
-        // Mostra un messaggio di conferma
-        alert("Dipendente eliminato e campi puliti!");
+
+document.getElementById('btn-elimina').addEventListener('click', function (event) {
+    if (!confirm("Sei sicuro di voler eliminare questo dipendente?")) {
+        event.preventDefault();  // Blocca il redirect se l'utente preme "No"
     }
 });
 
@@ -158,21 +176,11 @@ document.getElementById('btn-elimina').addEventListener('click', function () {
 document.getElementById('btn-aggiorna').addEventListener('click', function () {
     // Qui aggiungi la logica per inviare i dati aggiornati al server (ad esempio con una chiamata AJAX)
     alert("Modifiche aggiornate correttamente!");
-    
-    // Disabilita i campi dopo l'aggiornamento
-    const inputs = document.querySelectorAll('input');
-    inputs.forEach(input => {
-        input.disabled = true;
-    });
-    
-    // Nascondi il bottone "Aggiorna" e mostra di nuovo "Modifica"
-    document.getElementById('btn-aggiorna').style.display = 'none';
-    document.getElementById('btn-modifica').style.display = 'inline-block';
+   
 });
 </script> 
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 
 

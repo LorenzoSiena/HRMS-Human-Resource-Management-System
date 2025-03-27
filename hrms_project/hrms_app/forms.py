@@ -6,8 +6,8 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Dipendenti,Ruoli
 from random import randint
 
-class RegisterForm(UserCreationForm):
-    nome = forms.CharField(
+class RegisterForm(UserCreationForm):   
+    nome = forms.CharField(  
         max_length=100,
         widget=forms.TextInput(attrs={'class': 'form-control', 'style': '', 'placeholder': 'Nome'})
     )
@@ -116,7 +116,8 @@ class RegisterForm(UserCreationForm):
 
 
 
-class EditUserForm(RegisterForm):
+#class EditUserForm(RegisterForm):
+class EditUserForm(forms.ModelForm):
     class Meta:
         model = Dipendenti
         #fields = [field for field in RegisterForm.Meta.fields if field not in ['password1', 'password2']]
@@ -136,6 +137,7 @@ class EditUserForm(RegisterForm):
 
         # Aggiunge classi Bootstrap ai campi per uniformare lo stile con RegisterForm
         for field_name, field in self.fields.items():
+            field.widget.attrs['disabled'] = 'disabled'#
             if isinstance(field.widget, forms.TextInput) or isinstance(field.widget, forms.EmailInput):
                 field.widget.attrs.update({'class': 'form-control'})
             elif isinstance(field.widget, forms.Select):
