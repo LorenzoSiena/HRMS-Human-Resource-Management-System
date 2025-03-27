@@ -16,6 +16,7 @@ urlpatterns = [
     path("profilo",views.profilo,name="profilo"),
     path("stipendi",views.stipendi,name="stipendi"),
     path("gestione_dipendenti",views.gestione_dipendenti,name="gestione_dipendenti"),
+    path("gestione_ruoli",views.gestione_ruoli,name="gestione_ruoli"),
     path("gestione_assenze",views.gestione_assenze,name="gestione_assenze"),
     path("gestione_busta_paga",views.gestione_busta_paga,name="gestione_busta_paga"),
     path("consulta_documenti",views.consulta_documenti,name="consulta_documenti"),

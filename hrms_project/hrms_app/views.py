@@ -349,3 +349,5 @@ def gestione_busta_paga(request:HttpRequest):
 def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')
 
+def gestione_ruoli(request:HttpRequest):
+    return render(request,'hrms_app/gestione_ruoli.html')
