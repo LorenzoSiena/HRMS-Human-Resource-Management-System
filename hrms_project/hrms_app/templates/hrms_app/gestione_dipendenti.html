@@ -81,14 +81,70 @@
     <div class="card">
         <div class="card-header">
             <h3>Lista Dipendenti</h3>
-            <button class="btn btn-primary" type="submit">Aggiungi Dipendente</button>
+            <button class="btn btn-primary" href="{% url 'aggiungi_dipendente' %}" type="submit">Aggiungi Dipendente</button>
+            
         </div>
-        <div class="card-body">
-            <div class="container-fluid">
-                <form class="d-flex" role="search">
-                  <input class="form-control me-2" type="search" id="searchInput" placeholder="Search" aria-label="Search">
-                  <button class="btn btn-primary" type="button" id="searchButton">Search</button>
-                </form>
+
+        {% endif %}
+        <br>
+
+
+        <div class="card">
+
+            <div class="card-header text-center">
+                <h3>Lista dipendenti</h3>
+            </div>
+            
+            
+            <!-- Barra di ricerca e pulsante "Crea Dipendente" -->
+
+             <div class="card-body">
+                        <div class="container-fluid">
+                        <!-- Form di ricerca con larghezza dimezzata -->
+
+                        
+   
+                        <form method="POST" action="{% url 'gestione_dipendenti' %}">
+                            {% csrf_token %}
+                            <div class="d-flex">
+                                <label for="searchPerson" class="form-label">Cerca Dipendente</label>
+                                <input type="search" class="form-control me-2" id="searchPerson" name="dipendente" placeholder="Cerca per nome..." aria-label="Search">
+                            </div>
+                          
+                            <button type="submit" class="btn btn-primary">Cerca</button>
+                        </form>
+                      
+   
+
+                        
+                        
+                        <!-- Pulsante "Crea Dipendente" -->
+                        #<a href="{% url 'aggiungi_dipendente' %}" class="btn btn-primary align-self-end">➕Aggiungi Dipendente</a>
+                    </div>
+
+                <!-- Lista delle persone in due colonne -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <ul class="list-group" id="personList1">
+                            {% for dipendente in dipendenti|slice:":10" %}
+                                <li class="list-group-item" href= "{% url 'visualizza_dipendenti' %}" >
+
+                                    <a href="{% url 'modifica_dipendente' %}" > {{dipendente.nome}} {{ dipendente.cognome }}</a>
+ 
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+        
+                    <div class="col-md-6">
+                        <ul class="list-group" id="personList2">
+                            {% for dipendente in dipendenti|slice:"10:" %}
+                                <li class="list-group-item"href= "{% url 'visualizza_dipendenti' %}" >
+                                    <a href="{% url 'modifica_dipendente' %}" >{{ dipendente.nome }} {{ dipendente.cognome }}</a>
+                                </li>
+                            {% endfor %}
+                </div>
+
             </div>
             
             <!-- Lista dei dipendenti -->
@@ -106,6 +162,9 @@
                 <!-- Aggiungi altri dipendenti qui -->
             </ul>
         </div>
+
+
+
     </div>
 </div>
 
@@ -137,13 +196,19 @@
         // Filtra i dipendenti in base alla ricerca
         const filteredDipendenti = filterEmployees(searchTerm);
 
+
+    #<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    
+
         // Aggiungi i dipendenti filtrati alla lista
         filteredDipendenti.forEach(dipendente => {
             const li = document.createElement('li');
             li.innerHTML = `<strong>${dipendente.nome}</strong> - ${dipendente.ruolo}`;
             dipendenteList.appendChild(li);
+
         });
-    });
+   
     
 </script>
 

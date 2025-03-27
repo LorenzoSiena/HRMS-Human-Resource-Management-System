@@ -2,7 +2,11 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpRequest
 from django.contrib import messages
+
+from django.shortcuts import get_object_or_404, redirect
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+
 
 
 from django.contrib.auth.models import User,Group
@@ -283,8 +287,6 @@ def vai_all_admin(request):
 def user_login(request: HttpRequest):
     if request.user.is_authenticated:
         return redirect('home')
-    if request.user.is_authenticated:   
-        return redirect('home')
 
     if request.method == "POST":
         email = request.POST.get("email")
@@ -346,7 +348,25 @@ def busta_paga(request:HttpRequest):
     return render(request,'hrms_app/busta_paga.html')
 
 def gestione_dipendenti(request:HttpRequest):
-    return render(request,'hrms_app/gestione_dipendenti.html')
+
+    if request.method == "POST":
+        dipendente = request.POST.get("dipendente")
+        
+        #ricerca incrociata su nome e cognome dove %dipendente%
+        #lista_dipendenti = Dipendenti.objects.filter(nome=dipendente,cognome=dipendente)
+
+        lista_dipendenti = Dipendenti.objects.filter(Q(first_name__icontains=dipendente) | Q(last_name__icontains=dipendente))
+        if lista_dipendenti:
+            messages.success(request, "Utenti trovati")
+                    
+        else:
+            messages.error(request, "Nessun dipendente trovato")
+    
+
+        return render(request, "hrms_app/gestione_dipendenti.html", {"dipendenti": lista_dipendenti})
+    return render(request, "hrms_app/gestione_dipendenti.html")
+
+
 
 def gestione_assenze(request:HttpRequest):
     return render(request,'hrms_app/gestione_assenze.html')
@@ -356,4 +376,8 @@ def gestione_busta_paga(request:HttpRequest):
 
 def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')
+def sviluppo(request:HttpRequest):
+    return render(request,'hrms_app/modifica_dipendente.html')
+# def aggiungi_dipendente(request:HttpRequest):
+#     return render(request,'hrms_app/aggiungi_dipendente.html')
 

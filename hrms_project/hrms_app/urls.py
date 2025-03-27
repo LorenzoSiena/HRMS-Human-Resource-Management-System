@@ -30,8 +30,13 @@ urlpatterns = [
     path("visualizza_busta_paga",views.visualizza_busta_paga,name="visualizza_busta_paga"),
     path("crea_busta_paga",views.crea_busta_paga,name="crea_busta_paga"),
     path("crea_dipendente",views.crea_dipendente,name="crea_dipendente"),
-    path("modifica_dipendente",views.modifica_dipendente,name="modifica_dipendente"),
-    path("elimina_dipendente",views.elimina_dipendente,name="elimina_dipendente"),
+
+
+    
+    path("modifica_dipendente",views.sviluppo,name="modifica_dipendente"),
+
+   #path("modifica_dipendente/<int:id>",views.modifica_dipendente,name="modifica_dipendente"),
+    path("elimina_dipendente/<int:id>",views.elimina_dipendente,name="elimina_dipendente"),
 
 #----azioni Bacheca---------------------------------------------------------------------    
     path("aggiungi_messaggio_bacheca",views.aggiungi_messaggio_bacheca,name="aggiungi_messaggio_bacheca"),
