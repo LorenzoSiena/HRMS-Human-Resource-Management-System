@@ -44,8 +44,17 @@ urlpatterns = [
     path("area_modifica_bacheca/<int:id>",views.area_modifica_bacheca,name="area_modifica_bacheca"),
     path("cancella_messaggio_bacheca/<int:id>",views.cancella_messaggio_bacheca,name="cancella_messaggio_bacheca"),
     #path("visualizza_report_mensile",views.report_mensile,name="report_mensile"),
+
+    path("richieste_permessi_ferie", views.richiesta_permessi_ferie, name="richiesta_permessi_ferie"),
     
-    #----------------------- per resettare la password------------
+    # gestione permessi e ruoli
+
+    path("mostra_permessi",views.mostra_permessi,name="mostra_permessi"),
+
+
+
+
+# per resettare la password
     path('reset_password/', views.CustomPasswordResetView.as_view(), name='reset_password'),
     path('hrms_app/reset_password_done', views.CustomPasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset_password_confirm/<uidb64>/<token>/', views.CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),

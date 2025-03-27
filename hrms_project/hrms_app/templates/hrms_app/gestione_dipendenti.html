@@ -1,31 +1,90 @@
 {% extends 'hrms_app/base.html' %}
-{% block title %} Gestione Dipendenti {% endblock title %}
+{% block title %} Lista Dipendenti {% endblock title %}
 {% block content %}
 
 <style>
-    /* Personalizzazione della card */
-    .card-header {
-        font-weight: bold;
-        background-color: #f8f9fa;
-    }
-    .card-body {
-        padding: 1rem;
-    }
+/* Modifica della card per farla più lunga */
+.card-body {
+    max-height: none; 
+    overflow-y: auto;  
+}
+
+/* Allungare il contenitore per dare più spazio */
+.container.mt-2 {
+    width: 100%; 
+    padding: 15px;
+    box-sizing: border-box; 
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+}
+
+/* Impostiamo un massimo per la larghezza della card */
+.card {
+    max-width: 800px;
+    width: 100%;
+    min-height: 600px;  
+}
+
+/* Gestione della barra di ricerca e dei bottoni */
+.search-container {
+    display: flex;
+    justify-content: flex-start; /* Allinea i bottoni a sinistra */
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px; /* Spazio tra i bottoni */
+}
+
+.search-container input[type="text"] {
+    width: 70%; /* Riduci la larghezza della barra di ricerca */
+    padding: 10px;
+    margin-right: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.search-container button,
+.search-container a {
+    padding: 10px 15px;
+    margin: 0; /* Rimuove margini extra */
+}
+
+/* Gestione del formato per la lista dipendenti */
+.dipendente-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.dipendente-list li {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+}
+
+/* Allinea il titolo e il bottone nella stessa riga */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h3 {
+    margin: 0; /* Rimuove margine predefinito */
+}
+
+.card-header .btn {
+    margin-left: 15px;
+}
+
 </style>
 
-    <title>Lista Dipendenti</title>
-
-    <!-- Card con lista persone -->
-
-
-    <div class="container mt-5">
-        <br>
-        {% if messages %}
-        <div class="alert alert-danger">
-            {% for m in messages %}
-                <p>{{m}}</p>
-            {% endfor %}
+<div class="container mt-2">
+    <div class="card">
+        <div class="card-header">
+            <h3>Lista Dipendenti</h3>
+            <button class="btn btn-primary" href="{% url 'aggiungi_dipendente' %}" type="submit">Aggiungi Dipendente</button>
+            
         </div>
+
         {% endif %}
         <br>
 
@@ -38,25 +97,29 @@
             
             
             <!-- Barra di ricerca e pulsante "Crea Dipendente" -->
-                    <div class="d-flex justify-content-between mb-4">
+
+             <div class="card-body">
+                        <div class="container-fluid">
                         <!-- Form di ricerca con larghezza dimezzata -->
 
                         
-
+   
                         <form method="POST" action="{% url 'gestione_dipendenti' %}">
                             {% csrf_token %}
-                            <div class="me-2 col-md-6">
+                            <div class="d-flex">
                                 <label for="searchPerson" class="form-label">Cerca Dipendente</label>
-                                <input type="text" class="form-control" id="searchPerson" name="dipendente" placeholder="Cerca per nome...">
+                                <input type="search" class="form-control me-2" id="searchPerson" name="dipendente" placeholder="Cerca per nome..." aria-label="Search">
                             </div>
-                            <button type="submit" class="btn btn-success btn-block">Cerca</button>
+                          
+                            <button type="submit" class="btn btn-primary">Cerca</button>
                         </form>
-
+                      
+   
 
                         
                         
                         <!-- Pulsante "Crea Dipendente" -->
-                        <a href="{% url 'aggiungi_dipendente' %}" class="btn btn-primary align-self-end">➕Aggiungi Dipendente</a>
+                        #<a href="{% url 'aggiungi_dipendente' %}" class="btn btn-primary align-self-end">➕Aggiungi Dipendente</a>
                     </div>
 
                 <!-- Lista delle persone in due colonne -->
@@ -81,60 +144,72 @@
                                 </li>
                             {% endfor %}
                 </div>
+
             </div>
+            
+            <!-- Lista dei dipendenti -->
+            <ul class="dipendente-list" id="dipendenteList">
+                <!-- Questo sarà riempito dinamicamente con i dipendenti -->
+                <li>
+                    <strong>Mario Rossi</strong> - Sviluppatore
+                </li>
+                <li>
+                    <strong>Luca Bianchi</strong> - HR Manager
+                </li>
+                <li>
+                    <strong>Giulia Verdi</strong> - Designer
+                </li>
+                <!-- Aggiungi altri dipendenti qui -->
+            </ul>
         </div>
 
 
 
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script>
+    // Funzione per filtrare la lista dei dipendenti
+    function filterEmployees(searchTerm) {
+        const dipendenti = [
+            { nome: "Mario Rossi", ruolo: "Sviluppatore" },
+            { nome: "Luca Bianchi", ruolo: "HR Manager" },
+            { nome: "Giulia Verdi", ruolo: "Designer" },
+            // Aggiungi altri dipendenti alla lista qui
+        ];
 
-    <script>
-        // Funzione per filtrare la lista di persone in base al nome
-        document.getElementById("searchPerson").addEventListener("input", function() {
-            console.log("ciao")
+        const filteredDipendenti = dipendenti.filter(dipendente => {
+            return dipendente.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                dipendente.ruolo.toLowerCase().includes(searchTerm.toLowerCase());
+        });
 
-/*
-            fetch("{% url 'gestione_dipendenti' %}", {
-                method: "GET",
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest",
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": "{{ csrf_token }}",
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-            })
- 
-            let filter = this.value.toLowerCase();
-            let listItems1 = document.getElementById("personList1").getElementsByTagName("li");
-            let listItems2 = document.getElementById("personList2").getElementsByTagName("li");
+        return filteredDipendenti;
+    }
 
-            // Filtra la lista nella prima colonna
-            Array.from(listItems1).forEach(function(item) {
-                let text = item.textContent || item.innerText;
-                item.style.display = text.toLowerCase().includes(filter) ? "" : "none";
-            });
+    document.getElementById('searchButton').addEventListener('click', function() {
+        const searchTerm = document.getElementById('searchInput').value;
+        const dipendenteList = document.getElementById('dipendenteList');
+        
+        // Pulisce la lista
+        dipendenteList.innerHTML = '';
+
+        // Filtra i dipendenti in base alla ricerca
+        const filteredDipendenti = filterEmployees(searchTerm);
 
 
+    #<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
+    
 
-
-
-
-            // Filtra la lista nella seconda colonna
-            Array.from(listItems2).forEach(function(item) {
-                let text = item.textContent || item.innerText;
-                item.style.display = text.toLowerCase().includes(filter) ? "" : "none";
-            });
-            
-
- */
+        // Aggiungi i dipendenti filtrati alla lista
+        filteredDipendenti.forEach(dipendente => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${dipendente.nome}</strong> - ${dipendente.ruolo}`;
+            dipendenteList.appendChild(li);
 
         });
-    </script>
+   
+    
+</script>
 
-{% endblock %} 
+{% endblock %}
