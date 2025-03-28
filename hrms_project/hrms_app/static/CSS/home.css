@@ -7,20 +7,69 @@
     padding: 20px;    
     opacity: 90%;
     overflow: auto;
-   
 }
 
 .container_messaggi {
     max-height: 160px;
-    
-    
 }
 
 .container_timbrature {
-    width: auto;
-    height: 300px
+    box-sizing: content-box;
+    width: 20%;
+    height: 300px;
+}
+
+.orologio {
+    margin-bottom: 10px;
+}
+
+.orologio_data {
+    font-size: medium;
+}
+
+.orologio_ora {
+    font-weight: bold;
+    font-size: x-large;
+}
+
+.button_timbra {
+    margin-bottom: 15px;
+    font-weight: bold;
+    width: 100%;
+}
+
+.table_timbra {
+    font-size: small;
+    width: 200px;
+    display: block
+}
+
+.caption_timbra {   
+    width: 200px;
+    text-align: center;
+}
+
+.table_timbra_head {
+    display: inline-block;
+    position: sticky;
+    width: 200px;    
+}
+
+.table_timbra tr {
+    width: 200px;
+}
+
+.table_timbra th {
+    width: 100px;
+}
+
+.table_timbra_body {
+    display: inline-block;
+    overflow: auto;
+    max-height: 84px;
+    width: 200px
 }
 
 .container_permessi {
-    width: 80%;
+    width: 75%;
 }

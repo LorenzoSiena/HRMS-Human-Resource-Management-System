@@ -27,41 +27,43 @@
     <div class="container section_container container_timbrature">
 
         <!-- Orologio -->
-        <div style="margin-bottom: 10px">
-            <span id="data" style="font-size: regular"></span><br>
-            <span id="ora" style="font-weight: bold; font-size: x-large"></span>        
+        <div class="orologio">
+            <span id="data" class="orologio_data"></span><br>
+            <span id="ora" class="orologio_ora"></span>        
         </div>
         
         <!-- Pulsante di timbratura -->
 
         <form action="{% url 'gestione_timbratura' %}" method="POST">
             {% csrf_token %}       
-            <button type="submit" class="btn btn-primary btn-large" style="margin-bottom: 15px; font-weight: bold">   
+            <button type="submit" class="btn btn-primary btn-large button_timbra">   
                 {{ button_timbra }}
             </button>
         </form>
 
         <!--Tabella delle timbrature del giorno-->
-        <table class="table table-sm caption-top" style="width: 100px; margin-bottom: 0px">
-            <caption style="font-size: small; padding: 0px; text-align: center">Lista timbrature</caption>
-            <thead>
-                <tr style="font-size: small">
-                    <th scope="col">Entrata</th>
-                    <th scope="col">Uscita</th>           
-                </tr>
-            </thead>
-        </table>
-        <div style="max-height: 83px; overflow-Y: auto">
-            <table class="table table-sm" style="width: 100px">
-                <tbody>
-                    {% for presenza in lista_presenze %}
-                        <tr style="font-size: small">
-                            <td> {{ presenza.ora_ingresso|date:"H:i" }} </td>
-                            <td> {{ presenza.ora_uscita|date:"H:i" }} </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
+        <div class="table-responsive">
+            <table class="table table-sm caption-top" style="margin-bottom:0">
+                <caption class="caption_timbra">Lista timbrature</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Entrata</th>
+                        <th scope="col">Uscita</th>           
+                    </tr>
+                </thead>
             </table>
+            <div style="max-height: 85px; overflow-Y: auto">
+                <table class="table table-sm" style="margin-bottom:0">
+                    <tbody>
+                        {% for presenza in lista_presenze %}
+                            <tr>
+                                <td> {{ presenza.ora_ingresso|date:"H:i" }} </td>
+                                <td> {{ presenza.ora_uscita|date:"H:i" }} </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Messaggio di errore -->
@@ -74,11 +76,14 @@
     <div class="container section_container container_permessi" style="">
 
         {% if messages %}
+        <div class="container mt-3">
             {% for message in messages %}
-                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                    {{ message }}
-                </div>
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
             {% endfor %}
+        </div>
         {% endif %}
 
         {% if form.errors %}
@@ -137,6 +142,7 @@
                 {{ form.motivo.label_tag }}
                 {{ form.motivo }}
             </div>
+           
             <button type="submit" class="btn btn-primary">Invia Richiesta</button>
         </form>
         
@@ -175,8 +181,8 @@
                                     Permesso nr 
                                 {% endif %}
                             </td>
-                            <td style="width: 100px"> {{ permessi.data_ora_inizio|date:"d/m/Y hh:mm" }} </td>
-                            <td style="width: 100px"> {{ permessi.data_ora_fine|date:"d/m/Y hh:mm" }} </td>
+                            <td style="width: 100px"> {{ permessi.data_ora_inizio|date:"d/m/Y h:m" }} </td>
+                            <td style="width: 100px"> {{ permessi.data_ora_fine|date:"d/m/Y h:m" }} </td>
                             <td style="width: 50px"> {{ permessi.motivo }} </td>
                             <td style="width: 50px"> {{ permessi.stato }} </td>
                         </tr>
