@@ -1,12 +1,22 @@
 {% extends 'hrms_app/base.html' %}
+{% load static %}
+{% block style %}
+    <link href="{% static '/css/home.css' %}" type="text/css" rel="stylesheet">
+{% endblock style %}        
+
 {% block title %} Home {% endblock title %}
+
+{% block script %}
+    <script type="text/javascript" src="{% static '/js/home.js' %}" defer></script>
+{% endblock script %}
+
 {% block content %}
 
 <!-- Contenitore generale homepage -->
-<div class="container-fluid d-flex flex-wrap">
+<div class="container-fluid d-flex flex-wrap main_container">
 
     <!-- Visualizza la bacheca -->
-    <div class="container-fluid" style="background-color: white; padding: 20px; opacity: 90%; border-radius: 10px; max-height: 160px; overflow: auto; margin-bottom: 20px">
+    <div class="container-fluid section_container container_messaggi">
         {% for messaggio_bacheca in messaggi_bacheca %}
             <h5>{{ messaggio_bacheca.titolo }}</h5>
             <p>{{ messaggio_bacheca.messaggio }}</p>
@@ -14,44 +24,46 @@
     </div>
     
     <!-- Form per la timbratura delle presenze -->
-    <div class="container" style="background-color: white; padding: 15px 50px; opacity: 90%; border-radius: 10px; width: auto; height: 300px">
+    <div class="container section_container container_timbrature">
 
         <!-- Orologio -->
-        <div style="margin-bottom: 10px">
-            <span id="data" style="font-size: regular"></span><br>
-            <span id="ora" style="font-weight: bold; font-size: x-large"></span>        
+        <div class="orologio">
+            <span id="data" class="orologio_data"></span><br>
+            <span id="ora" class="orologio_ora"></span>        
         </div>
         
         <!-- Pulsante di timbratura -->
 
         <form action="{% url 'gestione_timbratura' %}" method="POST">
             {% csrf_token %}       
-            <button type="submit" class="btn btn-primary btn-large" style="margin-bottom: 15px; font-weight: bold">   
-                {{ text_button }}
+            <button type="submit" class="btn btn-primary btn-large button_timbra">   
+                {{ button_timbra }}
             </button>
         </form>
 
         <!--Tabella delle timbrature del giorno-->
-        <table class="table table-sm caption-top" style="width: 100px; margin-bottom: 0px">
-            <caption style="font-size: small; padding: 0px; text-align: center">Lista timbrature</caption>
-            <thead>
-                <tr style="font-size: small">
-                    <th scope="col">Entrata</th>
-                    <th scope="col">Uscita</th>           
-                </tr>
-            </thead>
-        </table>
-        <div style="max-height: 83px; overflow-Y: auto">
-            <table class="table table-sm" style="width: 100px">
-                <tbody>
-                    {% for presenza in lista_presenze %}
-                        <tr style="font-size: small">
-                            <td> {{ presenza.ora_ingresso|date:"H:i" }} </td>
-                            <td> {{ presenza.ora_uscita|date:"H:i" }} </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
+        <div class="table-responsive">
+            <table class="table table-sm caption-top" style="margin-bottom:0">
+                <caption class="caption_timbra">Lista timbrature</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Entrata</th>
+                        <th scope="col">Uscita</th>           
+                    </tr>
+                </thead>
             </table>
+            <div style="max-height: 85px; overflow-Y: auto">
+                <table class="table table-sm" style="margin-bottom:0">
+                    <tbody>
+                        {% for presenza in lista_presenze %}
+                            <tr>
+                                <td> {{ presenza.ora_ingresso|date:"H:i" }} </td>
+                                <td> {{ presenza.ora_uscita|date:"H:i" }} </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Messaggio di errore -->
@@ -61,90 +73,129 @@
     </div>    
     
     <!-- Form per la richiesta dei permessi o ferie -->
-    <div class="container" style="background-color: white; padding: 15px 50px; opacity: 90%; border-radius: 10px; width: auto; height: 300px; overflow: auto">
-        <form action="{% url 'richiesta_permessi_ferie' %}" method="POST">
-            {% csrf_token %} 
-            <h3>Richiesta Assenze</h3>
-            
-            <div class="form-check">
-                <input class="form-check-input" type="radio" id="flexRadioDefault1" name="tipo_permesso" value="ferie" checked>
-                <label class="form-check-label" for="flexRadioDefault1">Ferie</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" id="flexRadioDefault2" name="tipo_permesso" value="permesso">
-                <label class="form-check-label" for="flexRadioDefault2">Permesso</label>
-            </div>
-            <div class="form-check">            
-                <input class="form-check-input" type="radio" id="flexRadioDefault3" name="tipo_permesso" value="Permesso_nr">
-                <label class="form-check-label" for="flexRadioDefault3">Permesso non retribuito</label>
-            </div>                     
+    <div class="container section_container container_permessi" style="">
 
-            <div class="mb-3">
-                <label for="data_inizio" class="form-label">Data inizio</label>
-                <input type="date" class="form-control" id="data_inizio" min={% now "Y-m-d" %} required>
-                <input type="time" class="form-control" id="ora_inizio" min="09:00" max="18:00" required>
-            </div>            
-            <div class="mb-3">
-                <label for="data_fine" class="form-label">Data fine</label>
-                <input type="date" class="form-control" id="data_fine" placeholder="Data di fine ferie" min={% now "Y-m-d" %} required>
-                <input type="time" class="form-control" id="ora_fine" min="09:00" max="18:00" required>
+        {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-            <input class="form-control" type="text" placeholder="Motivo della richiesta" aria-label="default input example">
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <strong>Errore!</strong>
+                <ul>
+                    {% for field in form %}
+                        {% if field.errors %}
+                            <li><strong>{{ field.label }}:</strong>
+                                <ul>
+                                    {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form action="{% url 'richiesta_permessi_ferie' %}" method="POST" autocomplete="off">
+            {% csrf_token %} 
+            <h4>Richiesta Assenze</h4>
+            
+            <div class="tipo_richiesta">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="flexRadioDefault1" name="tipo_permesso" value="ferie" onchange="change_status()" checked>
+                    <label class="form-check-label" for="flexRadioDefault1">Ferie</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="flexRadioDefault2" name="tipo_permesso" value="permesso" onchange="change_status()">
+                    <label class="form-check-label" for="flexRadioDefault2">Permesso</label>
+                </div>
+                <div class="form-check">            
+                    <input class="form-check-input" type="radio" id="flexRadioDefault3" name="tipo_permesso" value="permesso_nr" onchange="change_status()">
+                    <label class="form-check-label" for="flexRadioDefault3">Permesso non retribuito</label>
+                </div>
+            </div>
+
+            <div class="form-group">                
+                {{ form.data_inizio.label_tag }}
+                {{ form.data_inizio }}
+                {{ form.ora_inizio.label_tag }}
+                {{ form.ora_inizio }}                
+             </div>
+             
+             <div class="form-group">                
+                {{ form.data_fine.label_tag }}
+                {{ form.data_fine }}
+                {{ form.ora_fine.label_tag }}
+                {{ form.ora_fine }}                
+            </div>
+
+            <div class="form-group">
+                {{ form.motivo.label_tag }}
+                {{ form.motivo }}
+            </div>
+           
             <button type="submit" class="btn btn-primary">Invia Richiesta</button>
         </form>
-        <p>{{ tipo_permesso }} {{ data_inizio }} {{ ora_inizio }} {{ data_fine }} {{ ora_fine }} {{ motivo }} {{ dipendente }}</p>
-    </div>
+        
+        <!--Tabella delle assenze richieste inevase-->
+        <table class="table table-sm caption-top" style="width: 100%; margin-bottom: 0px">
+            <caption style="font-size: small; padding: 0px; text-align: center">Elenco richieste inevase</caption>
+            <thead>
+                <tr style="font-size: small">
+                    <th scope="col" style="width: 50px">Richiesta</th>
+                    <th scope="col" style="width: 100px">Data inizio</th> 
+                    <th scope="col" style="width: 100px">Data fine</th>
+                    <th scope="col" style="width: 50px">Motivo</th>
+                    <th scope="col" style="width: 50px">Stato</th>          
+                </tr>
+            </thead>
+        </table>
+        <div style="max-height: 83px; overflow-Y: auto">
+            <table class="table table-sm" style="width: 100%">
+                <tbody>
+                    {% for ferie in lista_ferie %}
+                        <tr style="font-size: small">
+                            <td style="width: 50px"> Ferie </td>
+                            <td style="width: 100px"> {{ ferie.data_inizio|date:"d/m/Y" }} </td>
+                            <td style="width: 100px"> {{ ferie.data_fine|date:"d/m/Y" }} </td>
+                            <td style="width: 50px"></td>
+                            <td style="width: 50px"> {{ ferie.stato }} </td>
+                        </tr>
+                    {% endfor %}
 
-    -->
-
-    <!--TODO Creare l'elenco tramite ciclo For -->
-    <!--TODO Definire se aggiungere una lista delle persone che hanno le ferie confermate -->
-
-    <!--
-
-    <div class="container">
-        <h3>Elenco ferie richieste:</h3>
-        <ul class="list-group">
-            {% for dipendente in richiesta_ferie%}
-            <li class="list-group-item">
-            <input class="form-check-input me-1" type="checkbox" value="" id="firstCheckboxStretched">
-            <label class="form-check-label stretched-link" for="firstCheckboxStretched">{{ dipendente.nome }}{{dipendente.cognome }}{{ dipendente.data_inizio}}{{ dipendente.data_fine}}</label>
-            </li>
-            {% endfor %}
-        </ul>
-
-        <button href="{% url 'accetta_ferie' %}" type="button" class="btn btn-primary">Accetta</button>
-        <button href="{% url 'rifiuta_ferie' %}" type="button" class="btn btn-primary">Rifiuta</button>
-    </div>
-
-    <div class="container">    
-        <button href="{% url 'visualizza_busta_paga' %}" type="button" class="btn btn-primary">Scarica busta paga</button>
-    </div> -->
+                    {% for permessi in lista_permessi %}
+                        <tr style="font-size: small">
+                            <td style="width: 50px">
+                                {% if permessi.retribuito == True %}
+                                    Permesso
+                                {% else %}
+                                    Permesso nr 
+                                {% endif %}
+                            </td>
+                            <td style="width: 100px"> {{ permessi.data_ora_inizio|date:"d/m/Y h:m" }} </td>
+                            <td style="width: 100px"> {{ permessi.data_ora_fine|date:"d/m/Y h:m" }} </td>
+                            <td style="width: 50px"> {{ permessi.motivo }} </td>
+                            <td style="width: 50px"> {{ permessi.stato }} </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+                
+    </div> 
 
 </div>
 
-<script>
 
-    // Funzione per generare l'orologio delle timbrature
-
-    function aggiornaOrologio() {
-        let now = new Date();
-        let giorno = now.getDate();
-        let mese = now.toLocaleString("it-IT", { month: "long" });  // Nome del mese
-        let anno = now.getFullYear();
-        let ore = now.getHours().toString().padStart(2, '0');
-        let minuti = now.getMinutes().toString().padStart(2, '0');
-        let secondi = now.getSeconds().toString().padStart(2, '0');
-        let data = `${giorno} ${mese} ${anno}`;
-        let ora = `${ore}:${minuti}:${secondi}`;
-        document.getElementById("ora").textContent = `${ora}`;
-        document.getElementById("data").textContent = `${data}`;
-    }
-
-    setInterval(aggiornaOrologio, 1000); // Aggiorna ogni secondo
-    aggiornaOrologio(); // Imposta subito l'ora senza aspettare   
-
-</script>
 
 {% endblock %}
 

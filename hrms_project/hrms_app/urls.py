@@ -10,7 +10,7 @@ urlpatterns = [
     path("logout", views.user_logout, name="logout"),
     path("bacheca",views.bacheca,name="bacheca"),
     path("documenti_personali",views.documenti_personali,name="documenti_personali"),
-    path("assenze_personali",views.assenze_personali,name="assenze_personali"),
+    
     path("busta_paga",views.busta_paga,name="busta_paga"),
     path("report",views.report,name="report"),
     path("profilo",views.profilo,name="profilo"),
@@ -21,6 +21,7 @@ urlpatterns = [
     path("gestione_busta_paga",views.gestione_busta_paga,name="gestione_busta_paga"),
     path("consulta_documenti",views.consulta_documenti,name="consulta_documenti"),
     path("aggiungi_dipendente",views.aggiungi_dipendente,name="aggiungi_dipendente"),
+    path("notifiche",views.notifiche,name="notifiche"),
 #----azioni---------------------------------------------------------------------
     
     path("gestione_timbratura",views.gestione_timbratura,name="gestione_timbratura"),
@@ -30,6 +31,7 @@ urlpatterns = [
     path("visualizza_busta_paga",views.visualizza_busta_paga,name="visualizza_busta_paga"),
     path("crea_busta_paga",views.crea_busta_paga,name="crea_busta_paga"),
     path("crea_dipendente",views.crea_dipendente,name="crea_dipendente"),
+    path("salva_busta_paga",views.salva_busta_paga,name="salva_busta_paga"),
 
 
     path("modifica_dipendente/<int:id>",views.modifica_dipendente,name="modifica_dipendente"),
