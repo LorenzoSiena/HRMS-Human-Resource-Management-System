@@ -51,6 +51,21 @@
 
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
+
+                    <div class="dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Area Amministrativa
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'gestione_dipendenti' %}">Gestione Dipendenti</a></li>
+                            <li><a class="dropdown-item" href="{% url 'gestione_ruoli' %}">Gestione Ruoli</a></li>
+                            <li><a class="dropdown-item" href="{% url 'gestione_assenze' %}">Gestione Ferie e Permessi</a></li>
+                            <li><a class="dropdown-item" href="{% url 'gestione_busta_paga' %}">Gestione Buste Paga</a></li>
+                            <li><a class="dropdown-item" href="{% url 'consulta_documenti' %}">Consulta Documenti</a></li>
+                            <li><a class="dropdown-item" href="{% url 'report'%}">Report e Statistiche</a></li>
+                        </ul>
+                    </div>
+
                     <div class="dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                           Area Personale
@@ -64,20 +79,12 @@
                     </div>
 
                     <a class="nav-link" href="{% url 'bacheca' %}">Bacheca</a>
-                    <a class="nav-link" href="#">Notifiche</a>
-
-                    <div class="dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                          Area Amministrativa
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'gestione_dipendenti' %}">Gestione Dipendenti</a></li>
-                            <li><a class="dropdown-item" href="{% url 'gestione_assenze' %}">Gestione Ferie e Permessi</a></li>
-                            <li><a class="dropdown-item" href="{% url 'gestione_busta_paga' %}">Gestione Buste Paga</a></li>
-                            <li><a class="dropdown-item" href="{% url 'consulta_documenti' %}">Consulta Documenti</a></li>
-                            <li><a class="dropdown-item" href="{% url 'report'%}">Report e Statistiche</a></li>
-                        </ul>
-                    </div>
+                    <a class="nav-link position-relative" href="#">
+                        Notifiche
+                        <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                          <span class="visually-hidden">New alerts</span>
+                        </span>
+                    </a>
                 </div>
             
                 

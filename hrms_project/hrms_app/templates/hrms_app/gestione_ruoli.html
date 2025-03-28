@@ -1,0 +1,479 @@
+{% extends 'hrms_app/base.html' %}
+{% block title %} Gestione Ruoli {% endblock title %}
+{% block content %}
+   
+   <!-- Link a Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Posizionare l'alert in alto a destra */
+        #avviso {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: auto;
+            z-index: 1050;
+        }
+
+        /* Modifica dell'aspetto della card per dispositivi mobili */
+        .card {
+            margin-bottom: 1rem;
+        }
+    </style>
+
+
+<div class="container mt-5">
+    <!-- Sezione 1: Aggiungi Ruolo a Dipendente -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Assegna Ruolo a Dipendente</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{% url 'gestione_dipendenti' %}">
+              {% csrf_token %}
+                <div class="mb-3">
+                    <label for="ricerca-dipendente" class="form-label">Ricerca Dipendente</label>
+                    <input type="text" class="form-control" id="ricerca-dipendente" placeholder="Cerca per nome..." oninput="ricercaDipendenti()">
+                    <div id="suggerimenti" class="list-group mt-2" style="display: none;"></div>
+                </div>
+                <button type="submit" class="btn btn-primary">Cerca Dipendente</button>
+            </form>
+
+                <!-- Risultati della ricerca -->
+                <div id="risultati-ricerca" class="mb-3">
+                    <!-- I dipendenti trovati saranno mostrati qui -->
+                </div>
+
+                <div class="mb-3">
+                    <label for="ruolo" class="form-label">Seleziona Ruolo</label>
+                    <select class="form-select" id="ruolo">
+                        <!-- I ruoli saranno aggiunti dinamicamente -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="livello" class="form-label">Livello Ruolo</label>
+                    <input type="number" class="form-control" id="livello" min="1" max="100" placeholder="Inserisci livello">
+                </div>
+                <button type="submit" class="btn btn-primary">Aggiungi Ruolo</button>
+            </form>
+        </div>
+    </div>
+
+  
+<!-- Sezione 2: Permessi e Autorizzazioni -->
+<div class="card mt-4">
+  <div class="card-header">
+      <h5>Permessi e Autorizzazioni</h5>
+  </div>
+  <div class="card-body">
+      <form id="form-permessi">
+          <!-- Sezione di ricerca dipendente -->
+          <div class="mb-3">
+              <label for="ricerca-dipendente-permesso" class="form-label">Ricerca Ruolo</label>
+              <input type="text" class="form-control" id="ricerca-dipendente-permesso" placeholder="Cerca per nome..." oninput="ricercaDipendentiPermessi()">
+              <div id="suggerimenti-permessi" class="list-group mt-2" style="display: none;"></div>
+          </div>
+
+          <!-- Lista dei Permessi -->
+          <div id="permessi-lista" class="mb-3" style="display: none;">
+              <h6>Assegna Permessi e Autorizzazioni</h6>
+              <!-- Permessi e Autorizzazioni -->
+              <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="accesso-admin" id="accesso-admin">
+                  <label class="form-check-label" for="accesso-admin">
+                      Accesso Amministratore
+                  </label>
+              </div>
+              <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="visualizza-report" id="visualizza-report">
+                  <label class="form-check-label" for="visualizza-report">
+                      Visualizzare Report
+                  </label>
+              </div>
+              <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="modifica-dati" id="modifica-dati">
+                  <label class="form-check-label" for="modifica-dati">
+                      Modificare Dati Aziendali
+                  </label>
+              </div>
+              <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="gestione-ruoli" id="gestione-ruoli">
+                  <label class="form-check-label" for="gestione-ruoli">
+                      Gestire Ruoli e Permessi
+                  </label>
+              </div>
+              <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="accesso-dashboard" id="accesso-dashboard">
+                  <label class="form-check-label" for="accesso-dashboard">
+                      Accesso alla Dashboard
+                  </label>
+              </div>
+              <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="crea-utenti" id="crea-utenti">
+                  <label class="form-check-label" for="crea-utenti">
+                      Creare Nuovi Utenti
+                  </label>
+              </div>
+
+              <button type="submit" class="btn btn-primary mt-3">Salva Permessi</button>
+          </div>
+      </form>
+  </div>
+</div>
+
+
+<!-- Area per Visualizzare il Messaggio di Successo o Errore -->
+<div id="avviso" class="alert" style="display: none;">
+  <strong></strong> <span></span>
+</div>
+
+
+    
+
+    <!-- Sezione 3: Ruoli Esistenti e Creazione Nuovo Ruolo -->
+    <div class="card mt-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5>Ruoli Esistenti e Creazione Nuovo Ruolo</h5>
+            <button class="btn btn-success" id="btn-crea-ruolo" onclick="toggleFormRuolo()">Crea Nuovo Ruolo</button>
+        </div>
+        <div class="card-body">
+            <!-- Form per la creazione di un nuovo ruolo -->
+            <div id="form-nuovo-ruolo" style="display: none;">
+                <h6>Crea un nuovo ruolo</h6>
+                <form id="form-crea-ruolo">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="nuovo-ruolo" placeholder="Nome del ruolo">
+                    </div>
+                    <div class="mb-3">
+                        <div class="mb-3">
+                            <label for="creazioneLivello" class="form-label">Creazione Nuovo Livello</label>
+                            <input type="number" class="form-control" id="creazioneLivello" min="1" max="100" placeholder="Inserisci valore numerico per il ruolo">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Conferma</button>
+                </form>
+            </div>
+
+            <!-- Tabella dei ruoli esistenti -->
+            <table class="table  mt-4">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nome Dipendente</th>
+                        <th>Ruolo Assegnato</th>
+                        <th>Livello Ruolo</th>
+                        <th>Azione</th>
+                    </tr>
+                </thead>
+                <tbody id="tabella-ruoli">
+                    <!-- I ruoli esistenti saranno aggiunti dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Sezione per l'alert (avviso colorato) -->
+<div id="avviso" class="alert alert-dismissible fade show" role="alert" style="display: none;">
+    <strong></strong> <!-- Titolo del messaggio (es. errore o successo) -->
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<!-- Modal di conferma eliminazione -->
+<div class="modal fade" id="modalEliminazione" tabindex="-1" aria-labelledby="modalEliminazioneLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEliminazioneLabel">Conferma Eliminazione</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Sei sicuro di voler eliminare questo ruolo? L'azione non può essere annullata.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" class="btn btn-danger" onclick="eliminaRuolo()">Elimina</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tabella dei dipendenti -->
+<table class="table" id="tabella-ruoli">
+  <!-- Le righe della tabella verranno aggiunte dinamicamente via JavaScript -->
+</table>
+
+
+
+<script>
+    // Funzione per capitalizzare la prima lettera di ogni parola
+    function capitalizeWords(str) {
+        return str.replace(/\b\w/g, function(char) {
+            return char.toUpperCase();
+        });
+    }
+
+    // Array di dipendenti con i relativi ruoli
+    let dipendenti = [
+        { id: 1, nome: 'marco rossi', ruolo: 'manager', livello: '1' },
+        { id: 2, nome: 'luca bianchi', ruolo: 'sviluppatore', livello: '2' },
+        { id: 3, nome: 'giulia verdi', ruolo: 'designer', livello: '3' }
+    ];
+
+    // Array di ruoli esistenti
+    let ruoli = [
+        { id: 1, nome: 'manager', livello: '1' },
+        { id: 2, nome: 'sviluppatore', livello: '2' },
+        { id: 3, nome: 'designer', livello: '3' }
+    ];
+
+    let dipendenteSelezionato = null;
+
+    // Funzione per aggiornare la lista dei dipendenti e dei ruoli
+    function aggiornaDipendenti() {
+      const tabellaRuoli = document.getElementById('tabella-ruoli');
+      const selectRuolo = document.getElementById('ruolo');
+      tabellaRuoli.innerHTML = '';
+      selectRuolo.innerHTML = '';
+  
+      // Aggiungi i ruoli alla selezione per assegnare un ruolo ai dipendenti
+      ruoli.forEach(ruolo => {
+          const option = document.createElement('option');
+          option.value = ruolo.id;
+          option.textContent = capitalizeWords(ruolo.nome);
+          selectRuolo.appendChild(option);
+      });
+  
+      // Aggiungi i dipendenti alla tabella
+      dipendenti.forEach(dipendente => {
+          const tr = document.createElement('tr');
+          tr.setAttribute('data-id', dipendente.id);
+          tr.innerHTML = `
+              <td>${dipendente.id}</td>
+              <td><input type="text" class="form-control" value="${capitalizeWords(dipendente.nome)}" id="nome-dipendente-${dipendente.id}" disabled /></td>
+              <td>
+                  <select class="form-select" id="ruolo-selezionato-${dipendente.id}" disabled>
+                      ${ruoli.map(ruolo => `<option value="${ruolo.id}" ${ruolo.nome === dipendente.ruolo ? 'selected' : ''}>${capitalizeWords(ruolo.nome)}</option>`).join('')}
+                  </select>
+              </td>
+              <td>
+                  <select class="form-select" id="livello-selezionato-${dipendente.id}" disabled>
+                      <option value="1" ${dipendente.livello === '1' ? 'selected' : ''}>1</option>
+                      <option value="2" ${dipendente.livello === '2' ? 'selected' : ''}>2</option>
+                      <option value="3" ${dipendente.livello === '3' ? 'selected' : ''}>3</option>
+                  </select>
+              </td>
+              <td>
+                  <button class="btn btn-warning btn-sm" onclick="attivaModifica(${dipendente.id})">Modifica</button>
+                  <button class="btn btn-danger btn-sm" onclick="confermaEliminazione(${dipendente.id})">Elimina</button>
+              </td>
+          `;
+          tabellaRuoli.appendChild(tr);
+      });
+  }
+  
+    // Funzione per abilitare la modifica dei campi ruolo e livello
+    function attivaModifica(id) {
+        document.getElementById(`ruolo-selezionato-${id}`).disabled = false;
+        document.getElementById(`livello-selezionato-${id}`).disabled = false;
+
+        // Cambia il bottone "Modifica" in "Salva"
+        const btnModifica = document.querySelector(`button[onclick="attivaModifica(${id})"]`);
+        btnModifica.textContent = 'Salva';
+        btnModifica.setAttribute('onclick', `salvaModifica(${id})`);
+    }
+
+    // Funzione per salvare le modifiche ai ruoli e livelli
+    function salvaModifica(id) {
+        const nuovoRuolo = document.getElementById(`ruolo-selezionato-${id}`).value;
+        const nuovoLivello = document.getElementById(`livello-selezionato-${id}`).value;
+
+        // Trova il dipendente e aggiorna il ruolo e il livello
+        const dipendente = dipendenti.find(d => d.id === id);
+        dipendente.ruolo = ruoli.find(ruolo => ruolo.id == nuovoRuolo).nome;
+        dipendente.livello = nuovoLivello;
+
+        // Rinnova la tabella con le modifiche
+        aggiornaDipendenti();
+    }
+
+    // Funzione per confermare l'eliminazione
+function confermaEliminazione(id) {
+  dipendenteSelezionato = id;
+  // Mostra il modal di conferma
+  const modal = new bootstrap.Modal(document.getElementById('modalEliminazione'));
+  modal.show();
+}
+
+// Funzione per eliminare il ruolo selezionato
+function eliminaRuolo() {
+  if (dipendenteSelezionato !== null) {
+      // Rimuove il dipendente dalla lista dei dipendenti
+      dipendenti = dipendenti.filter(dipendente => dipendente.id !== dipendenteSelezionato);
+      
+      // Rinnova la lista dei dipendenti (riaggiorna la tabella)
+      aggiornaDipendenti();
+
+      // Chiudi il modal dopo l'eliminazione
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modalEliminazione'));
+      modal.hide();
+
+      // Mostra l'avviso di successo
+      mostraAvviso('Ruolo eliminato con successo!', 'Il ruolo è stato rimosso correttamente.');
+  }
+}
+
+
+    
+    // Funzione per aggiungere un nuovo ruolo
+document.getElementById('form-crea-ruolo').addEventListener('submit', function(e) {
+    e.preventDefault(); // Impedisce l'invio del form in modo tradizionale
+
+    const nuovoRuolo = document.getElementById('nuovo-ruolo').value;
+    const nuovoLivello = document.getElementById('creazioneLivello').value;
+
+    if (nuovoRuolo) {
+        // Controlla se il ruolo esiste già
+        const ruoloEsistente = ruoli.find(r => r.nome.toLowerCase() === nuovoRuolo.toLowerCase());
+        if (ruoloEsistente) {
+            mostraAvviso('Errore', ', il ruolo inserito esiste già!');
+            return;
+        }
+
+        const idRuolo = ruoli.length + 1;
+        ruoli.push({ id: idRuolo, nome: nuovoRuolo, livello: nuovoLivello });
+        aggiornaDipendenti();
+        mostraAvviso('Ruolo creato con successo! ', 'Il nuovo ruolo è stato aggiunto.');
+        document.getElementById('nuovo-ruolo').value = ''; // Pulisce il campo
+        document.getElementById('creazioneLivello').value = ''; // Pulisce il campo livello
+    } else {
+        mostraAvviso('Errore', ', per favore inserisci un nome per il nuovo ruolo.');
+    }
+});
+
+
+    // Funzione per mostrare l'alert di successo o errore
+    function mostraAvviso(titolo, messaggio) {
+        const avviso = document.getElementById('avviso');
+        avviso.querySelector('strong').textContent = titolo;
+        avviso.querySelector('strong').nextSibling.textContent = messaggio;
+        avviso.classList.remove('alert-success', 'alert-danger');
+        avviso.classList.add(titolo === 'Errore' ? 'alert-danger' : 'alert-success');
+        avviso.style.display = 'block';
+
+        // Nascondi l'alert dopo 5 secondi
+        setTimeout(function() {
+            avviso.style.display = 'none';
+        }, 5000);
+    }
+
+    // Funzione per mostrare/nascondere il form di creazione ruolo
+    function toggleFormRuolo() {
+        const formRuolo = document.getElementById('form-nuovo-ruolo');
+        formRuolo.style.display = formRuolo.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Chiamata per inizializzare la pagina
+    aggiornaDipendenti();
+
+
+     // Funzione per la ricerca dei dipendenti nella sezione permessi
+function ricercaDipendentiPermessi() {
+  const query = document.getElementById('ricerca-dipendente-permesso').value.toLowerCase();
+  const suggerimenti = document.getElementById('suggerimenti-permessi');
+  suggerimenti.innerHTML = '';
+  if (query) {
+      const risultati = dipendenti.filter(dipendente => dipendente.nome.toLowerCase().includes(query));
+      risultati.forEach(dipendente => {
+          const li = document.createElement('li');
+          li.classList.add('list-group-item');
+          li.textContent = capitalizeWords(dipendente.nome);
+          li.onclick = () => selezionaDipendentePermessi(dipendente);
+          suggerimenti.appendChild(li);
+      });
+      suggerimenti.style.display = 'block';
+  } else {
+      suggerimenti.style.display = 'none';
+  }
+}
+
+// Funzione per selezionare un dipendente dai suggerimenti e popolare i permessi
+function selezionaDipendentePermessi(dipendente) {
+  document.getElementById('ricerca-dipendente-permesso').value = capitalizeWords(dipendente.nome);
+  document.getElementById('suggerimenti-permessi').style.display = 'none';
+  
+  // Mostra la lista dei permessi
+  document.getElementById('permessi-lista').style.display = 'block';
+
+  // Imposta i permessi correnti del dipendente
+  document.getElementById('accesso-admin').checked = dipendente.permessi?.accessoAdmin || false;
+  document.getElementById('visualizza-report').checked = dipendente.permessi?.visualizzaReport || false;
+  document.getElementById('modifica-dati').checked = dipendente.permessi?.modificaDati || false;
+  document.getElementById('gestione-ruoli').checked = dipendente.permessi?.gestioneRuoli || false;
+  document.getElementById('accesso-dashboard').checked = dipendente.permessi?.accessoDashboard || false;
+  document.getElementById('crea-utenti').checked = dipendente.permessi?.creaUtenti || false;
+  
+  // Aggiungi una proprietà per memorizzare il dipendente selezionato
+  window.dipendenteSelezionato = dipendente;
+}
+
+// Funzione per gestire l'assegnazione dei permessi
+document.getElementById('form-permessi').addEventListener('submit', function(e) {
+  e.preventDefault();
+  if (!window.dipendenteSelezionato) {
+      mostraAvviso('Errore', 'Seleziona un dipendente per assegnare i permessi.');
+      return;
+  }
+
+  // Ottieni lo stato dei permessi selezionati
+  const permessi = {
+      accessoAdmin: document.getElementById('accesso-admin').checked,
+      visualizzaReport: document.getElementById('visualizza-report').checked,
+      modificaDati: document.getElementById('modifica-dati').checked,
+      gestioneRuoli: document.getElementById('gestione-ruoli').checked,
+      accessoDashboard: document.getElementById('accesso-dashboard').checked,
+      creaUtenti: document.getElementById('crea-utenti').checked,
+  };
+
+  // Assegna i permessi al dipendente selezionato
+  window.dipendenteSelezionato.permessi = permessi;
+
+  // Mostra un avviso per confermare i permessi assegnati
+  mostraAvviso('Permessi Assegnati. ', `I permessi per ${window.dipendenteSelezionato.nome} sono stati aggiornati.`);
+});
+
+// Funzione per mostrare l'alert di successo o errore
+function mostraAvviso(titolo, messaggio) {
+  const avviso = document.getElementById('avviso');
+  avviso.querySelector('strong').textContent = titolo;
+  avviso.querySelector('span').textContent = messaggio;
+  avviso.classList.remove('alert-success', 'alert-danger');
+  avviso.classList.add(titolo === 'Errore' ? 'alert-danger' : 'alert-success');
+  avviso.style.display = 'block';
+
+  // Nascondi l'alert dopo 5 secondi
+  setTimeout(function() {
+      avviso.style.display = 'none';
+  }, 5000);
+}
+  // Funzione per mostrare l'alert di successo o errore
+  function mostraAvviso(titolo, messaggio) {
+      const avviso = document.getElementById('avviso');
+      avviso.querySelector('strong').textContent = titolo;
+      avviso.querySelector('strong').nextSibling.textContent = messaggio;
+      avviso.classList.remove('alert-success', 'alert-danger');
+      avviso.classList.add(titolo === 'Errore' ? 'alert-danger' : 'alert-success');
+      avviso.style.display = 'block';
+
+      // Nascondi l'alert dopo 5 secondi
+      setTimeout(function() {
+          avviso.style.display = 'none';
+      }, 5000);
+  }
+
+  // Chiamata per inizializzare la pagina con i dipendenti
+  aggiornaDipendentiPermessi();
+
+    
+</script>
+
+{% endblock %}
