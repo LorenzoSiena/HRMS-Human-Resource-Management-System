@@ -4,93 +4,141 @@ Notifiche
 {% endblock %}
 {% block content %}
 
+<!-- Icone Font Awesome per icone di successo ed errore -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
-  <!-- Icone Font Awesome per icone di successo ed errore -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<div class="container mt-5">
+  <h2>Notifiche</h2>
 
-  <div class="container mt-5">
-    <h2>Notifiche</h2>
-
-    <!-- Contenitore per le notifiche -->
-    <div id="notificationContainer">
-      <!-- Le notifiche saranno aggiunte dinamicamente qui -->
-    </div>
+  <!-- Contenitore per le notifiche -->
+  <div id="notificationContainer">
+    <!-- Le notifiche saranno aggiunte dinamicamente qui -->
   </div>
+</div>
 
-  <!-- Bootstrap JS (opzionale per la gestione di componenti come i modali) -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Bootstrap JS (opzionale per la gestione di componenti come i modali) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-  <script>
-    // Array di notifiche simulato (puoi sostituirlo con dati reali)
-    const notifiche = [
-      { data: "2025-03-28", orario: "10:00", richiesta: "Richiesta approvata", tipo: "approvato" },
-      { data: "2025-03-28", orario: "09:30", richiesta: "Richiesta non approvata", tipo: "non approvato" },
-      { data: "2025-03-28", orario: "09:15", richiesta: "Caricata busta paga", tipo: "Busta paga" }
-    ];
+<script>
+  // Array di notifiche simulato (puoi sostituirlo con dati reali)
+  const notifiche = [
+    { data: "2025-03-28", orario: "10:00", richiesta: "Richiesta approvata", tipo: "approvato" },
+    { data: "2025-03-28", orario: "09:30", richiesta: "Richiesta non approvata", tipo: "non approvato" },
+    { data: "2025-03-28", orario: "09:15", richiesta: "Caricata busta paga", tipo: "Busta paga" }
+  ];
 
-    // Funzione per formattare la data in formato europeo (DD/MM/YYYY)
-    function formattaData(data) {
-      const [anno, mese, giorno] = data.split('-'); // Splitta la data in array [anno, mese, giorno]
-      return `${giorno}/${mese}/${anno}`; // Ritorna la data nel formato DD/MM/YYYY
-    }
+  // Funzione per formattare la data in formato europeo (DD/MM/YYYY)
+  function formattaData(data) {
+    const [anno, mese, giorno] = data.split('-'); // Splitta la data in array [anno, mese, giorno]
+    return `${giorno}/${mese}/${anno}`; // Ritorna la data nel formato DD/MM/YYYY
+  }
 
-    // Funzione per generare il contenuto delle notifiche
-    function visualizzaNotifiche() {
-      const notificationContainer = document.getElementById('notificationContainer');
-      notificationContainer.innerHTML = ''; // Pulisce le notifiche esistenti
+  // Funzione per generare il contenuto delle notifiche
+  function visualizzaNotifiche() {
+    const notificationContainer = document.getElementById('notificationContainer');
+    notificationContainer.innerHTML = ''; // Pulisce le notifiche esistenti
 
-      notifiche.forEach((notifica, index) => {
-        const div = document.createElement('div');
-        div.classList.add('alert', 'alert-dismissible', 'fade', 'show', 'mb-3');
-        
-        // Determiniamo il tipo di notifica (approvato, non approvato, caricata_busta_paga)
-        if (notifica.tipo === 'approvato') {
-          div.classList.add('alert-success');
-        } else if (notifica.tipo === 'non approvato') {
-          div.classList.add('alert-danger');
-        } else if (notifica.tipo === 'Busta paga') {
-          div.classList.add('alert-secondary');  // Colore neutro per "Caricata Busta Paga"
-        }
+    notifiche.forEach((notifica, index) => {
+      const div = document.createElement('div');
+      div.classList.add('alert', 'alert-dismissible', 'fade', 'show', 'mb-3', 'position-relative');
+      
+      // Determiniamo il tipo di notifica (approvato, non approvato, caricata_busta_paga)
+      if (notifica.tipo === 'approvato') {
+        div.classList.add('alert-success');
+      } else if (notifica.tipo === 'non approvato') {
+        div.classList.add('alert-danger');
+      } else if (notifica.tipo === 'Busta paga') {
+        div.classList.add('alert-primary');  // Colore neutro per "Caricata Busta Paga"
+      }
 
-        // Aggiungiamo un'icona per il risultato
-        let icona;
-        if (notifica.tipo === 'approvato') {
-          icona = '<i class="fas fa-check-circle text-success"></i>';
-        } else if (notifica.tipo === 'non approvato') {
-          icona = '<i class="fas fa-times-circle text-danger"></i>';
-        } else {
-          icona = '<i class="fas fa-file-invoice text-secondary"></i>';
-        }
+      // Aggiungiamo un'icona per il risultato
+      let icona;
+      if (notifica.tipo === 'approvato') {
+        icona = '<i class="fas fa-check-circle text-success"></i>';
+      } else if (notifica.tipo === 'non approvato') {
+        icona = '<i class="fas fa-times-circle text-danger"></i>';
+      } else {
+        icona = '<i class="fas fa-file-invoice text-primary"></i>';
+      }
 
-        // Creiamo il contenuto della notifica con uno spazio tra l'ora e la data
-        div.innerHTML = `
-          <div class="d-flex justify-content-between">
-            <div><strong>${icona} ${notifica.tipo.charAt(0).toUpperCase() + notifica.tipo.slice(1).replace('_', ' ')}</strong> - ${notifica.richiesta}</div>
-            <div><small class="text-muted">${notifica.orario}</small> <small class="text-muted"> - ${formattaData(notifica.data)}</small></div>
+      // Creiamo il contenuto della notifica con separazione tra testo e data/orario
+      div.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <strong>${icona} ${notifica.tipo.charAt(0).toUpperCase() + notifica.tipo.slice(1).replace('_', ' ')}</strong>
           </div>
-          <button type="button" class="close" aria-label="Close" onclick="rimuoviNotifica(${index})">
+          <button type="button" class="close ml-3 btn-close" aria-label="Close" onclick="rimuoviNotifica(${index})">
             <span aria-hidden="true">&times;</span>
           </button>
-        `;
+        </div>
+        <div class="d-flex">
+          <div class="text-muted">${notifica.richiesta}</div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <div class="d-flex align-items-center">
+            <small class="text-muted">${notifica.orario}</small> 
+            <small class="text-muted"> - ${formattaData(notifica.data)}</small>
+          </div>
+        </div>
+      `;
 
-        // Aggiungiamo la notifica al contenitore
-        notificationContainer.appendChild(div);
-      });
-    }
+      // Aggiungiamo la notifica al contenitore
+      notificationContainer.appendChild(div);
+    });
+  }
 
-    // Funzione per rimuovere una notifica
-    function rimuoviNotifica(index) {
-      // Rimuoviamo la notifica dall'array
-      notifiche.splice(index, 1);
-      // Rende il contenitore delle notifiche vuoto e riaggiunge tutte le notifiche aggiornate
-      visualizzaNotifiche();
-    }
+  // Funzione per rimuovere una notifica
+  function rimuoviNotifica(index) {
+    // Rimuoviamo la notifica dall'array
+    notifiche.splice(index, 1);
+    // Rende il contenitore delle notifiche vuoto e riaggiunge tutte le notifiche aggiornate
+    visualizzaNotifiche();
+  }
 
-    // Eseguiamo la funzione per visualizzare le notifiche al caricamento della pagina
-    window.onload = visualizzaNotifiche;
-  </script>
+  // Eseguiamo la funzione per visualizzare le notifiche al caricamento della pagina
+  window.onload = visualizzaNotifiche;
+</script>
 
+<style>
+  /* Stile per il bottone di chiusura */
+  .btn-close {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.2s ease;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+  .btn-close:hover {
+    color: #333;
+    transform: scale(1.2);
+  }
+
+  .alert {
+    border-radius: 8px; /* Aggiunta di angoli arrotondati alla notifica */
+    padding-right: 60px; /* Più spazio per il bottone di chiusura */
+    position: relative;
+  }
+
+  /* Stile per separare il testo della richiesta dalla data */
+  .d-flex {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .mt-2 {
+    margin-top: 0.5rem;
+  }
+
+  .text-muted {
+    font-size: 0.875rem;
+  }
+</style>
 
 {% endblock %}
