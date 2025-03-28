@@ -53,7 +53,7 @@
                 <div class="navbar-nav">
 
                     <div class="dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                           Area Amministrativa
                         </a>
                         <ul class="dropdown-menu">
@@ -73,13 +73,12 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{% url 'profilo'%}">Profilo</a></li>
                             <li><a class="dropdown-item" href="{% url 'documenti_personali' %}">I miei documenti</a></li>
-                            <li><a class="dropdown-item" href="{% url 'assenze_personali' %}">Richiesta Ferie e Permessi</a></li>
                             <li><a class="dropdown-item" href="{% url 'busta_paga' %}">Busta Paga</a></li>
                         </ul>
                     </div>
 
                     <a class="nav-link" href="{% url 'bacheca' %}">Bacheca</a>
-                    <a class="nav-link position-relative" href="#">
+                    <a class="nav-link position-relative" href="{% url 'notifiche' %}">
                         Notifiche
                         <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
                           <span class="visually-hidden">New alerts</span>

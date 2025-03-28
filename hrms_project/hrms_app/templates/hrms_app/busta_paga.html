@@ -1,8 +1,198 @@
 {% extends 'hrms_app/base.html' %}
-
 {% block title %}
-Busta paga
-{% endblock%}
-
+Visualizza Buste Paga
+{% endblock %}
 {% block content %}
+
+<style>
+  .container {
+      margin-top: 20px;
+  }
+
+  .busta-paga-list {
+      margin-top: 10px;
+      margin-bottom: 15px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+      max-width: 600px;
+      width: 100%; /* Original size */
+  }
+
+  .btn-custom {
+      margin-right: 5px;
+      cursor: pointer;
+  }
+
+  .table th, .table td {
+      text-align: center;
+      vertical-align: middle;
+  }
+
+  .table-responsive {
+      padding: 0;
+      margin-bottom: 0;
+  }
+
+  #payslipsList {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+  }
+
+  .centered-content {
+      text-align: center;
+  }
+
+  .centered-form {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+  }
+
+  .form-control {
+      width: 100%;
+      max-width: 280px;
+  }
+
+  .form-label {
+      font-size: 0.9rem;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 576px) {
+      .btn-custom {
+          margin-right: 0;
+          margin-bottom: 10px;
+          width: 100%;
+      }
+
+      .busta-paga-list {
+          padding: 10px;
+      }
+
+      .centered-form {
+          width: 90%;
+      }
+
+      .form-control {
+          max-width: 100%;
+      }
+  }
+
+  /* Regolazioni per schermi medi e grandi */
+  @media (min-width: 577px) {
+      .btn-custom {
+          width: auto;
+      }
+
+      .busta-paga-list {
+          max-width: 600px; /* Dimensione originale ripristinata */
+      }
+  }
+
+  /* Impedisce l'avvolgimento del testo */
+  .no-wrap {
+      white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="centered-content mb-4">
+      <h2>Buste Paga del Dipendente</h2>
+  </div>
+
+  <div class="centered-form mb-3">
+      <small id="monthYearFilterHelp" class="form-text text-muted no-wrap">Seleziona un mese e un anno per filtrare le buste paga.</small>
+      <input type="month" id="monthYearFilter" class="form-control" onchange="filterPayslips()" aria-describedby="monthYearFilterHelp">
+  </div>
+
+  <div id="payslipsList">
+      <div class="busta-paga-list" data-period="2025-01">
+          <dl>
+              <dt>Nome File:</dt>
+              <dd>Busta Paga Gennaio 2025</dd>
+              <dt>Periodo:</dt>
+              <dd>Gennaio 2025</dd>
+              <dt>Data Caricamento:</dt>
+              <dd>10 Gennaio 2025</dd>
+              <dt>Importo dello Stipendio:</dt>
+              <dd>€1500.50</dd>
+          </dl>
+          <button class="btn btn-info btn-sm btn-custom" onclick="viewPayslipDetails('path/to/payslip1.pdf')" aria-label="Visualizza Busta Paga Gennaio 2025">Visualizza</button>
+          <button class="btn btn-primary btn-sm btn-custom" onclick="downloadPayslip('path/to/payslip1.pdf')" aria-label="Scarica Busta Paga Gennaio 2025">Scarica</button>
+      </div>
+
+      <div class="busta-paga-list" data-period="2025-02">
+          <dl>
+              <dt>Nome File:</dt>
+              <dd>Busta Paga Febbraio 2025</dd>
+              <dt>Periodo:</dt>
+              <dd>Febbraio 2025</dd>
+              <dt>Data Caricamento:</dt>
+              <dd>12 Febbraio 2025</dd>
+              <dt>Importo dello Stipendio:</dt>
+              <dd>€1600.75</dd>
+          </dl>
+          <button class="btn btn-info btn-sm btn-custom" onclick="viewPayslipDetails('path/to/payslip2.pdf')" aria-label="Visualizza Busta Paga Febbraio 2025">Visualizza</button>
+          <button class="btn btn-primary btn-sm btn-custom" onclick="downloadPayslip('path/to/payslip2.pdf')" aria-label="Scarica Busta Paga Febbraio 2025">Scarica</button>
+      </div>
+
+      <div class="busta-paga-list" data-period="2025-03">
+          <dl>
+              <dt>Nome File:</dt>
+              <dd>Busta Paga Marzo 2025</dd>
+              <dt>Periodo:</dt>
+              <dd>Marzo 2025</dd>
+              <dt>Data Caricamento:</dt>
+              <dd>15 Marzo 2025</dd>
+              <dt>Importo dello Stipendio:</dt>
+              <dd>€1550.30</dd>
+          </dl>
+          <button class="btn btn-info btn-sm btn-custom" onclick="viewPayslipDetails('path/to/payslip3.pdf')" aria-label="Visualizza Busta Paga Marzo 2025">Visualizza</button>
+          <button class="btn btn-primary btn-sm btn-custom" onclick="downloadPayslip('path/to/payslip3.pdf')" aria-label="Scarica Busta Paga Marzo 2025">Scarica</button>
+      </div>
+  </div>
+
+</div>
+
+
+<script>
+  function downloadPayslip(fileLink) {
+      window.open(fileLink, '_blank');
+  }
+
+  function viewPayslipDetails(fileLink) {
+      window.open(fileLink, '_blank');
+  }
+
+  /**
+   * Filtrare le buste paga in base al mese e all'anno selezionati.
+   * Nascondere le buste paga che non corrispondono al mese e all'anno selezionati.
+   */
+  function filterPayslips() {
+      let selectedMonthYear = document.getElementById('monthYearFilter').value;
+      let payslips = document.querySelectorAll('.busta-paga-list');
+
+      payslips.forEach(payslip => {
+          let payslipPeriod = payslip.getAttribute('data-period');
+          if (selectedMonthYear && !payslipPeriod.startsWith(selectedMonthYear)) {
+              payslip.style.display = 'none';
+          } else {
+              payslip.style.display = '';
+          }
+      });
+  }
+</script>
+
 {% endblock %}

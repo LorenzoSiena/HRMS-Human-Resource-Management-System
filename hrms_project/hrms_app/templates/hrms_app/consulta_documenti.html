@@ -1,8 +1,14 @@
 {% extends 'hrms_app/base.html' %}
-
+{% comment %} {% block style %}
+    <link href="{% static '/css/consulta_documenti.css' %}" type="text/css" rel="stylesheet">
+{% endblock style %}       {% endcomment %}
 {% block title %}
 Consulta_documenti
 {% endblock %}
+{% comment %} {% block script %}
+    <script type="text/javascript" src="{% static '/js/consulta_documenti.js' %}" defer></script>
+{% endblock script %} {% endcomment %}
+
 
 {% block content %}
 

@@ -364,8 +364,7 @@ class CustomPasswordResetCompleteView(PasswordResetCompleteView):
 def documenti_personali(request:HttpRequest):
     return render(request,'hrms_app/documenti_personali.html')
 
-def assenze_personali(request:HttpRequest):
-    return render(request,'hrms_app/assenze_personali.html')
+
 
 def busta_paga(request:HttpRequest):
     return render(request,'hrms_app/busta_paga.html')
@@ -430,3 +429,6 @@ def sviluppo(request:HttpRequest):
 
 def gestione_ruoli(request:HttpRequest):
     return render(request,'hrms_app/gestione_ruoli.html')
+
+def notifiche(request:HttpRequest):
+    return render(request,'hrms_app/notifiche.html')
