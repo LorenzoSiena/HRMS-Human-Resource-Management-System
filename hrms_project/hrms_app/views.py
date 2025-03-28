@@ -406,3 +406,6 @@ def sviluppo(request:HttpRequest):
 
 def gestione_ruoli(request:HttpRequest):
     return render(request,'hrms_app/gestione_ruoli.html')
+
+def notifiche(request:HttpRequest):
+    return render(request,'hrms_app/notifiche.html')

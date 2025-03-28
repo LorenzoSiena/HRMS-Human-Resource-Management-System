@@ -21,6 +21,7 @@ urlpatterns = [
     path("gestione_busta_paga",views.gestione_busta_paga,name="gestione_busta_paga"),
     path("consulta_documenti",views.consulta_documenti,name="consulta_documenti"),
     path("aggiungi_dipendente",views.aggiungi_dipendente,name="aggiungi_dipendente"),
+    path("notifiche",views.notifiche,name="notifiche"),
 #----azioni---------------------------------------------------------------------
     
     path("gestione_timbratura",views.gestione_timbratura,name="gestione_timbratura"),
