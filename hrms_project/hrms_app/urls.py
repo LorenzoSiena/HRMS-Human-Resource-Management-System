@@ -10,7 +10,7 @@ urlpatterns = [
     path("logout", views.user_logout, name="logout"),
     path("bacheca",views.bacheca,name="bacheca"),
     path("documenti_personali",views.documenti_personali,name="documenti_personali"),
-    path("assenze_personali",views.assenze_personali,name="assenze_personali"),
+    
     path("busta_paga",views.busta_paga,name="busta_paga"),
     path("report",views.report,name="report"),
     path("profilo",views.profilo,name="profilo"),

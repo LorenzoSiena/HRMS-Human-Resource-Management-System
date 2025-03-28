@@ -1,5 +1,9 @@
 {% extends "hrms_app/base_bacheca.html" %}
+{% block style %}
+    <link href="{% static '/css/home.css' %}" type="text/css" rel="stylesheet">
+{% endblock style %}  
 {% block sezione %}
+ {% comment %}
 <style>
     /* CSS personalizzato per il contenuto */
 body, html {
@@ -45,7 +49,7 @@ footer {
     margin-top: 20px;
     position: relative;
 }
-</style>
+</style> {% endcomment %}
 
 
 <div class="container">
