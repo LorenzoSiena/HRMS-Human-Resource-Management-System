@@ -23,7 +23,13 @@
          display: block!;
         }
     </style>
-
+{% if messages %}
+{% for message in messages %}
+    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
 
 <div class="container mt-5">
     <!-- Sezione 1: Aggiungi Ruolo a Dipendente -->
@@ -153,7 +159,7 @@
                     <div class="mb-3">
                         
                         
-                        <input type="text" class="form-control" id="nuovo-ruolo" name= "nome" placeholder="Nome del ruolo">
+                        <input type="text" class="form-control" id="nuovo-ruolo" name= "name" placeholder="Nome del ruolo">
  
 
                     </div>

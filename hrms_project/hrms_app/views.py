@@ -388,15 +388,17 @@ def gestione_ruoli(request:HttpRequest):
 
 
 
-def crea_ruolo(request: HttpRequest):
+def crea_ruolo_nope(request: HttpRequest):
+    pass
 
-def crea_ruolo_no_form(request: HttpRequest):
+def crea_ruolo(request: HttpRequest):
     if request.method == "POST":
-        ruolo = request.POST.get("ruolo")
-        livello_accesso = request.POST.get("livello_accesso")
+        ruolo = request.POST.get("name") # testo
+        livello_accesso = request.POST.get("livello_accesso") #numero
 
         if not ruolo or not livello_accesso:
-            messages.error(request, "Errore nella creazione del ruolo. Controlla i dati inseriti.")
+
+            messages.error(request, f"Errore nella creazione del ruolo. {ruolo} livello {livello_accesso} Controlla i dati inseriti.")
             return redirect("gestione_ruoli")
 
         # Controlla se esiste già un Group con quel nome
@@ -411,8 +413,7 @@ def crea_ruolo_no_form(request: HttpRequest):
 
         # Crea il ruolo associato
         Ruoli.objects.create(ruolo=gruppo_esistente, livello_accesso=int(livello_accesso))
-
         messages.success(request, f"Creazione ruolo {ruolo} avvenuta con successo!")
-        return redirect("gestione_ruoli")
+        return render(request,'hrms_app/gestione_ruoli.html')
 
-    return redirect("gestione_ruoli")
+    return render(request,'hrms_app/gestione_ruoli.html')
