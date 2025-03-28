@@ -2,17 +2,12 @@
 
 {% block title %}
 Login
-{% endblock%}
+{% endblock %}
 
 {% block content %}
-
-<div class ="containerx">
-
-
+<div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center">
     <!-- Form di login -->
-
-    <div class="login-container" style="background-color: white; padding: 15px 50px; opacity: 90%; border-radius: 10px">
-
+    <div class="login-container" style="background-color: white; padding: 60px 60px; opacity: 90%; border-radius: 10px; max-width: 450px;">
         
         <h2 class="text-center mb-1 mt-0">Login</h2>
             
@@ -39,9 +34,7 @@ Login
         </form>
 
         <p class="text-center mt-2">
-
             Non hai un account? <a href="{% url 'registrati' %}">Registrati</a>
-
         </p>
 
         <p class="text-center mt-3">
@@ -49,7 +42,5 @@ Login
         </p>
 
     </div>
-
 </div>
-
 {% endblock content %}
