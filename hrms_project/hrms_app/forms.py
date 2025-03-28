@@ -3,8 +3,9 @@ from django.contrib.auth import get_user_model
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Dipendenti,Ruoli
+from .models import Dipendenti, Ruoli, Ferie, Permessi
 from random import randint
+from datetime import date, timedelta
 
 class RegisterForm(UserCreationForm):
     nome = forms.CharField(
@@ -113,3 +114,16 @@ class RegisterForm(UserCreationForm):
                     field.widget.attrs.update({'class': 'form-control', 'type': 'date'})
                 elif isinstance(field.widget, forms.FileInput):
                     field.widget.attrs.update({'class': 'form-control'})
+
+# Form per la richiesta di ferie o permessi
+class Richiedi_assenza(forms.ModelForm):    
+
+    data_inizio = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control','type': 'date', 'min': date.today}))  
+    ora_inizio = forms.TimeField(widget=forms.TimeInput(attrs={'class': 'form-control hidden','type': 'time', 'min': '09:00', 'max': '18:00'}), required = False)
+    data_fine = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control','type': 'date', 'min': date.today}))
+    ora_fine = forms.TimeField(widget=forms.TimeInput(attrs={'class': 'form-control hidden','type': 'time', 'min': '09:00', 'max': '18:00'}), required = False)
+    motivo = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control motivo hidden', 'rows': 2}), required = False)
+
+    class Meta:
+        model = Ferie
+        fields = ['data_inizio', 'ora_inizio', 'data_fine', 'ora_fine', 'motivo']
