@@ -84,8 +84,9 @@ class Dipendenti(AbstractUser):
         return self.nome
  """
 class Ruoli(models.Model):
-    ruolo = models.OneToOneField(Group, on_delete=models.CASCADE)  # Relazione 1 a 1 con Group
+    ruolo = models.OneToOneField(Group, on_delete=models.CASCADE, unique=True)  # Relazione 1 a 1 con Group
     """
+    class Group
     id	    AutoField	                    ID univoco
     name	CharField	                    Nome del gruppo
     permissions	ManyToManyField(Permission)	Permessi assegnati al gruppo 

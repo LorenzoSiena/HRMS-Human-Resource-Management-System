@@ -7,6 +7,9 @@ from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 
+from django.contrib.auth.models import Permission
+
+
 
 
 from django.contrib.auth.models import User,Group
@@ -83,6 +86,7 @@ def crea_dipendente(request: HttpRequest):
         livello_accesso = request.POST.get('livello_accesso', '').strip()
 
         if nome and cognome and email and ruolo and data_assunzione and livello_accesso:
+
             Dipendenti.objects.create(
                 nome=nome,
                 cognome=cognome,
@@ -91,6 +95,7 @@ def crea_dipendente(request: HttpRequest):
                 data_assunzione=data_assunzione,
                 livello_accesso=livello_accesso
             )
+            
             messages.success(request, f"✅ Dipendente '{nome} {cognome}' aggiunto con successo!")
         else:
             messages.error(request, "⚠️ Tutti i campi sono obbligatori!")
@@ -264,22 +269,14 @@ def registrati(request: HttpRequest):
 
     return render(request, "hrms_app/register_forms.html", {"form": form})
 
-@login_required
-def mostra_permessi(request):
-    permessi_individuali = request.user.get_all_permissions()  # Restituisce un set di permessi (app_label.codename)
-
-    permessi_ruolo = set()
-    ruolo=request.user.ruolo
-    if ruolo:  # Se l'utente ha un ruolo assegnato
-        permessi_ruolo = set(request.user.ruolo.ruolo.permissions.values_list('codename', flat=True))
-    
-    
-    return render(request, 'hrms_app/debug_permessi.html', {'permessi_individuali': permessi_individuali, 'permessi_ruolo':permessi_ruolo,'ruolo': ruolo})
 
 from django.urls import reverse
 
 def vai_all_admin(request):
     return redirect(reverse('admin:index'))  # Ricava l'URL dinamicamente
+
+
+
 
 
 
@@ -427,8 +424,242 @@ def sviluppo(request:HttpRequest):
 # def aggiungi_dipendente(request:HttpRequest):
 #     return render(request,'hrms_app/aggiungi_dipendente.html')
 
+
 def gestione_ruoli(request:HttpRequest):
     return render(request,'hrms_app/gestione_ruoli.html')
 
+
+
+#controllare validation!
+
+def crea_ruolo(request: HttpRequest):
+    if request.method == "POST":
+        ruolo = request.POST.get("name") # testo
+        livello_accesso = request.POST.get("livello_accesso") #numero
+
+        if not ruolo or not livello_accesso:
+
+            messages.error(request, f"Errore nella creazione del ruolo. {ruolo} livello {livello_accesso} Controlla i dati inseriti.")
+            return redirect("gestione_ruoli")
+
+        # Controlla se esiste già un Group con quel nome
+        gruppo_esistente = Group.objects.filter(name=ruolo).first()
+
+        if gruppo_esistente and Ruoli.objects.filter(ruolo=gruppo_esistente).exists():
+            messages.error(request, "Ruolo già esistente.")
+            return redirect("gestione_ruoli")
+
+        # Crea il gruppo se non esiste
+        if not gruppo_esistente:
+            gruppo_esistente = Group.objects.create(name=ruolo)
+
+        # Crea il ruolo associato
+        Ruoli.objects.create(ruolo=gruppo_esistente, livello_accesso=int(livello_accesso))
+        messages.success(request, f"Creazione ruolo {ruolo} avvenuta con successo!")
+        return render(request,'hrms_app/gestione_ruoli.html')
+
+    return render(request,'hrms_app/gestione_ruoli.html')
+
+""" 
+SELECT *
+FROM ruoli JOIN Group 
+ON ruoli.ruolo_id = Group.id
+WHERE Group.name = 'Contabile';
+"""          
+
+
+
+""" 
+Gestione dipendenti (crea,modifica,visualizza,elimina)
+Gestire Ruoli(crea,modifica,visualizza,elimina)
+Gestire Autorizzazioni(assegna a ruolo,rimuovi da ruolo,visualizza autorizzazioni per ruolo)
+Gestire Ferie/Permessi(accetta,rifiuta,visualizza)
+Visualizza Report(ferie,permessi,presenze)
+Gestire messaggi bacheca (Crea,modifica,elimina)
+Gestire Buste paga (Crea,carica file,elimina,visualizza)
+Gestire documenti [contratti e certificati] (visualizza,modifica,elimina)
+ """
+
+
+
+def cerca_ruolo(request:HttpRequest):
+
+
+    if request.method == "GET":
+        permessi_disponibili = {
+        "gestione_dipendenti": False,
+        "gestione_ruoli": False,
+        "gestione_autorizzazioni": True,
+        "gestione_ferie_permessi": False,
+        "visualizza_report": False,
+        "gestione_messaggi_bacheca": False,
+        "gestione_bustepaga": False,
+        "gestione_documenti": False
+    }
+        name = request.GET.get("name")
+        if name:
+            #name='Contabile'
+            ruolo=Ruoli.objects.filter(ruolo__name__icontains=name).first()
+            return render(request,'hrms_app/gestione_ruoli.html',{"ruolo":ruolo,'permessi_disponibili': permessi_disponibili}) 
+
+def modifica_autorizzazioni(request: HttpRequest, id):
+
+
+    # Dizionario con permessi disponibili
+    permessi_disponibili = {
+        "gestione_dipendenti": False,
+        "gestione_ruoli": False,
+        "gestione_autorizzazioni": False,
+        "gestione_ferie_permessi": False,
+        "visualizza_report": False,
+        "gestione_messaggi_bacheca": False,
+        "gestione_bustepaga": False,
+        "gestione_documenti": False
+    }
+
+    if request.method == "POST":
+
+
+        permessi_selezionati = request.POST.getlist("permessi")  # Ottieni solo quelli selezionati
+        permessi_nuovi = []
+
+        """ 
+        Gestione dipendenti (crea,modifica,visualizza,elimina) 4
+        Gestire Ruoli(crea,modifica,visualizza,elimina) 4
+        Gestire Autorizzazioni(assegna a ruolo,rimuovi da ruolo,visualizza autorizzazioni per ruolo) 4
+
+        Gestire Ferie/Permessi(accetta,rifiuta,visualizza)  
+        Ferie-> 1 (view) 2(change Nerfato)
+        Permessi-> 1 (view) 2(change Nerfato)
+        Visualizza Report(ferie,permessi,presenze) 3
+
+        Gestire messaggi bacheca (Crea,modifica,elimina) 3
+
+        Gestire Buste paga (Crea,carica file,elimina,visualizza) 4
+
+        Gestire documenti [contratti e certificati] (visualizza,modifica,elimina) 4
+        """
+
+        """ hrms_app.add_bustepaga 	hrms_app.change_certificati 	hrms_app.view_dipendenti 	hrms_app.view_certificati 	hrms_app.change_ruoli 	auth.delete_permission 	hrms_app.change_bustepaga 	hrms_app.add_certificati 	hrms_app.view_ferie 	hrms_app.delete_ruoli
+        hrms_app.view_bustepaga 	auth.change_permission 	hrms_app.change_dipendenti 	hrms_app.delete_certificati 	hrms_app.view_reportpresenze 	hrms_app.view_reportpermessi 	hrms_app.add_bacheca 	auth.add_permission 	hrms_app.change_ferie 	hrms_app.add_dipendenti
+        hrms_app.delete_bustepaga 	hrms_app.delete_bacheca 	hrms_app.change_bacheca 	hrms_app.view_permessi 	hrms_app.add_ruoli 	hrms_app.delete_dipendenti 	hrms_app.view_reportferie 	hrms_app.change_permessi 	auth.view_permission 	hrms_app.view_ruoli """
+
+        if "gestione_dipendenti" in permessi_selezionati:
+            permessi_nuovi.append(Permission.objects.get(codename='view_dipendenti'))   
+            permessi_nuovi.append(Permission.objects.get(codename='change_dipendenti'))  
+            permessi_nuovi.append(Permission.objects.get(codename='add_dipendenti'))  
+            permessi_nuovi.append(Permission.objects.get(codename='delete_dipendenti'))  
+
+        if "gestione_ruoli" in permessi_selezionati:
+            permessi_nuovi.append(Permission.objects.get(codename='view_ruoli'))   
+            permessi_nuovi.append(Permission.objects.get(codename='change_ruoli'))  
+            permessi_nuovi.append(Permission.objects.get(codename='add_ruoli'))  
+            permessi_nuovi.append(Permission.objects.get(codename='delete_ruoli'))  
+
+        if "gestione_autorizzazioni" in permessi_selezionati:
+            permessi_nuovi.append(Permission.objects.get(codename='view_permission'))   
+            permessi_nuovi.append(Permission.objects.get(codename='change_permission'))  
+            permessi_nuovi.append(Permission.objects.get(codename='add_permission'))  
+            permessi_nuovi.append(Permission.objects.get(codename='delete_permission'))  
+            
+        if "gestione_ferie" in permessi_selezionati:
+            permessi_nuovi.append(Permission.objects.get(codename='view_ferie'))   
+            permessi_nuovi.append(Permission.objects.get(codename='change_ferie'))  
+        
+        if "gestione_permessi" in permessi_selezionati:
+            permessi_nuovi.append(Permission.objects.get(codename='view_permessi'))   
+            permessi_nuovi.append(Permission.objects.get(codename='change_permessi'))  
+
+        if "visualizza_report" in permessi_selezionati:
+            permessi_nuovi.append(Permission.objects.get(codename='view_reportpermessi'))   
+            permessi_nuovi.append(Permission.objects.get(codename='view_reportpresenze'))   
+            permessi_nuovi.append(Permission.objects.get(codename='view_reportferie'))   
+
+        if "gestione_messaggi_bacheca" in permessi_selezionati:
+            permessi_nuovi.append(Permission.objects.get(codename='change_bacheca'))  
+            permessi_nuovi.append(Permission.objects.get(codename='add_bacheca'))  
+            permessi_nuovi.append(Permission.objects.get(codename='delete_bacheca'))  
+        
+        if "gestione_bustepaga" in permessi_selezionati:
+            permessi_nuovi.append(Permission.objects.get(codename='view_bustepaga'))   
+            permessi_nuovi.append(Permission.objects.get(codename='change_bustepaga'))  
+            permessi_nuovi.append(Permission.objects.get(codename='add_bustepaga'))  
+            permessi_nuovi.append(Permission.objects.get(codename='delete_bustepaga'))  
+        
+        if "gestione_documenti" in permessi_selezionati:
+            permessi_nuovi.append(Permission.objects.get(codename='view_certificati'))   
+            permessi_nuovi.append(Permission.objects.get(codename='change_certificati'))  
+            permessi_nuovi.append(Permission.objects.get(codename='add_certificati'))  
+            permessi_nuovi.append(Permission.objects.get(codename='delete_certificati'))  
+
+        
+        ruolo = Group.objects.get(id=id) 
+        ruolo.permissions.set(permessi_nuovi)
+        messages.success(request, f"✅ Ruolo aggiornato con successo!")
+
+
+    return render(request, 'hrms_app/gestione_ruoli.html', {
+        'ruolo': ruolo,
+    })
+
+
+
+
+
+""" 
+id 1
+
+permessi_attivi 
+['gestione_ruoli', 'gestione_messaggi_bacheca', 'gestione_documenti']
+
+permessi_dict 
+{'gestione_autorizzazioni': False,
+ 'gestione_buste_paga': False,
+ 'gestione_dipendenti': False,
+ 'gestione_documenti': True,
+ 'gestione_ferie_permessi': False,
+ 'gestione_messaggi_bacheca': True,
+ 'gestione_ruoli': True,
+ 'visualizza_report': False}
+
+permessi_disponibili 	
+{'gestione_autorizzazioni': False,
+ 'gestione_buste_paga': False,
+ 'gestione_dipendenti': False,
+ 'gestione_documenti': False,
+ 'gestione_ferie_permessi': False,
+ 'gestione_messaggi_bacheca': False,
+ 'gestione_ruoli': False,
+ 'visualizza_report': False}
+
+permessi_selezionati 	
+
+['gestione_ruoli', 'gestione_messaggi_bacheca', 'gestione_documenti']
+
+request 	
+
+<WSGIRequest: POST '/modifica_autorizzazioni/1'>
+
+ruolo 	
+
+<Ruoli: sayan (Livello: 11)>
+ """
+
+
+
+
+@login_required
+def mostra_permessi(request):
+    permessi_individuali = request.user.get_all_permissions()  # Restituisce un set di permessi (app_label.codename)
+
+    permessi_ruolo = set()
+    ruolo=request.user.ruolo
+    if ruolo:  # Se l'utente ha un ruolo assegnato
+        permessi_ruolo = set(request.user.ruolo.ruolo.permissions.values_list('codename', flat=True))
+    
+    
+    return render(request, 'hrms_app/debug_permessi.html', {'permessi_individuali': permessi_individuali, 'permessi_ruolo':permessi_ruolo,'ruolo': ruolo})
+
 def notifiche(request:HttpRequest):
     return render(request,'hrms_app/notifiche.html')
+
