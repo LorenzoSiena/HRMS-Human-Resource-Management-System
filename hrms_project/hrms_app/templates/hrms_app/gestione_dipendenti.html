@@ -77,6 +77,15 @@
 
 </style>
 
+
+{% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+{% endif %}
+
 <div class="container mt-2">
    <div class="card"> 
         <div class="card-header text-center">
@@ -115,16 +124,15 @@
                         </form>
                        
                     </div>
-
                 <!-- Lista delle persone in due colonne -->
                 <div class="row mt-4">
                     <div class="col-md-6">
                         <ul class="list-group" id="personList1">
                             {% for dipendente in dipendenti|slice:":10" %}
-                                <li class="dipendente-list" href= "{% url 'visualizza_dipendenti' %}" >
-
-                                    <a href="{% url 'modifica_dipendente' %}" > <strong>{{dipendente.nome}} {{ dipendente.cognome }}</strong> {{ dipendente.ruolo }}</a>
- 
+                                <li class="dipendente-list"  > 
+                                    
+                                    <a href="{% url 'modifica_dipendente' dipendente.id %}" > <strong>{{dipendente.id }}{{dipendente.nome}} {{ dipendente.cognome }}</strong> {{ dipendente.ruolo }}</a>
+                                    
                                 </li>
                             {% endfor %}
                         </ul>

@@ -5,4 +5,294 @@ Gestione busta paga
 {% endblock%}
 
 {% block content %}
+
+<style>
+    .busta-paga-card {
+        margin-top: 20px;
+    }
+
+    .busta-paga-list {
+        margin-top: 10px;
+        margin-bottom: 15px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+    .btn-custom {
+        margin-right: 5px;
+    }
+
+    /* Centra il contenuto della tabella */
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle; /* Centra verticalmente il contenuto */
+    }
+
+    /* Rimuove lo spazio in eccesso nella tabella */
+    .table-responsive {
+        padding: 0; /* Rimuove il padding in eccesso */
+        margin-bottom: 0; /* Rimuove il margine in eccesso */
+    }
+</style>
+</head>
+<body>
+
+<div class="container mt-5">
+
+    <!-- Form di ricerca dipendente -->
+    <form method="POST" action="{% url 'gestione_dipendenti' %}" class="mb-3">
+    {% csrf_token %}
+    <div class="row g-2 align-items-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="input-group">
+                <input type="search" class="form-control" id="searchPerson" name="dipendente" placeholder="Cerca per nome..." aria-label="Search">
+                <button type="submit" class="btn btn-primary">Cerca</button>
+            </div>
+        </div>
+    </div>
+    </form>
+  
+  
+
+    <!-- Tabella dei dipendenti -->
+    <div class="table-responsive">
+        <table class="table ">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Ruolo</th>
+                    <th>Email</th>
+                    <th>Operazioni</th>
+                </tr>
+            </thead>
+            <tbody id="employeeList">
+                <!-- Lista dipendenti (esempio statico) -->
+                <tr>
+                    <td>1</td>
+                    <td>Mario</td>
+                    <td>Rossi</td>
+                    <td>Amministrativo</td>
+                    <td>mario.rossi@example.com</td>
+                    <td>
+                        <button class="btn btn-info btn-sm btn-custom" onclick="viewPayslips(1)">Visualizza Buste Paga</button>
+                        <button class="btn btn-success btn-sm btn-custom" onclick="uploadPayslip(1)">Carica Busta Paga</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Luca</td>
+                    <td>Bianchi</td>
+                    <td>Tecnico</td>
+                    <td>luca.bianchi@example.com</td>
+                    <td>
+                        <button class="btn btn-info btn-sm btn-custom" onclick="viewPayslips(2)">Visualizza Buste Paga</button>
+                        <button class="btn btn-success btn-sm btn-custom" onclick="uploadPayslip(2)">Carica Busta Paga</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal per visualizzare le buste paga -->
+    <div class="modal" id="viewPayslipsModal" tabindex="-1" aria-labelledby="viewPayslipsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewPayslipsModalLabel">Buste Paga Dipendente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 id="employeeNameModal"></h6>
+
+                    <!-- Selezione mese e anno per filtro -->
+                    <div class="mb-3">
+                        <label for="monthYearFilter" class="form-label">Filtra per mese e anno</label>
+                        <input type="month" id="monthYearFilter" class="form-control" onchange="filterPayslips()">
+                    </div>
+
+                    <div id="payslipsList"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per caricare la busta paga -->
+    <div class="modal" id="uploadPayslipModal" tabindex="-1" aria-labelledby="uploadPayslipModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadPayslipModalLabel">Carica Busta Paga</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="uploadForm">
+                        <div class="mb-3">
+                            <label for="fileUpload" class="form-label">Seleziona il file della busta paga</label>
+                            <input type="file" class="form-control" id="fileUpload" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="periodUpload" class="form-label">Periodo</label>
+                            <input type="month" class="form-control" id="periodUpload" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="payslipName" class="form-label">Nome File</label>
+                            <input type="text" class="form-control" id="payslipName" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Carica</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast per conferma eliminazione -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="deleteToast" class="toast align-items-center text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <strong>Successo!</strong> La busta paga è stata eliminata con successo.
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    // Funzione per visualizzare le buste paga di un dipendente
+function viewPayslips(employeeId) {
+let employeeName = employeeId === 1 ? 'Mario Rossi' : 'Luca Bianchi';
+let payslips = [
+  { period: '2025-01', uploadDate: '2025-01-10', payslipName: 'Busta Paga Gennaio 2025', fileLink: 'path/to/payslip1.pdf', amount: 1500.50 },
+  { period: '2025-02', uploadDate: '2025-02-12', payslipName: 'Busta Paga Febbraio 2025', fileLink: 'path/to/payslip2.pdf', amount: 1600.75 },
+  { period: '2025-03', uploadDate: '2025-03-15', payslipName: 'Busta Paga Marzo 2025', fileLink: 'path/to/payslip3.pdf', amount: 1550.30 }
+];
+
+let payslipsList = '';
+payslips.forEach(payslip => {
+  payslipsList += `
+      <div class="busta-paga-list" data-period="${payslip.period}">
+          <p><strong>Nome File:</strong> ${payslip.payslipName}</p>
+          <p><strong>Periodo:</strong> ${payslip.period}</p>
+          <p><strong>Data Caricamento:</strong> ${payslip.uploadDate}</p>
+          <p><strong>Importo dello Stipendio:</strong> €${payslip.amount.toFixed(2)}</p>
+          <button class="btn btn-info btn-sm btn-custom" onclick="viewPayslipDetails('${payslip.fileLink}')">Visualizza</button>
+          <button class="btn btn-primary btn-sm btn-custom" onclick="downloadPayslip('${payslip.fileLink}')">Scarica</button>
+          <button class="btn btn-info btn-sm btn-custom" onclick="sharePayslip('${payslip.fileLink}')">Condividi via email</button>
+          <button class="btn btn-danger btn-sm btn-custom" onclick="deletePayslip('${payslip.fileLink}')">Elimina</button>
+      </div>
+  `;
+});
+
+document.getElementById('employeeNameModal').textContent = `Buste Paga di ${employeeName}`;
+document.getElementById('payslipsList').innerHTML = payslipsList;
+
+var modal = new bootstrap.Modal(document.getElementById('viewPayslipsModal'));
+modal.show();
+}
+
+
+    // Funzione per scaricare la busta paga
+    function downloadPayslip(fileLink) {
+        window.open(fileLink, '_blank');
+    }
+
+    // Funzione per condividere la busta paga via email
+    function sharePayslip(fileLink) {
+        let emailBody = `Ciao, ti invio la busta paga. Puoi scaricarla dal seguente link: ${fileLink}`;
+        window.location.href = `mailto:?subject=Busta Paga&body=${encodeURIComponent(emailBody)}`;
+    }
+
+    // Funzione per visualizzare la busta paga
+    function viewPayslipDetails(fileLink) {
+        window.open(fileLink, '_blank');
+    }
+
+    // Funzione per eliminare la busta paga
+function deletePayslip(fileLink) {
+  if (confirm('Sei sicuro di voler eliminare questa busta paga?')) {
+      showDeleteToast();
+
+      // Trova il bottone cliccato e risali fino al contenitore della busta paga
+      let payslipElement = event.target.closest('.busta-paga-list');
+      
+      if (payslipElement) {
+          payslipElement.remove();
+      } else {
+          alert('Errore: impossibile trovare la busta paga da eliminare.');
+      }
+  }
+}
+
+
+    // Funzione per mostrare il toast di eliminazione
+    function showDeleteToast() {
+        var toast = new bootstrap.Toast(document.getElementById('deleteToast'));
+        toast.show();
+    }
+
+    // Funzione per caricare la busta paga
+    function uploadPayslip(employeeId) {
+        var modal = new bootstrap.Modal(document.getElementById('uploadPayslipModal'));
+        modal.show();
+
+        document.getElementById('uploadForm').onsubmit = function (e) {
+            e.preventDefault();
+
+            let file = document.getElementById('fileUpload').files[0];
+            let period = document.getElementById('periodUpload').value;
+            let payslipName = document.getElementById('payslipName').value;
+
+            alert('Busta paga caricata con nome: ' + payslipName + ' per il periodo: ' + period);
+
+            modal.hide();
+        };
+    }
+
+    // Funzione di ricerca dipendente (simulata)
+    function searchEmployee() {
+        let searchValue = document.getElementById('searchEmployee').value.toLowerCase();
+        let rows = document.getElementById('employeeList').getElementsByTagName('tr');
+        
+        Array.from(rows).forEach(row => {
+            let name = row.cells[1].textContent.toLowerCase();
+            let surname = row.cells[2].textContent.toLowerCase();
+            let role = row.cells[3].textContent.toLowerCase();
+            if (name.includes(searchValue) || surname.includes(searchValue) || role.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Funzione per filtrare le buste paga in base al mese e anno
+    function filterPayslips() {
+        let selectedMonthYear = document.getElementById('monthYearFilter').value;
+        let payslips = document.querySelectorAll('.busta-paga-list');
+
+        payslips.forEach(payslip => {
+            let payslipPeriod = payslip.getAttribute('data-period');
+            if (selectedMonthYear && !payslipPeriod.startsWith(selectedMonthYear)) {
+                payslip.style.display = 'none';
+            } else {
+                payslip.style.display = '';
+            }
+        });
+    }
+</script>
+
+
 {% endblock %}

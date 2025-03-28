@@ -13,7 +13,9 @@ from django.contrib.auth.models import User,Group
 from .models import *
 
 #Form
-from .forms import RegisterForm
+
+from .forms import RegisterForm, Richiedi_assenza, EditUserForm
+
 from django.contrib.auth import authenticate, login, logout
 
 #Password reset
@@ -28,54 +30,48 @@ from datetime import datetime ,date , time
 def hrms_app(request: HttpRequest):
     if not request.user.is_authenticated:
         return redirect('login')
+    # Visualizza i messagi della bacheca
+    messaggi_bacheca = Bacheca.objects.all().order_by('data_pubblicazione')
     # Verifico se esiste una timbratura di sola entrata con la data odierna
     dipendente = Dipendenti.objects.get(id = request.user.id)  # Dipendente loggato
     # Se non esiste imposto per la timbrature di entrata
     if Presenze.objects.filter(dipendente = dipendente, data = date.today(), ora_uscita = None).last() is None:
-        text_button = "Timbra Entrata"
+        button_timbra = "Timbra Entrata"
     # Se esiste imposto per la timbrature di uscita
     else:
-        text_button = "Timbra Uscita"
+        button_timbra = "Timbra Uscita"
     # Lista delle timbrature da visualizzare - Solo quelle della data odierna
     lista_presenze = Presenze.objects.filter(dipendente = dipendente, data = date.today()) # Lista timbrature odierna
-    # Visualizza i messagi della bacheca
-    messaggi_bacheca = Bacheca.objects.all().order_by('data_pubblicazione')    
-
-    return render(request,'hrms_app/home.html', {'text_button': text_button, 'lista_presenze': lista_presenze, 'messaggi_bacheca': messaggi_bacheca })
+    # Carico il form per la richiesta di permessi o ferie
+    form = Richiedi_assenza()
+    lista_ferie = Ferie.objects.filter(dipendente = dipendente, stato = "In attesa")
+    lista_permessi = Permessi.objects.filter(dipendente = dipendente, stato = "In attesa")
+    return render(request,'hrms_app/home.html', {'messaggi_bacheca': messaggi_bacheca, 'button_timbra': button_timbra, 'lista_ferie': lista_ferie, 'lista_permessi': lista_permessi, 'form': form, 'lista_presenze': lista_presenze})
 
 # Funzione per gestire le timbrature
 def gestione_timbratura(request: HttpRequest):
     if request.method == "POST":    
-        dipendente = Dipendenti.objects.get(id = request.user.id) # Dipendente loggato
-        lista_presenze = Presenze.objects.filter(dipendente = dipendente, data = date.today()) # Lista timbrature odierna
-        messaggio_errore = ""
+        dipendente = Dipendenti.objects.get(id = request.user.id) # Dipendente loggato      
         # Verifico se l'utente ha gia' timbrato l'entrata nella data corrente    
         if Presenze.objects.filter(dipendente = dipendente, data = date.today(), ora_uscita = None).last() is None:
             # Se l'utente non ha ancora timbrato nella data corrente, procedo con la inserimento dell'entrata
             try:
                 Presenze.objects.create(data = date.today(), ora_ingresso = datetime.now().time(), dipendente = dipendente)
-                text_button = "Timbra Uscita"
             except Exception as e:
-                messaggio_errore = f"⚠️ Errore nella creazione dell'entrata!, errore: " + str(e)
+                messages.success(request,f"⚠️ Errore nella creazione dell'entrata!, errore: " + str(e))
         else:
             # Se l'utente ha gia' timbrato nella data corrente, proseguo con l'inserimento della data di uscita
             try:
                 presenza = Presenze.objects.filter(dipendente = dipendente, data = date.today()).last() # Prendo l'ultima riga generata con la data corrente
                 presenza.ora_uscita = datetime.now().time() # Aggiorno l'orario di uscita
                 presenza.save()
-                text_button = "Timbra Entrata"
             except Exception as e:
-                messaggio_errore = f"⚠️ Errore nella creazione dell'uscita!, errore: " + str(e)
-        return redirect('home')       
-    return render(request, 'hrms_app/home.html', {'text_button': text_button, 'lista_presenze' : lista_presenze, 'messaggio_errore': messaggio_errore})
-   
+                messages.success(request,f"⚠️ Errore nella creazione dell'uscita!, errore: " + str(e))
+    return redirect('home')
 
 def profilo(request:HttpRequest):
     return render(request,'hrms_app/profilo.html')
 
-def visualizza_dipendenti(request: HttpRequest):
-    dipendenti = Dipendenti.objects.all().values('nome', 'cognome')
-    return render(request, 'hrms_app/visualizza_dipendenti.html', {'dipendenti': dipendenti})
 
 def crea_dipendente(request: HttpRequest):
     if request.method == "POST":
@@ -101,34 +97,8 @@ def crea_dipendente(request: HttpRequest):
 
     return redirect('dipendenti')
 
-def modifica_dipendente(request: HttpRequest, id_dipendente):
-    dipendente = get_object_or_404(Dipendenti, id=id_dipendente)
 
-    if request.method == "POST":
-        nome = request.POST.get('nome', '').strip()
-        cognome = request.POST.get('cognome', '').strip()
-        email = request.POST.get('email', '').strip()
-        ruolo = request.POST.get('ruolo', '').strip()
-        data_assunzione = request.POST.get('data_assunzione', '').strip()
-        livello_accesso = request.POST.get('livello_accesso', '').strip()
 
-        if nome and cognome and email and ruolo and data_assunzione and livello_accesso:
-            dipendente.nome = nome
-            dipendente.cognome = cognome
-            dipendente.email = email
-            dipendente.ruolo = ruolo
-            dipendente.data_assunzione = data_assunzione
-            dipendente.livello_accesso = livello_accesso
-            dipendente.save()
-            messages.success(request, f"✅ Dipendente '{nome} {cognome}' modificato con successo!")
-        else:
-            messages.error(request, "⚠️ Tutti i campi sono obbligatori!")
-
-def elimina_dipendente(request: HttpRequest, id_dipendente):
-    dipendente = get_object_or_404(Dipendenti, id=id_dipendente)
-    dipendente.delete()
-    messages.success(request, f"🗑️ Dipendente '{dipendente.nome} {dipendente.cognome}' eliminato con successo!")
-    return redirect('dipendenti')
 
 
 
@@ -182,7 +152,7 @@ def modifica_messaggio_bacheca(request:HttpRequest,id):
             messaggio.messaggio = nuovo_messaggio
             messaggio.save()
             messages.success(request, "✏️ Messaggio  modificato con successo!")
-            return redirect('bacheca') # serve???
+            return redirect('bacheca') 
         else:
             messages.error(request, "⚠️ Titolo e messaggio sono obbligatori!")
 
@@ -248,6 +218,36 @@ def aggiungi_dipendente(request:HttpRequest):
     return render(request, "hrms_app/aggiungi_dipendente.html", {"form": form})
     
 
+def modifica_dipendente(request: HttpRequest, id):
+    dipendente = Dipendenti.objects.get(id=id)  # Recupera l'utente esistente
+    if request.method == "POST":
+        form = EditUserForm(request.POST, request.FILES, instance=dipendente)  # Passa l'istanza
+        if form.is_valid():
+            form.save()  # Modifica solo i campi cambiati
+            messages.success(request,f" Dipendente '{dipendente.nome} {dipendente.cognome}' modificato con successo!")
+            return redirect('gestione_dipendenti')
+        else:
+            messages.error(request,f" Campi errati!",)
+
+
+    else:
+        form = EditUserForm(instance=dipendente)  # Precompila il form
+    return render(request, 'hrms_app/modifica_dipendente.html', {'form': form, 'dipendente': dipendente})
+
+
+
+
+
+
+def elimina_dipendente(request: HttpRequest, id):
+    dipendente = get_object_or_404(Dipendenti, id=id)
+    dipendente.delete()
+    messages.success(request, f"🗑️ Dipendente '{dipendente.nome} {dipendente.cognome}' eliminato con successo!")
+    return redirect('gestione_dipendenti')
+
+
+
+
 
 def registrati(request: HttpRequest):
     if request.method == "POST":
@@ -303,18 +303,41 @@ def user_logout(request: HttpRequest):
     logout(request)
     return redirect('home')
 
+# Funzione per la richiesta permessi e ferie
 def richiesta_permessi_ferie(request: HttpRequest):
-    if request.method == "POST":       
-        # tipo_permesso = request.POST.get("tipo_permesso", "Nessuna selezione") # Prende il valore dal radio button selezionato nel form
-        tipo_permesso=""
-        data_inizio = request.POST.get("data_inizio", "nessuna selezione") # Prende il valore dal input del form
-        ora_inizio = request.POST.get("ora_inizio") # Prende il valore dal input del form
-        data_fine = request.POST.get("data_fine") # Prende il valore dal input del form
-        ora_fine = request.POST.get("ora_fine") # Prende il valore dal input del form
-        motivo = request.POST.get("motivo") # Prende il valore dal input del form
-        dipendente = Dipendenti.objects.get(id = request.user.id) # Dipendente loggato
-
-        return render(request, 'hrms_app/home.html', {"tipo_permesso": tipo_permesso, "data_inizio": data_inizio, "ora_inizio": ora_inizio, "data_fine": data_fine, "ora_fine": ora_fine, "motivo": motivo, "dipendente": dipendente})
+    if request.method == "POST":
+        tipo_permesso = request.POST.get("tipo_permesso", "Nessuna selezione") # Prende il valore dal radio button selezionato nel form
+        form = Richiedi_assenza(request.POST)
+        if form.is_valid():
+            data_inizio = form.cleaned_data['data_inizio']
+            ora_inizio = form.cleaned_data['ora_inizio']
+            data_fine = form.cleaned_data['data_fine']
+            ora_fine = form.cleaned_data['ora_fine']
+            motivo = form.cleaned_data['motivo']
+            dipendente = Dipendenti.objects.get(id = request.user.id)
+            # Controllo che la data fine sia maggiore o uguale alla data inizio
+            if data_inizio < data_fine:
+                messages.error(request, 'Errore nella richiesta: La data fine deve essere maggiore o uguale alla data inizio.')
+                return redirect('home')
+            # Controllo che le ore di ingresso e uscita siano tra le 9.00 e le 18.00
+            if ora_inizio < datetime.strptime('09:00', '%H:%M').time() or ora_inizio > datetime.strptime('18:00', '%H:%M').time():
+                messages.error(request, 'Errore nella richiesta: Le ore di ingresso devono essere tra le 9.00 e le 18.00.')
+                return redirect('home')
+            if ora_fine < datetime.strptime('09:00', '%H:%M').time() or ora_fine > datetime.strptime('18:00', '%H:%M').time():
+                messages.error(request, 'Errore nella richiesta: Le ore di uscita devono essere tra le 9.00 e le 18.00.')
+                return redirect('home')
+            # Controllo che l'ora di uscita sia maggiore dell'ora di ingresso nei permessi dello stesso giorno
+            if data_inizio == data_fine and ora_inizio > ora_fine:
+                messages.error(request, "Errore nella richiesta: Le ore di uscita deve essere maggiore dell'ora di entrata")
+                return redirect('home')
+            if tipo_permesso == "ferie":
+                Ferie.objects.create(dipendente = dipendente, data_inizio = data_inizio, data_fine = data_fine, stato = "In attesa") 
+                messages.success(request, 'Permesso richiesto con successo!')               
+            elif tipo_permesso == "permesso" or tipo_permesso == "permesso_nr":
+                retribuito = (tipo_permesso == "permesso")
+                Permessi.objects.create(dipendente = dipendente, data_ora_inizio = datetime.combine(data_inizio, ora_inizio), data_ora_fine = datetime.combine(data_fine, ora_fine), stato = "In attesa", retribuito = retribuito, motivo = motivo)
+                messages.success(request, 'Permesso richiesto con successo!')
+        return redirect('home')        
 
 #RESETTO LA PASSWORD
 
