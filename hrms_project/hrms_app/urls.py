@@ -46,6 +46,10 @@ urlpatterns = [
     
     # gestione permessi e ruoli
     path("crea_ruolo",views.crea_ruolo,name="crea_ruolo"),
+    path("cerca_ruolo",views.cerca_ruolo,name="cerca_ruolo"),
+
+    path("modifica_autorizzazioni/<int:id>",views.modifica_autorizzazioni,name="modifica_autorizzazioni"),
+    
     path("mostra_permessi",views.mostra_permessi,name="mostra_permessi"),
 
 

@@ -68,67 +68,85 @@
         </div>
     </div>
 
-  
+  {% comment %} TODO2 {% endcomment %}
 <!-- Sezione 2: Permessi e Autorizzazioni -->
 <div class="card mt-4">
   <div class="card-header">
       <h5>Permessi e Autorizzazioni</h5>
   </div>
+
+
   <div class="card-body">
-      <form id="form-permessi">
+      <form id="form-cerca-ruoli" method="GET" action="{% url 'cerca_ruolo' %}">
+          
           <!-- Sezione di ricerca dipendente -->
+
           <div class="mb-3">
-              <label for="ricerca-dipendente-permesso" class="form-label">Ricerca Ruolo</label>
-              <input type="text" class="form-control" id="ricerca-dipendente-permesso" placeholder="Cerca per nome..." oninput="ricercaDipendentiPermessi()">
-              <div id="suggerimenti-permessi" class="list-group mt-2" style="display: none;"></div>
+              <label for="ricerca-dipendente-permesso" class="form-label">Ricerca Ruoloxxx</label>
+              <input type="text" name="name"  class="form-control" id="ricerca-dipendente-permesso" placeholder="Cerca per nome..." >
+              <div id="suggerimenti-permessi" class="list-group mt-2" ></div>
           </div>
 
-          <!-- Lista dei Permessi -->
-          <div id="permessi-lista" class="mb-3" style="display: none;">
-              <h6>Assegna Permessi e Autorizzazioni</h6>
-              <!-- Permessi e Autorizzazioni -->
-              <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="accesso-admin" id="accesso-admin">
-                  <label class="form-check-label" for="accesso-admin">
-                      Accesso Amministratore
-                  </label>
-              </div>
-              <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="visualizza-report" id="visualizza-report">
-                  <label class="form-check-label" for="visualizza-report">
-                      Visualizzare Report
-                  </label>
-              </div>
-              <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="modifica-dati" id="modifica-dati">
-                  <label class="form-check-label" for="modifica-dati">
-                      Modificare Dati Aziendali
-                  </label>
-              </div>
-              <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="gestione-ruoli" id="gestione-ruoli">
-                  <label class="form-check-label" for="gestione-ruoli">
-                      Gestire Ruoli e Permessi
-                  </label>
-              </div>
-              <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="accesso-dashboard" id="accesso-dashboard">
-                  <label class="form-check-label" for="accesso-dashboard">
-                      Accesso alla Dashboard
-                  </label>
-              </div>
-              <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="crea-utenti" id="crea-utenti">
-                  <label class="form-check-label" for="crea-utenti">
-                      Creare Nuovi Utenti
-                  </label>
-              </div>
 
-              <button type="submit" class="btn btn-primary mt-3">Salva Permessi</button>
+    </form>
+        <div class ="form-check-label" >
+
+            <h5>Ruolo attuale</h5>
+            <h9>--------------</h9>
+            <h9 style="color:red;">
+            
+            {% if ruolo %}
+            {{ ruolo }}
+
+            </h9>
+
+
+
+
+            <form id="form-permessi" method="POST" action="{% url 'modifica_autorizzazioni' ruolo.id %}">
+                    {% csrf_token %}
+
+                    <h6>Assegna Permessi e Autorizzazioni</h6>
+
+                    <br>
+
+
+                    {% for permesso, attivo in permessi_disponibili.items %}
+                    <div class="form-check">
+                        <input class="form-check-input" 
+                               type="checkbox" 
+                               name="permessi"  
+                               value="{{ permesso }}"  
+                               id="permesso_{{ permesso }}"
+                               {% if attivo %} checked {% endif %}>
+            
+                        <label class="form-check-label" for="permesso_{{ permesso }}">
+                            {{ permesso }}
+                        </label>
+                    </div>
+                {% endfor %}
+        
+        
+                      <button type="submit" class="btn btn-primary mt-3">Salva Permessi</button>
+        
+                    </form>
+
+            {% else %}
+            Nessun ruolo selezionato
+            {% endif %}
+            
+            <h9>--------------</h9>
+       
+ 
           </div>
-      </form>
+      
   </div>
 </div>
+
+
+
+
+
 
 
 <!-- Area per Visualizzare il Messaggio di Successo o Errore -->
@@ -233,12 +251,8 @@
 
 
 <script>
-{% comment %}     // Funzione per capitalizzare la prima lettera di ogni parola
-    function capitalizeWords(str) {
-        return str.replace(/\b\w/g, function(char) {
-            return char.toUpperCase();
-        });
-    }
+    
+   
 
     // Array di dipendenti con i relativi ruoli
     let dipendenti = [
@@ -351,32 +365,6 @@ function eliminaRuolo() {
 }
 
 
-    
-    // Funzione per aggiungere un nuovo ruolo
-document.getElementById('form-crea-ruolo').addEventListener('submit', function(e) {
-    e.preventDefault(); // Impedisce l'invio del form in modo tradizionale
-
-    const nuovoRuolo = document.getElementById('nuovo-ruolo').value;
-    const nuovoLivello = document.getElementById('creazioneLivello').value;
-
-    if (nuovoRuolo) {
-        // Controlla se il ruolo esiste già
-        const ruoloEsistente = ruoli.find(r => r.nome.toLowerCase() === nuovoRuolo.toLowerCase());
-        if (ruoloEsistente) {
-            mostraAvviso('Errore', ', il ruolo inserito esiste già!');
-            return;
-        }
-
-        const idRuolo = ruoli.length + 1;
-        ruoli.push({ id: idRuolo, nome: nuovoRuolo, livello: nuovoLivello });
-        aggiornaDipendenti();
-        mostraAvviso('Ruolo creato con successo! ', 'Il nuovo ruolo è stato aggiunto.');
-        document.getElementById('nuovo-ruolo').value = ''; // Pulisce il campo
-        document.getElementById('creazioneLivello').value = ''; // Pulisce il campo livello
-    } else {
-        mostraAvviso('Errore', ', per favore inserisci un nome per il nuovo ruolo.');
-    }
-});
 
 
     // Funzione per mostrare l'alert di successo o errore
@@ -500,8 +488,71 @@ function mostraAvviso(titolo, messaggio) {
 
   // Chiamata per inizializzare la pagina con i dipendenti
   aggiornaDipendentiPermessi();
- {% endcomment %}
+ 
     
 </script>
 
 {% endblock %}
+
+
+
+{% comment %} 
+                {% csrf_token %}
+                </div>
+                  <!-- Lista dei Permessi -->
+                  <div id="permessi-lista" class="mb-3" >
+                      <h6>Assegna Permessi e Autorizzazioni</h6>
+                      <!-- Permessi e Autorizzazioni -->
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="gestione_dipendenti" id="gestione_dipendenti">
+                          <label class="form-check-label" for="gestione_dipendenti">
+                              Gestione dipendenti (crea,modifica,visualizza,elimina)
+                          </label>
+                      </div>
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="gestione_ruoli" id="gestione_ruoli">
+                          <label class="form-check-label" for="gestione_ruoli">
+                              Gestire Ruoli(crea,modifica,visualizza,elimina)
+                          </label>
+                      </div>
+        
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="gestione_autorizzazioni" id="gestione_autorizzazioni">
+                          <label class="form-check-label" for="gestione_autorizzazioni">
+                              Gestire Autorizzazioni(assegna a ruolo,rimuovi da ruolo,visualizza autorizzazioni per ruolo)
+                          </label>
+                      </div>
+                      
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="gestione_ferie_permessi" id="gestione_ferie_permessi">
+                          <label class="form-check-label" for="gestione_ferie_permessi">
+                              Gestire Ferie/Permessi(accetta,rifiuta,visualizza)
+                          </label>
+                      </div>
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="visualizza_report" id="visualizza_report">
+                          <label class="form-check-label" for="visualizza_report">
+                              Visualizza Report(ferie,permessi,presenze)
+                          </label>
+                      </div>
+        
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="gestione_messaggi_bacheca" id="gestione_messaggi_bacheca">
+                        <label class="form-check-label" for="gestione_messaggi_bacheca">
+                            Gestire messaggi bacheca (Crea,modifica,elimina)
+                        </label>
+                    </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="gestione_buste_paga" id="gestione_buste_paga">
+                        <label class="form-check-label" for="gestione_buste_paga">
+                            Gestire Buste paga (Crea,carica file,elimina,visualizza)
+                        </label>
+                    </div>
+                    
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="gestione_documenti" id="gestione_documenti">
+                        <label class="form-check-label" for="gestione_documenti">
+                            Gestire documenti [contratti e certificati] (visualizza,modifica,elimina)
+                        </label>
+                    </div>
+                     {% endcomment %}
