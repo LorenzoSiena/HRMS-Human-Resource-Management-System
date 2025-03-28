@@ -1,0 +1,26 @@
+.main_container {
+    gap: 10px;
+}
+
+.section_container {
+    background-color: white;
+    padding: 20px;    
+    opacity: 90%;
+    overflow: auto;
+   
+}
+
+.container_messaggi {
+    max-height: 160px;
+    
+    
+}
+
+.container_timbrature {
+    width: auto;
+    height: 300px
+}
+
+.container_permessi {
+    width: 80%;
+}
