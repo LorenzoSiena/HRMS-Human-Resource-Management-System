@@ -33,17 +33,22 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-{% if messages %}
-{% for message in messages %}
-    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-        {{ message }}
-    </div>
-{% endfor %}
-{% endif %}
-
-
 </style>
 
+TESTOXXX
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}
+            {% if 'error' in message.tags %}
+                alert-danger
+            {% else %}
+                alert-{{ message.tags }}
+            {% endif %}
+        {% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
 
 
 <div class="container mt-5">
