@@ -31,11 +31,14 @@
 #btn-crea-ruolo {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+    
+
+
+
 }
 
 </style>
 
-TESTOXXX
 {% if messages %}
     {% for message in messages %}
         <div class="alert {% if message.tags %}
@@ -52,37 +55,84 @@ TESTOXXX
 
 
 <div class="container mt-5">
+
+
+
+
+    
+
+
+
+
+
 <!-- Sezione 1: Aggiungi Ruolo a Dipendente -->
     <div class="card">
     <div class="card-header">
         <h5>Assegna Ruolo a Dipendente</h5>
     </div>
     <div class="card-body">
+
         <form method="POST" action="{% url 'gestione_dipendenti' %}">
           {% csrf_token %}
             <div class="mb-3">
-                <label for="ricerca-dipendente" class="form-label">Ricerca Dipendente</label>
-                <input type="text" class="form-control" id="ricerca-dipendente" placeholder="Cerca per nome..." oninput="ricercaDipendenti()">
-                <div id="suggerimenti" class="list-group mt-2" style="display: none;"></div>
-            </div>
-            <button type="submit" class="btn btn-primary">Cerca Dipendente</button>
 
-            <div class="mb-3">
-                <label for="ruolo" class="form-label">Seleziona Ruolo</label>
-                <select class="form-select" id="ruolo">
-                    <!-- I ruoli saranno aggiunti dinamicamente -->
-                </select>
+                <label for="ricerca-dipendente" class="form-label">Ricerca Dipendente</label>
+                <input type="text" name="dipendente" class="form-control" id="ricerca-dipendente" placeholder="Cerca per nome o cognome" >
+                <div id="suggerimenti" class="list-group mt-2" style="display: none;"></div>
+           
             </div>
-            <div class="mb-3">
-                <label for="livello" class="form-label">Livello Ruolo</label>
-                <input type="number" class="form-control" id="livello" min="1" max="100" placeholder="Inserisci livello">
-            </div>
-            <button type="submit" class="btn btn-primary">Aggiungi Ruolo</button>
+            <input type="hidden" name="origine_form" value="ruoli">
+            <button type="submit" class="btn btn-primary">Cerca Dipendente</button>
         </form>
+        {% comment %}  {% endcomment %}
+        
+          
+
+
+
+        <form method="POST" action="{% url 'assegna_ruolo' %}">
+            {% csrf_token %}
+            <br>
+             {%if dipendenti%}
+             <h6>Seleziona il dipendente da assegnare</h6>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <ul class="list-group" id="personList1">
+                        {% for dipendente in dipendenti|slice:":10" %}
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="dipendente" value={{ dipendente.id }} id="flexRadioDefault1">
+                            <label class="form-check-label" for="flexRadioDefault1">
+                                {{dipendente.nome}} {{ dipendente.cognome }} <br>Ruolo attuale: {{ dipendente.ruolo }}
+                            </label>
+                          </div>
+                        
+                        {% endfor %}
+                    </ul>
+
+                </div>          
+            </div>
+            {%endif%}
+            <div class="mb-3">
+                <label for="ruolo" class="form-label">Seleziona nuovo ruolo</label>
+                <select class="form-select" name ="ruolo" id="ruolo">
+                        {% for r in ruoli %}
+                            <option value="{{ r.id }}"{% if ruolo == r %}selected{% endif %}>{{ r }} ID: {{r.id}}</option>
+                        {% endfor %}
+                </select>
+            </div>           
+            <button type="submit" class="btn btn-primary">Assegna Ruolo</button>
+        
+
+        </form>
+
+
+
     </div>
+
 </div>
 
-  {% comment %} TODO2 {% endcomment %}
+
 <!-- Sezione 2: Permessi e Autorizzazioni -->
 <div class="card mt-4">
   <div class="card-header">
@@ -91,28 +141,29 @@ TESTOXXX
 
 
   <div class="card-body">
-      <form id="form-cerca-ruoli" method="GET" action="{% url 'cerca_ruolo' %}">
-          
-          <!-- Sezione di ricerca dipendente -->
+
+
+          <form id="form-cerca-ruoli" method="GET" action="{% url 'cerca_ruolo_id' %}">
 
           <div class="mb-3">
-              <label for="ricerca-dipendente-permesso" class="form-label">Ricerca Ruoloxxx</label>
-              <input type="text" name="name"  class="form-control" id="ricerca-dipendente-permesso" placeholder="Cerca per nome..." >
-              <div id="suggerimenti-permessi" class="list-group mt-2" ></div>
-          </div>
+            <label for="ruolo" class="form-label">Seleziona Ruolo</label>
+            <select class="form-select" name="id" id="ruolo">
+                {% for r in ruoli %}
+                    <option value="{{ r.id }}"{% if ruolo == r %}selected{% endif %}>{{ r }} ID: {{r.id}}
+           </option>
+                {% endfor %}
+            </select>
+        </div>
 
-
+          <button type="submit" class="btn btn-primary">Cerca</button>
     </form>
+
         <div class ="form-check-label" >
 
-            <h5>Ruolo attuale</h5>
-            <h9>--------------</h9>
-            <h9 style="color:red;">
+            <h5>{% if ruolo %}
+                {{ ruolo }}</h5>
             
-            {% if ruolo %}
-            {{ ruolo }}
-
-            </h9>
+               
 
 
 
@@ -148,8 +199,7 @@ TESTOXXX
             {% else %}
             Nessun ruolo selezionato
             {% endif %}
-            
-            <h9>--------------</h9>
+        
        
  
           </div>
@@ -175,7 +225,6 @@ TESTOXXX
     <div class="card mt-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5>Ruoli Esistenti e Creazione Nuovo Ruolo</h5>
-            <button class="btn btn-success" id="btn-crea-ruolo" onclick="toggleFormRuolo()">Crea Nuovo Ruolo</button>
         </div>
         <div class="card-body">
             <!-- Form per la creazione di un nuovo ruolo -->
@@ -203,7 +252,7 @@ TESTOXXX
                         
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Conferma</button>
+                    <button type="submit" class="btn btn-primary">Crea Nuovo Ruolo</button>
                 </form>
                 
 
@@ -213,42 +262,17 @@ TESTOXXX
 
             </div>
 
-            <!-- Tabella dei ruoli esistenti -->
-            <table class="table  mt-4">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Nome Dipendente</th>
-                        <th>Ruolo Assegnato</th>
-                        <th>Livello Ruolo</th>
-                        <th>Azione</th>
-                    </tr>
-                </thead>
-                <tbody id="tabella-ruoli">
-                    <!-- I ruoli esistenti saranno aggiunti dinamicamente -->
-                </tbody>
-            </table>
-
+        
         </div>
 
-        <!-- Tabella dei ruoli esistenti -->
-        <table class="table mt-4">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Nome Dipendente</th>
-                    <th>Ruolo Assegnato</th>
-                    <th>Livello Ruolo</th>
-                    <th>Azione</th>
-                </tr>
-            </thead>
-            <tbody id="tabella-ruoli">
-                <!-- I ruoli esistenti saranno aggiunti dinamicamente -->
-            </tbody>
-        </table>
+        
     </div>
 </div>
-    
+
+
+
+
+
 <!-- Sezione per l'alert (avviso colorato) -->
 <div id="avviso" class="alert alert-dismissible fade show" role="alert" style="display: none;">
     <strong></strong> <!-- Titolo del messaggio (es. errore o successo) -->

@@ -52,10 +52,11 @@ urlpatterns = [
     path("crea_ruolo",views.crea_ruolo,name="crea_ruolo"),
     
     path("cerca_ruolo",views.cerca_ruolo,name="cerca_ruolo"),
+    path("cerca_ruolo_id",views.cerca_ruolo_id,name="cerca_ruolo_id"),
     path("modifica_autorizzazioni/<int:id>",views.modifica_autorizzazioni,name="modifica_autorizzazioni"),
          
     path("mostra_permessi",views.mostra_permessi,name="mostra_permessi"),
-
+    path("assegna_ruolo",views.assegna_ruolo,name="assegna_ruolo"),
 
 
 

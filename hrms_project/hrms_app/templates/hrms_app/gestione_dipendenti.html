@@ -142,22 +142,27 @@
 
         <div class="card">
             <!-- Barra di ricerca e pulsante "Crea Dipendente" -->
-            <div class="card-body">
-                <div class="container-fluid">
-                    <form method="POST" action="{% url 'gestione_dipendenti' %}" class="mb-3">
-                        {% csrf_token %}
-                        <div class="row g-2 align-items-center">
-                            <div class="col-12 col-md-8 col-lg-6">
-                                <div class="input-group">
-                                    <input type="search" class="form-control" id="searchPerson" name="dipendente" placeholder="Cerca per nome..." aria-label="Search">
-                                    <button type="submit" class="btn btn-primary">Cerca</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
 
-                <!-- Lista delle persone in colonna ordinata -->
+
+                <div class="card-body">
+                        <div class="container-fluid">
+                        <!-- Form di ricerca con larghezza dimezzata -->
+
+                        
+   
+                        <form method="POST" action="{% url 'gestione_dipendenti' %}">
+                            {% csrf_token %}
+                            <div class="d-flex">
+                                <label for="searchPerson" class="form-label">Cerca Dipendente</label>
+                                <input type="search" class="form-control me-2" id="searchPerson" name="dipendente" placeholder="Cerca per nome..." aria-label="Search">
+                            </div>
+                          
+                            <button type="submit" class="btn btn-primary">Cerca</button>
+                        </form>
+                       
+                        </div>
+                <!-- Lista delle persone in due colonne -->
+
                 <div class="row mt-4">
                     <div class="col-md-6">
                         <ol class="dipendente-list" id="personList1">
