@@ -1,14 +1,7 @@
 {% extends 'hrms_app/base.html' %}
-{% comment %} {% block style %}
-    <link href="{% static '/css/consulta_documenti.css' %}" type="text/css" rel="stylesheet">
-{% endblock style %}       {% endcomment %}
 {% block title %}
 Consulta_documenti
 {% endblock %}
-{% comment %} {% block script %}
-    <script type="text/javascript" src="{% static '/js/consulta_documenti.js' %}" defer></script>
-{% endblock script %} {% endcomment %}
-
 
 {% block content %}
 
@@ -44,8 +37,14 @@ Consulta_documenti
     }
     .card-footer {
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
         flex-wrap: wrap;
+    }
+    .card-footer button {
+        padding: 2px 5px;
+        width: 45%;
+        margin: 0.5em 0;
+        font-size: 0.9em;
     }
     .file-input {
         display: none;
@@ -144,18 +143,58 @@ Consulta_documenti
     .search-results li:hover {
         background-color: #f0f0f0;
     }
+
+    /* Media Queries per la Responsività */
+    @media (max-width: 768px) {
+        .search-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-container input[type="search"] {
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+
+        .card-footer {
+            flex-direction: column;
+        }
+
+        .card-footer button {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .row-cols-1 .col {
+            margin-bottom: 20px;
+        }
+
+        .row-cols-md-3 .col {
+            max-width: 100%;
+            margin-bottom: 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        h1 {
+            font-size: 1.5rem;
+        }
+
+        .card-footer button {
+            padding: 10px 15px;
+        }
+    }
 </style>
 
 <div class="container">
-    <h1>Gestione Documentazione</h1>
+    <h1>Gestione Documenti</h1>
 
     <div class="card shadow-lg">
         <div class="card-body">
             <form method="POST" action="{% url 'gestione_dipendenti' %}">
                 {% csrf_token %}
                 <div class="search-container">
-                    <label for="searchPerson" class="form-label">Cerca Dipendente: </label>
-                    <input type="search" class="form-control me-2" id="searchPerson" name="dipendente" placeholder="Cerca per nome..." aria-label="Search">
+                    <input type="search" class="form-control me-2" id="searchPerson" name="dipendente" placeholder="Cerca per nome" aria-label="Search">
                     <button type="submit" class="btn btn-primary">Cerca Dipendente</button>
                 </div>
             </form>
