@@ -369,7 +369,7 @@ def busta_paga(request:HttpRequest):
 def gestione_dipendenti(request:HttpRequest):
     if request.method == "POST":
         dipendente = request.POST.get("dipendente")
-        
+        origine_form = request.POST.get("origine_form")
         #ricerca incrociata su nome e cognome dove %dipendente%
         #lista_dipendenti = Dipendenti.objects.filter(nome=dipendente,cognome=dipendente)
         lista_dipendenti = Dipendenti.objects.filter(Q(first_name__icontains=dipendente) | Q(last_name__icontains=dipendente))
@@ -378,9 +378,30 @@ def gestione_dipendenti(request:HttpRequest):
         else:
             messages.error(request, "Nessun dipendente trovato")    
 
-        return render(request, "hrms_app/gestione_dipendenti.html", {"dipendenti": lista_dipendenti})
+        if origine_form == "ruoli":
+            ruoli = Ruoli.objects.all()
+            return render(request, "hrms_app/gestione_ruoli.html", {"dipendenti": lista_dipendenti, "ruoli": ruoli})
+        else:
+            return render(request, "hrms_app/gestione_dipendenti.html", {"dipendenti": lista_dipendenti})
+        
+
     return render(request, "hrms_app/gestione_dipendenti.html")
 
+
+
+def assegna_ruolo(request:HttpRequest):
+    if request.method == "POST":
+        id_dipendente = request.POST.get("dipendente")
+        id_ruolo = request.POST.get("ruolo")
+        dipendente = Dipendenti.objects.get(id=id_dipendente)
+        dipendente.ruolo = Ruoli.objects.get(id=id_ruolo)
+        dipendente.save()
+        messages.success(request, f"Ruolo assegnato con successo {dipendente.nome} {dipendente.cognome} -> {dipendente.ruolo}")
+    return redirect("gestione_ruoli")
+
+
+
+    
 def gestione_assenze(request:HttpRequest):
     return render(request,'hrms_app/gestione_assenze.html')
 
@@ -428,11 +449,14 @@ def sviluppo(request:HttpRequest):
 
 
 def gestione_ruoli(request:HttpRequest):
-    return render(request,'hrms_app/gestione_ruoli.html')
+    ruoli = Ruoli.objects.all()
+    return render(request,'hrms_app/gestione_ruoli.html',{'ruoli':ruoli})
 
 #controllare validation!
 
 def crea_ruolo(request: HttpRequest):
+
+
     if request.method == "POST":
         ruolo = request.POST.get("name") # testo
         livello_accesso = request.POST.get("livello_accesso") #numero
@@ -456,7 +480,8 @@ def crea_ruolo(request: HttpRequest):
         # Crea il ruolo associato
         Ruoli.objects.create(ruolo=gruppo_esistente, livello_accesso=int(livello_accesso))
         messages.success(request, f"Creazione ruolo {ruolo} avvenuta con successo!")
-        return render(request,'hrms_app/gestione_ruoli.html')
+        #return render(request,'hrms_app/gestione_ruoli.html') 
+        return redirect("gestione_ruoli") 
 
     return render(request,'hrms_app/gestione_ruoli.html')
 
@@ -481,6 +506,25 @@ Gestire documenti [contratti e certificati] (visualizza,modifica,elimina)
  """
 
 
+def cerca_ruolo_id(request:HttpRequest):
+    ruoli = Ruoli.objects.all()
+    if request.method == "GET":    
+        id = request.GET.get("id")
+        if id:
+            ruolo = Ruoli.objects.get(id=id)
+            if not ruolo:
+                messages.error(request, f"Ruolo non trovato.")
+                return redirect("gestione_ruoli")
+
+            permessi_disponibili = {}
+            permessi_ruolo = set(ruolo.ruolo.permissions.values_list('codename', flat=True))
+
+            for nome_permesso, permessi_richiesti in PERMESSI_APP.items():
+                permessi_disponibili[nome_permesso] = all(p in permessi_ruolo for p in permessi_richiesti)
+            
+            return render(request,'hrms_app/gestione_ruoli.html',{"ruolo":ruolo,'permessi_disponibili': permessi_disponibili,'ruoli':ruoli}) 
+
+    return redirect('gestione_ruoli')
 
 def cerca_ruolo(request:HttpRequest):
 
@@ -506,7 +550,7 @@ def cerca_ruolo(request:HttpRequest):
 
 
 def modifica_autorizzazioni(request: HttpRequest, id):
-
+    ruoli = Group.objects.all()
     if request.method == "POST":
 
         permessi_selezionati = request.POST.getlist("permessi")  # Ottieni solo quelli selezionati
@@ -520,10 +564,10 @@ def modifica_autorizzazioni(request: HttpRequest, id):
         ruolo = Group.objects.get(id=id) 
         ruolo.permissions.set(permessi_nuovi)
         messages.success(request, f"✅ Ruolo aggiornato con successo!")
-        return render(request,'hrms_app/gestione_ruoli.html')
+        return render(request,'hrms_app/gestione_ruoli.html',{'ruoli':ruoli})
 
     return render(request, 'hrms_app/gestione_ruoli.html', {
-        'ruolo': ruolo,
+        'ruolo': ruolo,'ruoli':ruoli
     })
 
 
