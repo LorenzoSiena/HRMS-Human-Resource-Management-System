@@ -24,138 +24,129 @@
   <div class="container">
     <!-- Card per il form di ricerca -->
     <div class="card mt-4 shadow-sm">
-      <div class="card-header text-dark ">
+      <div class="card-header text-dark">
         <h3 class="card-title">Gestione Report</h3>
       </div>
       <div class="card-body">
-        <form id="searchForm" class="form-container">
-          <div class="row mb-3">
-            <div class="col-12 col-sm-6 col-md-4">
-              <label for="search">Ricerca Dipendente:</label>
-              <input type="text" id="search" class="form-control" placeholder="Cerca per nome">
-            </div>
-            <div class="col-12 col-sm-6 col-md-3">
-              <label for="month">Mese:</label>
-              <select id="month" class="form-select">
-                <option value="">Seleziona mese</option>
-                <option value="01">Gennaio</option>
-                <option value="02">Febbraio</option>
-                <option value="03">Marzo</option>
-                <option value="04">Aprile</option>
-                <option value="05">Maggio</option>
-                <option value="06">Giugno</option>
-                <option value="07">Luglio</option>
-                <option value="08">Agosto</option>
-                <option value="09">Settembre</option>
-                <option value="10">Ottobre</option>
-                <option value="11">Novembre</option>
-                <option value="12">Dicembre</option>
-              </select>
-            </div>
-            <div class="col-12 col-sm-6 col-md-3">
-              <label for="year">Anno:</label>
-              <select id="year" class="form-select">
-                <option value="">Seleziona anno</option>
-                <option value="2025">2025</option>
-                <option value="2024">2024</option>
-                <option value="2023">2023</option>
-                <option value="2022">2022</option>
-              </select>
-            </div>
-            <div class="col-12 col-sm-6 col-md-2 d-flex align-items-end">
-                <form method="POST" action="{% url 'gestione_dipendenti' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">Cerca Dipendente</button>
-                </form>
-            </div>
-          </div>
+        <form id="searchForm" class="form-container" method="POST" action="{% url 'gestione_dipendenti' %}">
+          {% csrf_token %}
+          <label for="ricerca-dipendente" class="form-label">Ricerca Dipendente</label>
+          <input type="text" name="dipendente" class="form-control" id="ricerca-dipendente" placeholder="Cerca per nome o cognome">
+          <div id="suggerimenti" class="list-group mt-2" style="display: none;"></div>
+          <input type="hidden" name="origine_form" value="report">
+          <button type="submit" class="btn btn-primary">Cerca Dipendente</button>
         </form>
       </div>
     </div>
 
-    <!-- Tabella dei dipendenti -->
+    <!-- Card per la selezione del dipendente e report mensile -->
     <div class="card mt-4 shadow-sm">
       <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-bordered table-striped">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Ore Lavorative </th>
-                <th>Ferie </th>
-                <th>Permessi </th>
-                <th>Ore di Permesso Non Retribuite </th>
-                <th>Tot. Ore Lavorative Effettive</th>
-              </tr>
-            </thead>
-            <tbody id="employeeTable">
-              <!-- I dati dei dipendenti verranno inseriti qui -->
-            </tbody>
-          </table>
+        
+        <form id="searchForm" class="form-container" method="POST" action="{% url 'cerca_report_mensile' %}">
+          {% csrf_token %}
+          
+          {% if dipendenti %}
+            <h6>Seleziona il dipendente da assegnare</h6>
+            <div class="row mt-4">
+              <div class="col-12 col-sm-6 col-md-3">
+                <ul class="list-group" id="personList1">
+                  {% for dipendente in dipendenti|slice:":10" %}
+                    <li class="form-check">
+                      <input class="form-check-input" type="radio" name="dipendente" value="{{ dipendente.id }}" id="flexRadioDefault1">
+                      <label class="form-check-label" for="flexRadioDefault1">
+                        {{ dipendente.nome }} {{ dipendente.cognome }}
+                      </label>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>  
+          {% endif %}
+          
+          <div class="col-12 col-sm-6 col-md-3">
+            <label for="month">Mese:</label>
+            <select id="month" name="month" class="form-select">
+              <option value="">Seleziona mese</option>
+              <option value="01">Gennaio</option>
+              <option value="02">Febbraio</option>
+              <option value="03">Marzo</option>
+              <option value="04">Aprile</option>
+              <option value="05">Maggio</option>
+              <option value="06">Giugno</option>
+              <option value="07">Luglio</option>
+              <option value="08">Agosto</option>
+              <option value="09">Settembre</option>
+              <option value="10">Ottobre</option>
+              <option value="11">Novembre</option>
+              <option value="12">Dicembre</option>
+            </select>
+          </div>
+
+          <div class="col-12 col-sm-6 col-md-3">
+            <label for="selectedYear">Seleziona un anno:</label>
+            <select id="selectedYear" name="year"  class="form-select"></select>
+          </div>
+
+          <div class="col-12 col-sm-6 col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Cerca Report</button>
+          </div>
         </div>
+      </form>
+    </div>
+  
+
+  <!-- Tabella dei dipendenti -->
+  <div class="card mt-4 shadow-sm">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Ore Lavorative</th>
+              <th>Ferie</th>
+              <th>Permessi</th>
+              <th>Ore di Permesso Non Retribuite</th>
+              <th>Tot. Ore Lavorative Effettive</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for dipendente in report_dipendenti %}
+              <tr>
+                <td>{{ dipendente.nome }}</td>
+                <td>{{ dipendente.ore_lavorative }}</td>
+                <td>{{ dipendente.ferie }}</td>
+                <td>{{ dipendente.permessi }}</td>
+                <td>{{ dipendente.ore_permesso_non_retribuite }}</td>
+                <td>{{ dipendente.ore_effettive }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="text-center">Nessun dipendente trovato con i criteri selezionati.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <script>
-    // Dati di esempio (questi verrebbero recuperati dal server in un'applicazione reale)
-    const employees = [
-      { nome: "Mario Rossi", ferie: 5, permessi: 3, oreLavorative: 160, orePermessoNonRetribuito: 2, mese: "03", anno: "2025" },
-      { nome: "Luigi Bianchi", ferie: 2, permessi: 1, oreLavorative: 160, orePermessoNonRetribuito: 1, mese: "03", anno: "2025" },
-      { nome: "Anna Verdi", ferie: 7, permessi: 5, oreLavorative: 160, orePermessoNonRetribuito: 3, mese: "02", anno: "2025" },
-      { nome: "Giuseppe Neri", ferie: 3, permessi: 2, oreLavorative: 160, orePermessoNonRetribuito: 0, mese: "03", anno: "2025" },
-    ];
+</div>
 
-    // Funzione per effettuare la ricerca
-    function searchEmployee() {
-      const searchTerm = document.getElementById("search").value.toLowerCase();
-      const selectedMonth = document.getElementById("month").value;
-      const selectedYear = document.getElementById("year").value;
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const select = document.getElementById("selectedYear");
+    const startYear = 2000;
+    const currentYear = new Date().getFullYear();
 
-      const filteredEmployees = employees.filter(employee => {
-        const isNameMatch = employee.nome.toLowerCase().includes(searchTerm);
-        const isMonthMatch = selectedMonth ? employee.mese === selectedMonth : true;
-        const isYearMatch = selectedYear ? employee.anno === selectedYear : true;
-        return isNameMatch && isMonthMatch && isYearMatch;
-      });
-
-      displayEmployees(filteredEmployees);
+    for (let year = startYear; year <= currentYear + 50; year++) {
+      let option = document.createElement("option");
+      option.value = currentYear;
+      option.textContent = year;
+      select.appendChild(option);
     }
-
-    // Funzione per visualizzare i dipendenti filtrati
-    function displayEmployees(employees) {
-      const tbody = document.getElementById("employeeTable");
-      tbody.innerHTML = ""; // Svuota la tabella
-
-      if (employees.length === 0) {
-        const row = document.createElement("tr");
-        row.innerHTML = `<td colspan="6" class="text-center">Nessun dipendente trovato con i criteri selezionati.</td>`;
-        tbody.appendChild(row);
-        return;
-      }
-
-      employees.forEach(employee => {
-        // Calcoliamo il report ferie in ore (1 giorno = 8 ore)
-        const ferieInOre = employee.ferie * 8;
-        const reportPermessi = employee.permessi * 8; // Permessi in ore
-        const oreNonRetribuite = employee.orePermessoNonRetribuito; // Ore non retribuite
-        const oreLavorativeEffettive = employee.oreLavorative - (ferieInOre + reportPermessi + oreNonRetribuite);
-
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${employee.nome}</td>
-          <td>${employee.oreLavorative}</td>
-          <td>${ferieInOre}</td>
-          <td>${reportPermessi}</td>
-          <td>${oreNonRetribuite}</td>
-          <td>${oreLavorativeEffettive}</td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
-
-    // Mostra tutti i dipendenti all'inizio
-    displayEmployees(employees);
-  </script>
+  });
+</script>
 
 {% endblock %}

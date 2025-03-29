@@ -191,23 +191,6 @@ def visualizza_busta_paga():
     pass
 
 
-
-
-
-def visualizza_report_presenze(request:HttpRequest):
-    pass
-
-def visualizza_report_ferie(request:HttpRequest):
-    pass
-
-def visualizza_report_permessi(request:HttpRequest):
-    pass
-
-
-
-def visualizza_report_mensile(request:HttpRequest):
-    pass
-
 def aggiungi_dipendente(request:HttpRequest):
     if request.method == "POST":
         form = RegisterForm(request.POST, request.FILES)
@@ -381,6 +364,8 @@ def gestione_dipendenti(request:HttpRequest):
         if origine_form == "ruoli":
             ruoli = Ruoli.objects.all()
             return render(request, "hrms_app/gestione_ruoli.html", {"dipendenti": lista_dipendenti, "ruoli": ruoli})
+        elif origine_form == "report":
+            return render(request, "hrms_app/report.html", {"dipendenti": lista_dipendenti})
         else:
             return render(request, "hrms_app/gestione_dipendenti.html", {"dipendenti": lista_dipendenti})
         
@@ -440,8 +425,35 @@ def salva_busta_paga(request: HttpRequest):
 
 def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')
-def sviluppo(request:HttpRequest):
-    return render(request,'hrms_app/modifica_dipendente.html')
+
+def cerca_report_mensile(request):
+    report_mensile = []
+    if request.method == "POST":
+        # Assicurati che i parametri 'id', 'month', e 'year' siano presenti
+        if request.POST.get('dipendente') and request.POST.get('month') and request.POST.get('year'):
+            dipendente_id = request.POST.get('dipendente')
+            month = int(request.POST.get('month'))
+            year = int(request.POST.get('year'))
+
+            # Filtro il dipendente
+            dipendente = Dipendenti.objects.get(id=dipendente_id)
+
+            # Recupero i report per ferie, permessi e presenze
+            ferie = ReportFerie.objects.filter(dipendente=dipendente, mese=month, anno=year)
+            permessi = ReportPermessi.objects.filter(dipendente=dipendente, mese=month, anno=year)
+            presenze = ReportPresenze.objects.filter(dipendente=dipendente, mese=month, anno=year)
+
+            # Preparo i dati da passare alla vista
+            report_mensile = [{
+                'dipendente': dipendente,
+                'giorni_totali_ferie': ferie.giorni_totali if ferie else 0,
+                'ore_totali_permessi': permessi.ore_totali_permessi if permessi else 0,
+                'ore_totali_presenze': presenze.ore_totali if presenze else 0,
+            }]
+
+    return render(request, 'hrms_app/report.html', {'report_mensile': report_mensile})
+
+
 # def aggiungi_dipendente(request:HttpRequest):
 #     return render(request,'hrms_app/aggiungi_dipendente.html')
 
