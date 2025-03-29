@@ -21,9 +21,19 @@
 
 /* Impostiamo un massimo per la larghezza della card */
 .card {
-    max-width: 800px;
     width: 100%;
-    min-height: 600px;  
+    max-width: 600px; /* Aumenta la larghezza massima della card per renderla meno stretta */
+    height: 550px; /* Altezza per una forma rettangolare in verticale */
+    margin: 0 auto; /* Centra la card orizzontalmente */
+}
+
+/* Responsività: la card si adatta su schermi più piccoli */
+@media (max-width: 768px) {
+    .card {
+        width: 100%;
+        max-width: 100%; /* La card occupa l'intera larghezza dello schermo sui dispositivi mobili */
+        height: auto; /* Altezza automatica in base al contenuto */
+    }
 }
 
 /* Gestione della barra di ricerca e dei bottoni */
@@ -95,27 +105,11 @@
     color: #007bff;
 }
 
-
 .dipendente-list a:hover {
     text-decoration: underline;
 }
 
 </style>
-
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert {% if message.tags %}
-            {% if 'error' in message.tags %}
-                alert-danger
-            {% else %}
-                alert-{{ message.tags }}
-            {% endif %}
-        {% endif %}">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
-
 
 <div class="container mt-2">
    <div class="card"> 
