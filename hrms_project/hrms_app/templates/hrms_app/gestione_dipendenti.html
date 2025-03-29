@@ -56,8 +56,16 @@
 }
 
 .dipendente-list li {
-    border-bottom: 1px solid #ccc;
-    padding: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.dipendente-list li:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 /* Allinea il titolo e il bottone nella stessa riga */
@@ -75,8 +83,24 @@
     margin-left: 15px;
 }
 
-</style>
+/* Stile per il ruolo dei dipendenti */
+.dipendente-list .role {
+    font-size: 0.9rem;
+    color: #6c757d; /* Grigio scuro */
+}
 
+/* Stile per i link cliccabili */
+.dipendente-list a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+
+.dipendente-list a:hover {
+    text-decoration: underline;
+}
+
+</style>
 
 {% if messages %}
     {% for message in messages %}
@@ -98,74 +122,61 @@
         <div class="card-header text-center">
             <h3>Lista Dipendenti</h3>
             <a href="{% url 'aggiungi_dipendente' %}" class="btn btn-primary" type="submit">Aggiungi Dipendente</a>
-            
         </div>
 
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}
+                    {% if 'error' in message.tags %}
+                        alert-danger
+                    {% else %}
+                        alert-{{ message.tags }}
+                    {% endif %}
+                {% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
         
         <br>
 
-
         <div class="card">
-
-            <!-- <div class="card-header text-center">
-                <h3>Lista dipendenti</h3>
-            </div> -->
-            
-            
             <!-- Barra di ricerca e pulsante "Crea Dipendente" -->
-
-             <div class="card-body">
-                        <div class="container-fluid">
-                        <!-- Form di ricerca con larghezza dimezzata -->
-
-                        
-   
-                        <form method="POST" action="{% url 'gestione_dipendenti' %}">
-                            {% csrf_token %}
-                            <div class="d-flex">
-                                <label for="searchPerson" class="form-label">Cerca Dipendente</label>
-                                <input type="search" class="form-control me-2" id="searchPerson" name="dipendente" placeholder="Cerca per nome..." aria-label="Search">
+            <div class="card-body">
+                <div class="container-fluid">
+                    <form method="POST" action="{% url 'gestione_dipendenti' %}" class="mb-3">
+                        {% csrf_token %}
+                        <div class="row g-2 align-items-center">
+                            <div class="col-12 col-md-8 col-lg-6">
+                                <div class="input-group">
+                                    <input type="search" class="form-control" id="searchPerson" name="dipendente" placeholder="Cerca per nome..." aria-label="Search">
+                                    <button type="submit" class="btn btn-primary">Cerca</button>
+                                </div>
                             </div>
-                          
-                            <button type="submit" class="btn btn-primary">Cerca</button>
-                        </form>
-                       
-                    </div>
-                <!-- Lista delle persone in due colonne -->
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Lista delle persone in colonna ordinata -->
                 <div class="row mt-4">
                     <div class="col-md-6">
-                        <ul class="list-group" id="personList1">
+                        <ol class="dipendente-list" id="personList1">
                             {% for dipendente in dipendenti|slice:":10" %}
-                                <li class="dipendente-list"  > 
-                                    
-                                    <a href="{% url 'modifica_dipendente' dipendente.id %}" > <strong>{{dipendente.id }}{{dipendente.nome}} {{ dipendente.cognome }}</strong> {{ dipendente.ruolo }}</a>
-                                    
+                                <li class="list-group-item">
+                                    <a href="{% url 'modifica_dipendente' dipendente.id %}">
+                                        <strong>{{ dipendente.nome }} {{ dipendente.cognome }}</strong>
+                                    </a>
+                                    <div>
+                                        <small class="role">({{ dipendente.ruolo }})</small>
+                                    </div>
                                 </li>
                             {% endfor %}
-                        </ul>
+                        </ol>
                     </div>          
                 </div>
-                
-            <!-- Lista dei dipendenti -->
-            <ul class="dipendente-list" id="dipendenteList">
-                <!-- Questo sarà riempito dinamicamente con i dipendenti -->
-                <li>
-                    <strong>Mario Rossi</strong> - Sviluppatore
-                </li>
-                <li>
-                    <strong>Luca Bianchi</strong> - HR Manager
-                </li>
-                <li>
-                    <strong>Giulia Verdi</strong> - Designer
-                </li>
-                <!-- Aggiungi altri dipendenti qui -->
-            </ul>
+            </div>
         </div>
-
-
-
     </div>
 </div>
-
 
 {% endblock %}
