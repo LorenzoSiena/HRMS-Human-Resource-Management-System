@@ -426,36 +426,50 @@ def salva_busta_paga(request: HttpRequest):
 def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')
 
-def cerca_report_mensile(request:HttpRequest):
+def report_mensile(request:HttpRequest):
+    dipendenti = Dipendenti.objects.all()
     report_mensile = []
+
+    # Recupera il mese e l'anno scelti dall'utente
     if request.method == "POST":
-        # Assicurati che i parametri 'id', 'month', e 'year' siano presenti
-        if request.POST.get('dipendente') and request.POST.get('month') and request.POST.get('year'):
-            dipendente_id = request.POST.get('dipendente')
-            month = int(request.POST.get('month'))
-            year = int(request.POST.get('year'))
+        mese = request.POST.get("month")
+        anno = request.POST.get("year")
 
-            # Filtro il dipendente
-            dipendente = Dipendenti.objects.get(id=dipendente_id)
+        for dipendente in dipendenti:
+            # Ore lavorative totali
+            ore_lavorative = ReportPresenze.objects.get("ore_lavorate" , dipendente=dipendente.id, anno=anno, mese=mese)
+   
 
-            # Recupero i report per ferie, permessi e presenze
-            ferie = ReportFerie.objects.filter(dipendente=dipendente, mese=month, anno=year)
-            permessi = ReportPermessi.objects.filter(dipendente=dipendente, mese=month, anno=year)
-            presenze = ReportPresenze.objects.filter(dipendente=dipendente, mese=month, anno=year)
+           
+            
 
-            # Preparo i dati da passare alla vista
-            report_mensile = [{
-                'dipendente': dipendente,
-                'giorni_totali_ferie': ferie.giorni_totali if ferie else 0,
-                'ore_totali_permessi': permessi.ore_totali_permessi if permessi else 0,
-                'ore_totali_presenze': presenze.ore_totali if presenze else 0,
-            }]
+            # Ferie totali
+            ferie = ReportFerie.objects.get("giorni_totali" , dipendente=dipendente.id, anno=anno, mese=mese)
+        
 
-    return render(request, 'hrms_app/report.html', {'report_mensile': report_mensile})
+            # Permessi totali
+            permessi = ReportPermessi.objects.get("ore_totali_permesso_approvate", dipendente=dipendente.id, anno=anno, mese=mese)
+         
+
+            # # Ore di permesso non retribuite
+            # ore_permesso_non_retribuite = Permessi.objects.filter(
 
 
-# def aggiungi_dipendente(request:HttpRequest):
-#     return render(request,'hrms_app/aggiungi_dipendente.html')
+            # Ore effettive lavorate
+            # ore_effettive = ore_lavorate_float - ore_permesso_non_retribuite
+
+            report_mensile.append({
+                "nome": dipendente.first_name,
+                "cognome": dipendente.last_name,
+                "ore_lavorative": ore_lavorative,
+                "ferie": ferie,
+                "permessi": permessi,
+                # "ore_permesso_non_retribuite": ore_permesso_non_retribuite,
+                # "ore_effettive": ore_effettive,
+            })
+
+    return render(request, "hrms_app/report.html", {"report_mensile": report_mensile, "dipendenti": dipendenti})
+
 
 
 

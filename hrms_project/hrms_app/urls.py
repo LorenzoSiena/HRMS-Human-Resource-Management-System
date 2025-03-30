@@ -62,7 +62,7 @@ urlpatterns = [
 
     #---------gestire report mensile------------
 
-    path("cerca_report_mensile/",views.cerca_report_mensile,name="cerca_report_mensile"), 
+    path("report_mensile/",views.report_mensile,name="report_mensile"), 
 
 
 # per resettare la password
