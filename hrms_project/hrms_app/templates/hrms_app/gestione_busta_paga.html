@@ -3,25 +3,39 @@
 {% block title %}Gestione busta paga{% endblock%}
 
 {% block style %}
-    <style>
 
+    <style>       
 
         .busta-paga-card {
             margin-top: 20px;
-            }
-        
+        }
+    
         .busta-paga-list {
             margin-top: 10px;
-            margin-bottom: 15px;  /* Aggiungi spazio tra le buste paga */
-            padding: 15px;        /* Aggiungi un po' di padding per migliorare l'aspetto */
-            border: 1px solid #ddd;  /* Puoi anche aggiungere un bordo per separare meglio ogni busta paga */
-            border-radius: 5px;   /* Aggiungi angoli arrotondati per un aspetto più morbido */
-            background-color: #f9f9f9;  /* Aggiungi un colore di sfondo per differenziare */
-            }
-
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+    
         .btn-custom {
             margin-right: 5px;
         }
+    
+        /* Centra il contenuto della tabella */
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle; /* Centra verticalmente il contenuto */
+        }
+    
+        /* Rimuove lo spazio in eccesso nella tabella */
+        .table-responsive {
+            padding: 0; /* Rimuove il padding in eccesso */
+            margin-bottom: 0; /* Rimuove il margine in eccesso */
+        }
+    
+
     </style>
 
 {% endblock%}
@@ -41,57 +55,7 @@
                 </div>
             </div>
         </div>
-    </form> 
-
-<style>
-    .busta-paga-card {
-        margin-top: 20px;
-    }
-
-    .busta-paga-list {
-        margin-top: 10px;
-        margin-bottom: 15px;
-        padding: 15px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-    }
-
-    .btn-custom {
-        margin-right: 5px;
-    }
-
-    /* Centra il contenuto della tabella */
-    .table th, .table td {
-        text-align: center;
-        vertical-align: middle; /* Centra verticalmente il contenuto */
-    }
-
-    /* Rimuove lo spazio in eccesso nella tabella */
-    .table-responsive {
-        padding: 0; /* Rimuove il padding in eccesso */
-        margin-bottom: 0; /* Rimuove il margine in eccesso */
-    }
-</style>
-</head>
-<body>
-
-<div class="container mt-5">
-
-    <!-- Form di ricerca dipendente -->
-    <form method="POST" action="{% url 'gestione_dipendenti' %}" class="mb-3">
-    {% csrf_token %}
-    <div class="row g-2 align-items-center">
-        <div class="col-12 col-md-8 col-lg-6">
-            <div class="input-group">
-                <input type="search" class="form-control" id="searchPerson" name="dipendente" placeholder="Cerca per nome..." aria-label="Search">
-                <button type="submit" class="btn btn-primary">Cerca</button>
-            </div>
-        </div>
-    </div>
-    </form>
-  
-  
+    </form>  
 
     <!-- Tabella dei dipendenti -->
     <div class="table-responsive">
@@ -115,14 +79,16 @@
                         <td> {{ dipendente.ruolo }} </td>
                         <td> {{ dipendente.email }} </td>                       
                         <td>                            
-                            <button class="btn btn-info btn-sm btn-custom" onclick="viewPayslips({{ dipendente.id }})">Visualizza Buste Paga</button>
-                            <button class="btn btn-success btn-sm btn-custom" onclick="uploadPayslip({{ dipendente.id }})">⬆️ Carica Busta Paga</button>                                   
+
+                            <a class="btn btn-info btn-sm btn-custom" href="{% url 'visualizza_busta_paga' dipendente.id %}">Visualizza Buste Paga</a>
+                            <button class="btn btn-success btn-sm btn-custom" onclick="carica_busta_paga({{ dipendente.id }})">⬆️ Carica Busta Paga</button>                                   
+
                         </td>
                     </tr>
                 {% endfor %}                
             </tbody>
         </table>
-    </div>
+    </div>    
 
     <p> {{ id }} {{ dipendente }} {{ mese }} {{ anno }} {{ importo }} {{ documento }} </p>
     <!-- Modal per visualizzare le buste paga -->
@@ -142,6 +108,15 @@
                         <input type="month" id="monthYearFilter" class="form-control" onchange="filterPayslips()">
                     </div>
 
+                    {% for busta_paga in elenco_buste_paga %} 
+                        {{ busta_paga.dipendente }}
+                        {{ busta_paga.data_emissione }}        
+                        {{ form_carica_busta.mese }} {{ form_carica_busta.anno }} {{ busta_paga.mese }}
+                        {{ busta_paga.anno }}
+                        {{ busta_paga.importo }}
+                        {{ busta_paga.documento }} 
+                    {% endfor %}
+
                     <div id="payslipsList"></div>
                 </div>
                 <div class="modal-footer">
@@ -156,12 +131,15 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="uploadPayslipModalLabel">Carica Busta Paga</h5>
+                    <h5 class="modal-title" id="uploadPayslipModalLabel">Carica Busta Paga {{ dipendente.id }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="uploadForm" action="{% url 'salva_busta_paga' %}" method="POST" autocomplete="off">
-                        {% csrf_token %}                        
+
+                    <form id="uploadForm" action="{% url 'salva_busta_paga' %}" method="POST" enctype="multipart/form-data" autocomplete="off">
+                        {% csrf_token %}
+                        <input id="dipendente_id" type="hidden" name="dipendente_id">
+
                         <div class="mb-3">                            
                             {{ form_carica_busta.mese }}
                         </div>                        
@@ -202,59 +180,22 @@
 <script>
 
     // Funzione per caricare la busta paga
-    function uploadPayslip(employeeId) {
-        var modal = new bootstrap.Modal(document.getElementById('uploadPayslipModal'));
+
+    function carica_busta_paga(ddipendente_i) {
+        let modal = new bootstrap.Modal(document.getElementById('uploadPayslipModal'));
         modal.show();
-
-        //document.getElementById('uploadForm').onsubmit = function (e) {
-        //    e.preventDefault();
-
-        //    let file = document.getElementById('fileUpload').files[0];
-        //    let period = document.getElementById('periodUpload').value;
-        //    let payslipName = document.getElementById('payslipName').value;
-
-        //    alert('Busta paga caricata con nome: ' + payslipName + ' per il periodo: ' + period);
-
-        //modal.hide();
-        
-        //};
+        // Imposta l'ID del dipendente nel campo nascosto del form
+        elemento_nascosto = document.getElementById('dipendente_id');
+        elemento_nascosto.value = dipendente_id;
     }
 
 
     // Funzione per visualizzare le buste paga di un dipendente
-function viewPayslips(employeeId) {
 
-    let employeeName = employeeId === 1 ? 'Mario Rossi' : 'Luca Bianchi';
-
-    let payslips = [
-    { period: '2025-01', uploadDate: '2025-01-10', payslipName: 'Busta Paga Gennaio 2025', fileLink: 'path/to/payslip1.pdf', amount: 1500.50 },
-    { period: '2025-02', uploadDate: '2025-02-12', payslipName: 'Busta Paga Febbraio 2025', fileLink: 'path/to/payslip2.pdf', amount: 1600.75 },
-    { period: '2025-03', uploadDate: '2025-03-15', payslipName: 'Busta Paga Marzo 2025', fileLink: 'path/to/payslip3.pdf', amount: 1550.30 }
-    ];
-
-    let payslipsList = '';
-    payslips.forEach(payslip => {
-    payslipsList += `
-        <div class="busta-paga-list" data-period="${payslip.period}">
-            <p><strong>Nome File:</strong> ${payslip.payslipName}</p>
-            <p><strong>Periodo:</strong> ${payslip.period}</p>
-            <p><strong>Data Caricamento:</strong> ${payslip.uploadDate}</p>
-            <p><strong>Importo dello Stipendio:</strong> €${payslip.amount.toFixed(2)}</p>
-            <button class="btn btn-info btn-sm btn-custom" onclick="viewPayslipDetails('${payslip.fileLink}')">Visualizza</button>
-            <button class="btn btn-primary btn-sm btn-custom" onclick="downloadPayslip('${payslip.fileLink}')">Scarica</button>
-            <button class="btn btn-info btn-sm btn-custom" onclick="sharePayslip('${payslip.fileLink}')">Condividi via email</button>
-            <button class="btn btn-danger btn-sm btn-custom" onclick="deletePayslip('${payslip.fileLink}')">Elimina</button>
-        </div>
-    `;
-    });
-
-    document.getElementById('employeeNameModal').textContent = `Buste Paga di ${employeeName}`;
-    document.getElementById('payslipsList').innerHTML = payslipsList;
-
-    var modal = new bootstrap.Modal(document.getElementById('viewPayslipsModal'));
-    modal.show();
-}
-
+    function visualizza_busta_paga(dipendente_i) {
+        let modal = new bootstrap.Modal(document.getElementById('viewPayslipsModal'));
+        modal.show();
+    }
 
     // Funzione per scaricare la busta paga
     function downloadPayslip(fileLink) {
