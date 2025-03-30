@@ -426,7 +426,7 @@ def salva_busta_paga(request: HttpRequest):
 def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')
 
-def cerca_report_mensile(request):
+def cerca_report_mensile(request:HttpRequest):
     report_mensile = []
     if request.method == "POST":
         # Assicurati che i parametri 'id', 'month', e 'year' siano presenti
