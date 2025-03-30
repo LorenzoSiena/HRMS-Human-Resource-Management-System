@@ -14,7 +14,7 @@ from .models import *
 
 #Form
 
-from .forms import RegisterForm, Richiedi_assenza, EditUserForm
+from .forms import RegisterForm, RichiediAssenza, EditUserForm, CaricaBustaPaga
 
 from django.contrib.auth import authenticate, login, logout
 
@@ -43,7 +43,7 @@ def hrms_app(request: HttpRequest):
     # Lista delle timbrature da visualizzare - Solo quelle della data odierna
     lista_presenze = Presenze.objects.filter(dipendente = dipendente, data = date.today()) # Lista timbrature odierna
     # Carico il form per la richiesta di permessi o ferie
-    form = Richiedi_assenza()
+    form = RichiediAssenza()
     lista_ferie = Ferie.objects.filter(dipendente = dipendente, stato = "In attesa")
     lista_permessi = Permessi.objects.filter(dipendente = dipendente, stato = "In attesa")
     return render(request,'hrms_app/home.html', {'messaggi_bacheca': messaggi_bacheca, 'button_timbra': button_timbra, 'lista_ferie': lista_ferie, 'lista_permessi': lista_permessi, 'form': form, 'lista_presenze': lista_presenze})
@@ -307,7 +307,7 @@ def user_logout(request: HttpRequest):
 def richiesta_permessi_ferie(request: HttpRequest):
     if request.method == "POST":
         tipo_permesso = request.POST.get("tipo_permesso", "Nessuna selezione") # Prende il valore dal radio button selezionato nel form
-        form = Richiedi_assenza(request.POST)
+        form = RichiediAssenza(request.POST)
         if form.is_valid():
             data_inizio = form.cleaned_data['data_inizio']
             ora_inizio = form.cleaned_data['ora_inizio']
@@ -316,24 +316,24 @@ def richiesta_permessi_ferie(request: HttpRequest):
             motivo = form.cleaned_data['motivo']
             dipendente = Dipendenti.objects.get(id = request.user.id)
             # Controllo che la data fine sia maggiore o uguale alla data inizio
-            if data_inizio < data_fine:
+            if not(data_inizio < data_fine):
                 messages.error(request, 'Errore nella richiesta: La data fine deve essere maggiore o uguale alla data inizio.')
-                return redirect('home')
-            # Controllo che le ore di ingresso e uscita siano tra le 9.00 e le 18.00
-            if ora_inizio < datetime.strptime('09:00', '%H:%M').time() or ora_inizio > datetime.strptime('18:00', '%H:%M').time():
-                messages.error(request, 'Errore nella richiesta: Le ore di ingresso devono essere tra le 9.00 e le 18.00.')
-                return redirect('home')
-            if ora_fine < datetime.strptime('09:00', '%H:%M').time() or ora_fine > datetime.strptime('18:00', '%H:%M').time():
-                messages.error(request, 'Errore nella richiesta: Le ore di uscita devono essere tra le 9.00 e le 18.00.')
-                return redirect('home')
-            # Controllo che l'ora di uscita sia maggiore dell'ora di ingresso nei permessi dello stesso giorno
-            if data_inizio == data_fine and ora_inizio > ora_fine:
-                messages.error(request, "Errore nella richiesta: Le ore di uscita deve essere maggiore dell'ora di entrata")
                 return redirect('home')
             if tipo_permesso == "ferie":
                 Ferie.objects.create(dipendente = dipendente, data_inizio = data_inizio, data_fine = data_fine, stato = "In attesa") 
-                messages.success(request, 'Permesso richiesto con successo!')               
+                messages.success(request, 'Assenza per Ferie richiesta con successo!')               
             elif tipo_permesso == "permesso" or tipo_permesso == "permesso_nr":
+                # Controllo che le ore di ingresso e uscita siano tra le 9.00 e le 18.00
+                if ora_inizio < datetime.strptime('09:00', '%H:%M').time() or ora_inizio > datetime.strptime('18:00', '%H:%M').time():
+                    messages.error(request, 'Errore nella richiesta: Le ore di ingresso devono essere tra le 9.00 e le 18.00.')
+                    return redirect('home')
+                if ora_fine < datetime.strptime('09:00', '%H:%M').time() or ora_fine > datetime.strptime('18:00', '%H:%M').time():
+                    messages.error(request, 'Errore nella richiesta: Le ore di uscita devono essere tra le 9.00 e le 18.00.')
+                    return redirect('home')
+                # Controllo che l'ora di uscita sia maggiore dell'ora di ingresso nei permessi dello stesso giorno
+                if data_inizio == data_fine and ora_inizio > ora_fine:
+                    messages.error(request, "Errore nella richiesta: Le ore di uscita deve essere maggiore dell'ora di entrata")
+                    return redirect('home')
                 retribuito = (tipo_permesso == "permesso")
                 Permessi.objects.create(dipendente = dipendente, data_ora_inizio = datetime.combine(data_inizio, ora_inizio), data_ora_fine = datetime.combine(data_fine, ora_fine), stato = "In attesa", retribuito = retribuito, motivo = motivo)
                 messages.success(request, 'Permesso richiesto con successo!')
@@ -370,31 +370,55 @@ def busta_paga(request:HttpRequest):
     return render(request,'hrms_app/busta_paga.html')
 
 def gestione_dipendenti(request:HttpRequest):
-
     if request.method == "POST":
         dipendente = request.POST.get("dipendente")
         
         #ricerca incrociata su nome e cognome dove %dipendente%
         #lista_dipendenti = Dipendenti.objects.filter(nome=dipendente,cognome=dipendente)
-
         lista_dipendenti = Dipendenti.objects.filter(Q(first_name__icontains=dipendente) | Q(last_name__icontains=dipendente))
         if lista_dipendenti:
             messages.success(request, "Utenti trovati")
-                    
         else:
-            messages.error(request, "Nessun dipendente trovato")
-    
+            messages.error(request, "Nessun dipendente trovato")    
 
         return render(request, "hrms_app/gestione_dipendenti.html", {"dipendenti": lista_dipendenti})
     return render(request, "hrms_app/gestione_dipendenti.html")
 
-
-
 def gestione_assenze(request:HttpRequest):
     return render(request,'hrms_app/gestione_assenze.html')
 
-def gestione_busta_paga(request:HttpRequest):
-    return render(request,'hrms_app/gestione_busta_paga.html')
+def gestione_busta_paga(request: HttpRequest):
+    if request.method == "POST":
+        dipendente = request.POST.get("dipendente")        
+        #Ricerca incrociata su nome e cognome dove %dipendente%    
+        lista_dipendenti = Dipendenti.objects.filter(Q(first_name__icontains=dipendente) | Q(last_name__icontains=dipendente))
+        if lista_dipendenti:
+            messages.success(request, "Utenti trovati")
+        else:
+            messages.error(request, "Nessun dipendente trovato")
+        form_carica_busta = CaricaBustaPaga(request.POST)       
+
+        return render(request, 'hrms_app/gestione_busta_paga.html', {"lista_dipendenti": lista_dipendenti, "form_carica_busta": form_carica_busta})        
+    return render(request, 'hrms_app/gestione_busta_paga.html')
+
+def salva_busta_paga(request: HttpRequest):  
+    if request.method == "POST":
+        form_carica_busta = CaricaBustaPaga(request.POST)
+        if form_carica_busta.is_valid():
+            mese = form_carica_busta.cleaned_data['mese']
+            anno = form_carica_busta.cleaned_data['anno']
+            importo = form_carica_busta.cleaned_data['importo']
+            documento = form_carica_busta.cleaned_data['documento']
+            dipendente = Dipendenti.objects.get(id = id)
+            
+            #busta_paga = form_carica_busta.save(commit=False)
+            #busta_paga.save()
+            messages.success(request, "Busta paga caricata con successo")
+            return redirect('gestione_busta_paga' , 'dipendente' , dipendente , 'anno' , anno , 'mese' , mese, 'documento' , documento, 'importo' , importo)
+        else:
+            messages.error(request, "Errore nel caricamento della busta paga")
+            return redirect('gestione_busta_paga')
+    return redirect('gestione_busta_paga')
 
 def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')
