@@ -8,6 +8,9 @@ from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 
+from django.contrib.auth.models import Permission
+from hrms_app.constant import PERMESSI_APP
+
 
 
 from django.contrib.auth.models import User,Group
@@ -84,6 +87,7 @@ def crea_dipendente(request: HttpRequest):
         livello_accesso = request.POST.get('livello_accesso', '').strip()
 
         if nome and cognome and email and ruolo and data_assunzione and livello_accesso:
+
             Dipendenti.objects.create(
                 nome=nome,
                 cognome=cognome,
@@ -92,6 +96,7 @@ def crea_dipendente(request: HttpRequest):
                 data_assunzione=data_assunzione,
                 livello_accesso=livello_accesso
             )
+            
             messages.success(request, f"✅ Dipendente '{nome} {cognome}' aggiunto con successo!")
         else:
             messages.error(request, "⚠️ Tutti i campi sono obbligatori!")
@@ -265,22 +270,14 @@ def registrati(request: HttpRequest):
 
     return render(request, "hrms_app/register_forms.html", {"form": form})
 
-@login_required
-def mostra_permessi(request):
-    permessi_individuali = request.user.get_all_permissions()  # Restituisce un set di permessi (app_label.codename)
-
-    permessi_ruolo = set()
-    ruolo=request.user.ruolo
-    if ruolo:  # Se l'utente ha un ruolo assegnato
-        permessi_ruolo = set(request.user.ruolo.ruolo.permissions.values_list('codename', flat=True))
-    
-    
-    return render(request, 'hrms_app/debug_permessi.html', {'permessi_individuali': permessi_individuali, 'permessi_ruolo':permessi_ruolo,'ruolo': ruolo})
 
 from django.urls import reverse
 
 def vai_all_admin(request):
     return redirect(reverse('admin:index'))  # Ricava l'URL dinamicamente
+
+
+
 
 
 
@@ -373,22 +370,38 @@ def busta_paga(request:HttpRequest):
 def gestione_dipendenti(request:HttpRequest):
     if request.method == "POST":
         dipendente = request.POST.get("dipendente")
-        
+        origine_form = request.POST.get("origine_form")
         #ricerca incrociata su nome e cognome dove %dipendente%
         #lista_dipendenti = Dipendenti.objects.filter(nome=dipendente,cognome=dipendente)
         lista_dipendenti = Dipendenti.objects.filter(Q(first_name__icontains=dipendente) | Q(last_name__icontains=dipendente))
         if lista_dipendenti:
             messages.success(request, "Utenti trovati")
         else:
-            messages.error(request, "Nessun dipendente trovato")    
-
-        return render(request, "hrms_app/gestione_dipendenti.html", {"dipendenti": lista_dipendenti})
+            messages.error(request, "Nessun dipendente trovato")
+        if origine_form == "ruoli":
+            ruoli = Ruoli.objects.all()
+            return render(request, "hrms_app/gestione_ruoli.html", {"dipendenti": lista_dipendenti, "ruoli": ruoli})
+        else:
+            return render(request, "hrms_app/gestione_dipendenti.html", {"dipendenti": lista_dipendenti})
     return render(request, "hrms_app/gestione_dipendenti.html")
 
 def gestione_assenze(request:HttpRequest):
     return render(request,'hrms_app/gestione_assenze.html')
 
-def gestione_busta_paga(request: HttpRequest):    
+def assegna_ruolo(request:HttpRequest):
+    if request.method == "POST":
+        id_dipendente = request.POST.get("dipendente")
+        id_ruolo = request.POST.get("ruolo")
+        dipendente = Dipendenti.objects.get(id=id_dipendente)
+        dipendente.ruolo = Ruoli.objects.get(id=id_ruolo)
+        dipendente.save()
+        messages.success(request, f"Ruolo assegnato con successo {dipendente.nome} {dipendente.cognome} -> {dipendente.ruolo}")
+    return redirect("gestione_ruoli")
+    
+def gestione_assenze(request:HttpRequest):
+    return render(request,'hrms_app/gestione_assenze.html')
+
+def gestione_busta_paga(request: HttpRequest):
     if request.method == "POST":
         dipendente = request.POST.get("dipendente")        
         #Ricerca incrociata su nome e cognome dove %dipendente%    
@@ -436,7 +449,7 @@ def visualizza_busta_paga(request: HttpRequest, id):
     return render(request, 'hrms_app/modifica_busta_paga.html', {'dipendente': dipendente, 'elenco_buste_paga': elenco_buste_paga}) # Reindirizza alla pagina di gestione busta paga con l'elenco delle buste paga('gestione_busta_paga')    
 
 def modifica_busta_paga(request: HttpRequest):
-    return render(request, 'hrms_app/modifica_busta_paga.html') # Reindirizza alla pagina di modifica busta paga con l'id della busta paga da modificare
+    return render(request, 'hrms_app/modifica_busta_paga.html') # Reindirizza alla pagina di modifica busta paga con l'id della busta paga da modificare        
 
 def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')
@@ -445,8 +458,150 @@ def sviluppo(request:HttpRequest):
 # def aggiungi_dipendente(request:HttpRequest):
 #     return render(request,'hrms_app/aggiungi_dipendente.html')
 
+
+
+
 def gestione_ruoli(request:HttpRequest):
+    ruoli = Ruoli.objects.all()
+    return render(request,'hrms_app/gestione_ruoli.html',{'ruoli':ruoli})
+
+#controllare validation!
+
+def crea_ruolo(request: HttpRequest):
+
+
+    if request.method == "POST":
+        ruolo = request.POST.get("name") # testo
+        livello_accesso = request.POST.get("livello_accesso") #numero
+
+        if not ruolo or not livello_accesso:
+
+            messages.error(request, f"Errore nella creazione del ruolo. {ruolo} livello {livello_accesso} Controlla i dati inseriti.")
+            return redirect("gestione_ruoli")
+
+        # Controlla se esiste già un Group con quel nome
+        gruppo_esistente = Group.objects.filter(name=ruolo).first()
+
+        if gruppo_esistente and Ruoli.objects.filter(ruolo=gruppo_esistente).exists():
+            messages.error(request, "Ruolo già esistente.")
+            return redirect("gestione_ruoli")
+
+        # Crea il gruppo se non esiste
+        if not gruppo_esistente:
+            gruppo_esistente = Group.objects.create(name=ruolo)
+
+        # Crea il ruolo associato
+        Ruoli.objects.create(ruolo=gruppo_esistente, livello_accesso=int(livello_accesso))
+        messages.success(request, f"Creazione ruolo {ruolo} avvenuta con successo!")
+        #return render(request,'hrms_app/gestione_ruoli.html') 
+        return redirect("gestione_ruoli") 
+
     return render(request,'hrms_app/gestione_ruoli.html')
+
+""" 
+SELECT *
+FROM ruoli JOIN Group 
+ON ruoli.ruolo_id = Group.id
+WHERE Group.name = 'Contabile';
+"""          
+
+
+
+""" 
+Gestione dipendenti (crea,modifica,visualizza,elimina)
+Gestire Ruoli(crea,modifica,visualizza,elimina)
+Gestire Autorizzazioni(assegna a ruolo,rimuovi da ruolo,visualizza autorizzazioni per ruolo)
+Gestire Ferie/Permessi(accetta,rifiuta,visualizza)
+Visualizza Report(ferie,permessi,presenze)
+Gestire messaggi bacheca (Crea,modifica,elimina)
+Gestire Buste paga (Crea,carica file,elimina,visualizza)
+Gestire documenti [contratti e certificati] (visualizza,modifica,elimina)
+ """
+
+
+def cerca_ruolo_id(request:HttpRequest):
+    ruoli = Ruoli.objects.all()
+    if request.method == "GET":    
+        id = request.GET.get("id")
+        if id:
+            ruolo = Ruoli.objects.get(id=id)
+            if not ruolo:
+                messages.error(request, f"Ruolo non trovato.")
+                return redirect("gestione_ruoli")
+
+            permessi_disponibili = {}
+            permessi_ruolo = set(ruolo.ruolo.permissions.values_list('codename', flat=True))
+
+            for nome_permesso, permessi_richiesti in PERMESSI_APP.items():
+                permessi_disponibili[nome_permesso] = all(p in permessi_ruolo for p in permessi_richiesti)
+            
+            return render(request,'hrms_app/gestione_ruoli.html',{"ruolo":ruolo,'permessi_disponibili': permessi_disponibili,'ruoli':ruoli}) 
+
+    return redirect('gestione_ruoli')
+
+def cerca_ruolo(request:HttpRequest):
+
+    if request.method == "GET":    
+        name = request.GET.get("name")
+        if name:
+            ruolo = Ruoli.objects.filter(ruolo__name__icontains=name).first()
+            if not ruolo:
+                messages.error(request, f"Ruolo non trovato.")
+                return redirect("gestione_ruoli")
+
+            permessi_disponibili = {}
+            permessi_ruolo = set(ruolo.ruolo.permissions.values_list('codename', flat=True))
+
+            for nome_permesso, permessi_richiesti in PERMESSI_APP.items():
+                permessi_disponibili[nome_permesso] = all(p in permessi_ruolo for p in permessi_richiesti)
+            
+            return render(request,'hrms_app/gestione_ruoli.html',{"ruolo":ruolo,'permessi_disponibili': permessi_disponibili}) 
+
+    return redirect('gestione_ruoli')
+
+
+
+
+def modifica_autorizzazioni(request: HttpRequest, id):
+    ruoli = Group.objects.all()
+    if request.method == "POST":
+
+        permessi_selezionati = request.POST.getlist("permessi")  # Ottieni solo quelli selezionati
+        permessi_nuovi = []
+
+        for gruppo, permessi_richiesti in PERMESSI_APP.items():
+            if gruppo in permessi_selezionati:
+                # Aggiungi i permessi richiesti per il gruppo selezionato
+                permessi_nuovi.extend(Permission.objects.filter(codename__in=permessi_richiesti))
+
+        ruolo = Group.objects.get(id=id) 
+        ruolo.permissions.set(permessi_nuovi)
+        messages.success(request, f"✅ Ruolo aggiornato con successo!")
+        return render(request,'hrms_app/gestione_ruoli.html',{'ruoli':ruoli})
+
+    return render(request, 'hrms_app/gestione_ruoli.html', {
+        'ruolo': ruolo,'ruoli':ruoli
+    })
+
+
+
+
+
+
+
+
+@login_required
+def mostra_permessi(request):
+    permessi_individuali = request.user.get_all_permissions()  # Restituisce un set di permessi (app_label.codename)
+
+    permessi_ruolo = set()
+    ruolo=request.user.ruolo
+    if ruolo:  # Se l'utente ha un ruolo assegnato
+        permessi_ruolo = set(request.user.ruolo.ruolo.permissions.values_list('codename', flat=True))
+    
+    
+    return render(request, 'hrms_app/debug_permessi.html', {'permessi_individuali': permessi_individuali, 'permessi_ruolo':permessi_ruolo,'ruolo': ruolo})
 
 def notifiche(request:HttpRequest):
     return render(request,'hrms_app/notifiche.html')
+

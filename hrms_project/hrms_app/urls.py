@@ -16,7 +16,9 @@ urlpatterns = [
     path("profilo",views.profilo,name="profilo"),
     path("stipendi",views.stipendi,name="stipendi"),
     path("gestione_dipendenti",views.gestione_dipendenti,name="gestione_dipendenti"),
-    path("gestione_ruoli",views.gestione_ruoli,name="gestione_ruoli"),
+
+    
+    
     path("gestione_assenze",views.gestione_assenze,name="gestione_assenze"),
     path("gestione_busta_paga",views.gestione_busta_paga,name="gestione_busta_paga"),
     path("consulta_documenti",views.consulta_documenti,name="consulta_documenti"),
@@ -34,6 +36,7 @@ urlpatterns = [
     path("crea_dipendente",views.crea_dipendente,name="crea_dipendente"),
     path("salva_busta_paga",views.salva_busta_paga,name="salva_busta_paga"),
 
+    path("gestione_ruoli",views.gestione_ruoli,name="gestione_ruoli"),
 
     path("modifica_dipendente/<int:id>",views.modifica_dipendente,name="modifica_dipendente"),
     path("elimina_dipendente/<int:id>",views.elimina_dipendente,name="elimina_dipendente"),
@@ -48,9 +51,14 @@ urlpatterns = [
     path("richieste_permessi_ferie", views.richiesta_permessi_ferie, name="richiesta_permessi_ferie"),
     
     # gestione permessi e ruoli
-
+    path("crea_ruolo",views.crea_ruolo,name="crea_ruolo"),
+    
+    path("cerca_ruolo",views.cerca_ruolo,name="cerca_ruolo"),
+    path("cerca_ruolo_id",views.cerca_ruolo_id,name="cerca_ruolo_id"),
+    path("modifica_autorizzazioni/<int:id>",views.modifica_autorizzazioni,name="modifica_autorizzazioni"),
+         
     path("mostra_permessi",views.mostra_permessi,name="mostra_permessi"),
-
+    path("assegna_ruolo",views.assegna_ruolo,name="assegna_ruolo"),
 
 
 
