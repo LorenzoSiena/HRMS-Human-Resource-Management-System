@@ -2,26 +2,15 @@
 {% block title %} Modifica Buste Paga {% endblock title %}
 {% block content %}
 
-<style>
-    /* Impostiamo un'altezza massima per la card e abilitiamo lo scroll */
-    .card-body {
-        overflow-y: auto;  /* Abilita lo scroll verticale */
-    }
-    /* Garantiamo che il footer stia sempre in fondo */
-    footer {
-        margin-top: 5px; /* Separazione dal contenuto */
-    }
-</style>
-
 {% if messages %}
-        {% for message in messages %}
-            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
 
-    {% if form.errors %}
+{% if form.errors %}
     <div class="alert alert-danger">
         <strong>Errore!</strong>
         <ul>
@@ -42,16 +31,61 @@
 
 <div class="container mt-5">
     <div class="card">
-        <div class="card-header">
-            <h5>Elenco Buste Paga del dipendente: {{ dipendente }}</h5>
+        <div class="d-flex justify-content-between align-items-center card-header">
+            <span><strong>Elenco Buste Paga del dipendente: {{ dipendente }}</strong></span>
+            <a type="button" href="{% url 'gestione_busta_paga' %}" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></a>
         </div>
 
-        {% for busta_paga in elenco_buste_paga %} 
-        {{ busta_paga.dipendente }}
-        {{ busta_paga.mese.label_tag }}
-            {{ busta_paga.mese }}
+        <div class="table-responsive">            
+            <div class="row">
+                <div class="col">#</div>
+                <div class="col">Mese</div>
+                <div class="col">Anno</div>
+                <div class="col">Importo</div>
+                <div class="col">File</div>
+            </div>
+            {% for busta_paga in elenco_buste_paga %}
+            <div class="row">
+                <form method="post" action="{% url 'modifica_busta_paga' %}"> 
+                    {% csrf_token %}
+                    <div class="col">{{ forloop.counter }}</div>
+                    <div class="col">{{ busta_paga.mese }}</div>
+                    <div class="col">{{ busta_paga.anno }}</div>
+                    <div class="col">{{ busta_paga.importo }}</div>
+                    <div class="col">{{ busta_paga.documento|cut:"documenti_bustepaga/"|cut:".pdf" }}</div>
+                    <div class="col">
+                        <a id="btn-modifica" class="btn btn-outline-primary btn-sm btn-custom" title="Modifica">📝</a>                                
+                        <a id="btn-scarica" class="btn btn-outline-primary btn-sm btn-custom"  title="Scarica">📥</a>
+                        <a id="btn-condividi" class="btn btn-outline-primary btn-sm btn-custom"  title="Condividi">🔁</a>                                
+                        <a id="btn-elimina" class="btn btn-outline-danger btn-sm btn-custom"  title="Elimina">🗑️</a>
+                        <button type="submit" id="btn-aggiorna" class="btn btn-outline-success btn-sm btn-custom hidden" type="submit" title="Aggiorna">✅</button>
+                        <a id="btn-annulla" class="btn btn-outline-secondary btn-sm btn-custom hidden" href="{% url 'visualizza_busta_paga' dipendente.id %}" title="Chiudi">❌</a>
+                    </div> 
+                </form>    
+            </div>
+                    <!-- <tr>
+                        <form method="post" action="{% url 'modifica_busta_paga' %}"> 
+                            {% csrf_token %}
+                            <td class="hidden"> {{ busta_paga.id }} </td>
+                            <td class="Riga hidden"> {{ forloop.counter }} </td>                            
+                            <td> {{ busta_paga.mese }} </td>
+                            <td> {{ busta_paga.anno }} </td>
+                            <td> {{ busta_paga.importo }} </td>                             
+                            <td>
+                                {{ busta_paga.documento|cut:"documenti_bustepaga/"|cut:".pdf" }}-->
+                            <!-- <a href="{{ busta_paga.documento.url }}" target="_blank" class="btn btn-primary btn-sm btn-custom">Visualizza</a> --> 
+                            <!-- <td>
+                                <a id="btn-modifica" class="btn btn-outline-primary btn-sm btn-custom" title="Modifica">📝</a>                                
+                                <a id="btn-scarica" class="btn btn-outline-primary btn-sm btn-custom"  title="Scarica">📥</a>
+                                <a id="btn-condividi" class="btn btn-outline-primary btn-sm btn-custom"  title="Condividi">🔁</a>                                
+                                <a id="btn-elimina" class="btn btn-outline-danger btn-sm btn-custom"  title="Elimina">🗑️</a>
+                                <button type="submit" id="btn-aggiorna" class="btn btn-outline-success btn-sm btn-custom hidden" type="submit" title="Aggiorna">✅</button>
+                                <a id="btn-annulla" class="btn btn-outline-secondary btn-sm btn-custom hidden" href="{% url 'visualizza_busta_paga' dipendente.id %}" title="Chiudi">❌</a>        
+                            </td>
+                        </form>
+                    </tr>-->
+            {% endfor %}                
            
-        {% endfor %}
 
         <!--
         <div class="card-body">
@@ -153,22 +187,51 @@
                     <button type="submit" class="btn btn-success" id="btn-aggiorna"  style="display:none;">Aggiorna</button>
                 </form>
                     <a href="{% url 'elimina_dipendente' dipendente.id %}" type="button" class="btn btn-danger" id="btn-elimina">Elimina</a>
-                </div>
+                </div>-->
             
-        </div>--> 
+        </div>
     </div>
 </div>
 
 
 <script>
- document.getElementById('btn-modifica').addEventListener('click', function () {
-    const inputs = document.querySelectorAll('input, select');
-    inputs.forEach(input => {
-        input.disabled = false;
+
+    document.getElementById('btn-modifica').addEventListener('click', function () {
+        row = this.closest('tr'); // Trova la riga corrente
+        const cells = row.querySelectorAll('td'); // Trova tutte le celle della riga
+        cells.forEach(cell => {
+            
+        })
+        const inputs = row.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.disabled = false;            
+        });
+
+        const buttons = row.querySelectorAll('a');
+        buttons.forEach(button => {            
+            button.classList.toggle('hidden'); // Toggle the 'hidden' class to show or hide the button.
+        });
     });
-    document.getElementById('btn-aggiorna').style.display = 'inline-block'; // Mostra il bottone "Aggiorna"
-    document.getElementById('btn-modifica').style.display = 'none'; // Nasconde il bottone "Modifica"
-});
+
+    document.getElementById('btn-annulla').addEventListener('click', function () {
+        row = this.closest('tr'); // Trova la riga corrente
+        const cells = row.querySelectorAll('td'); // Trova tutte le celle della riga
+        cells.forEach(cell => {
+            
+        })
+        const inputs = row.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.disabled = true;            
+        });
+
+        const buttons = row.querySelectorAll('a');
+        buttons.forEach(button => {            
+            button.classList.toggle('hidden'); // Toggle the 'hidden' class to show or hide the button.
+        });
+    });
+        
+
+
 
 
 
@@ -185,4 +248,4 @@ document.getElementById('btn-aggiorna').addEventListener('click', function () {
 });
 </script> 
 
-{% endblock %} 
+{% endblock content%} 
