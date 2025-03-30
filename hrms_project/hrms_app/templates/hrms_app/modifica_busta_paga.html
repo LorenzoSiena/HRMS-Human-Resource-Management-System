@@ -1,0 +1,188 @@
+{% extends 'hrms_app/base.html' %}
+{% block title %} Modifica Buste Paga {% endblock title %}
+{% block content %}
+
+<style>
+    /* Impostiamo un'altezza massima per la card e abilitiamo lo scroll */
+    .card-body {
+        overflow-y: auto;  /* Abilita lo scroll verticale */
+    }
+    /* Garantiamo che il footer stia sempre in fondo */
+    footer {
+        margin-top: 5px; /* Separazione dal contenuto */
+    }
+</style>
+
+{% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <strong>Errore!</strong>
+        <ul>
+            {% for field in form %}
+                {% if field.errors %}
+                    <li><strong>{{ field.label }}:</strong>
+                        <ul>
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h5>Elenco Buste Paga del dipendente: {{ dipendente }}</h5>
+        </div>
+
+        {% for busta_paga in elenco_buste_paga %} 
+        {{ busta_paga.dipendente }}
+        {{ busta_paga.mese.label_tag }}
+            {{ busta_paga.mese }}
+           
+        {% endfor %}
+
+        <!--
+        <div class="card-body">
+             <h1> {{dipendente.id}} </h1>
+            {% comment %} <form method="post" action="{% url 'modifica_dipendente' %}" enctype="multipart/form-data" > {% endcomment %} 
+            <form method="post" action="{% url 'modifica_dipendente' dipendente.id %}"  > 
+                {% csrf_token %}
+                 Nome 
+                <div class="mb-3 row">
+                    <label for="nome" class="col-sm-2 col-form-label">Nome</label>
+                    <div class="col-sm-10">
+                        {{ form.first_name}}
+                    </div>
+                </div>
+                
+                 Cognome
+                <div class="mb-3 row">
+                    <label for="cognome" class="col-sm-2 col-form-label">Cognome</label>
+                    <div class="col-sm-10">
+                        {{ form.last_name}}
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label for="data_nascita" class="col-sm-2 col-form-label">Data di Nascita</label>
+                    <div class="col-sm-10">
+                        {{ form.data_nascita}}
+                    </div>
+                </div>
+
+                 Codice Fiscale 
+                <div class="mb-3 row">
+                    <label for="codice_fiscale" class="col-sm-2 col-form-label">Codice Fiscale</label>
+                    <div class="col-sm-10">
+                        {{ form.codice_fiscale}}
+                    </div>
+                </div>
+
+                 Email 
+                <div class="mb-3 row">
+                    <label for="email" class="col-sm-2 col-form-label">Email</label>
+                    <div class="col-sm-10">
+                        {{ form.email}}
+                    </div>
+                </div>
+
+                 Indirizzo 
+                <div class="mb-3 row">
+                    <label for="indirizzo" class="col-sm-2 col-form-label">Indirizzo</label>
+                    <div class="col-sm-10">
+                        {{ form.indirizzo_completo}}
+                    </div>
+                </div>
+
+                 Telefono 
+                <div class="mb-3 row">
+                    <label for="telefono" class="col-sm-2 col-form-label">Telefono</label>
+                    <div class="col-sm-10">
+                        {{ form.telefono}}
+                    </div>
+                </div>
+
+                 Ruolo 
+                <div class="mb-3 row">
+                    <label for="ruolo" class="col-sm-2 col-form-label">Ruolo</label>
+                    <div class="col-sm-10">
+                        {{ form.ruolo }}
+                    </div>
+                </div>
+
+                 Responsabile 
+                <div class="mb-3 row">
+                    <label for="responsabile" class="col-sm-2 col-form-label">Responsabile</label>
+                    <div class="col-sm-10">
+                        {{ form.superiore }}
+                    </div>
+                </div>
+
+                 Data di assunzione 
+                <div class="mb-3 row">
+                    <label for="data_assunzione" class="col-sm-2 col-form-label">Data di Assunzione</label>
+                    <div class="col-sm-10">
+                        {{ form.data_assunzione }}
+                    </div>
+                </div>
+
+                  Stipendio 
+                <div class="mb-3 row">
+                    <label for="stipendio" class="col-sm-2 col-form-label">Stipendio</label>
+                    <div class="col-sm-10">
+                        {{ form.stipendio }}
+                        
+                    </div>
+                </div>
+
+                 Pulsanti per modifica e eliminazione
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-warning" id="btn-modifica">Modifica</button>
+                    <button type="submit" class="btn btn-success" id="btn-aggiorna"  style="display:none;">Aggiorna</button>
+                </form>
+                    <a href="{% url 'elimina_dipendente' dipendente.id %}" type="button" class="btn btn-danger" id="btn-elimina">Elimina</a>
+                </div>
+            
+        </div>--> 
+    </div>
+</div>
+
+
+<script>
+ document.getElementById('btn-modifica').addEventListener('click', function () {
+    const inputs = document.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        input.disabled = false;
+    });
+    document.getElementById('btn-aggiorna').style.display = 'inline-block'; // Mostra il bottone "Aggiorna"
+    document.getElementById('btn-modifica').style.display = 'none'; // Nasconde il bottone "Modifica"
+});
+
+
+
+document.getElementById('btn-elimina').addEventListener('click', function (event) {
+    if (!confirm("Sei sicuro di voler eliminare questo dipendente?")) {
+        event.preventDefault();  // Blocca il redirect se l'utente preme "No"
+    }
+});
+
+// Funzione per aggiornare i dati
+document.getElementById('btn-aggiorna').addEventListener('click', function () {
+    alert("Modifiche aggiornate correttamente!");
+   
+});
+</script> 
+
+{% endblock %} 
