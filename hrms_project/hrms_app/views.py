@@ -1,4 +1,5 @@
 #Standard imports
+from django.forms import modelformset_factory
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpRequest
 from django.contrib import messages
@@ -387,38 +388,55 @@ def gestione_dipendenti(request:HttpRequest):
 def gestione_assenze(request:HttpRequest):
     return render(request,'hrms_app/gestione_assenze.html')
 
-def gestione_busta_paga(request: HttpRequest):
+def gestione_busta_paga(request: HttpRequest):    
     if request.method == "POST":
         dipendente = request.POST.get("dipendente")        
         #Ricerca incrociata su nome e cognome dove %dipendente%    
         lista_dipendenti = Dipendenti.objects.filter(Q(first_name__icontains=dipendente) | Q(last_name__icontains=dipendente))
+        lista_dipendenti_id = [ dipendente.id for dipendente in lista_dipendenti] # Salvo il dipendente nella sessione per il redirect
+        request.session['lista_dipendenti_id'] = lista_dipendenti_id # Salvo il dipendente nella sessione per il redirect
         if lista_dipendenti:
             messages.success(request, "Utenti trovati")
         else:
             messages.error(request, "Nessun dipendente trovato")
-        form_carica_busta = CaricaBustaPaga(request.POST)       
-
-        return render(request, 'hrms_app/gestione_busta_paga.html', {"lista_dipendenti": lista_dipendenti, "form_carica_busta": form_carica_busta})        
-    return render(request, 'hrms_app/gestione_busta_paga.html')
+    else:
+        if 'lista_dipendenti_id' in request.session:
+            lista_dipendenti = Dipendenti.objects.filter(id__in=request.session['lista_dipendenti_id'])
+        else:
+            lista_dipendenti = None
+    form_carica_busta = CaricaBustaPaga()
+    if 'lista_buste_paga_id' in request.session:
+        elenco_buste_paga = BustePaga.objects.filter(id__in=request.session['lista_buste_paga_id']).order_by('-data_emissione')
+    else:
+        elenco_buste_paga = None
+    #elenco_buste_paga = BustePaga.objects.all() # Recupera tutte le buste paga del dipendente      
+    return render(request, 'hrms_app/gestione_busta_paga.html', {"lista_dipendenti": lista_dipendenti, "form_carica_busta": form_carica_busta, " elenco_buste_paga": elenco_buste_paga }) 
 
 def salva_busta_paga(request: HttpRequest):  
-    if request.method == "POST":
-        form_carica_busta = CaricaBustaPaga(request.POST)
-        if form_carica_busta.is_valid():
-            mese = form_carica_busta.cleaned_data['mese']
-            anno = form_carica_busta.cleaned_data['anno']
-            importo = form_carica_busta.cleaned_data['importo']
-            documento = form_carica_busta.cleaned_data['documento']
-            dipendente = Dipendenti.objects.get(id = id)
-            
-            #busta_paga = form_carica_busta.save(commit=False)
-            #busta_paga.save()
-            messages.success(request, "Busta paga caricata con successo")
-            return redirect('gestione_busta_paga' , 'dipendente' , dipendente , 'anno' , anno , 'mese' , mese, 'documento' , documento, 'importo' , importo)
+    if request.method == "POST":        
+        dipendente = Dipendenti.objects.get(id = request.POST.get("dipendente_id")) # Recupera l'utente selezionato
+        if not dipendente:
+            messages.error(request, "Dipendente non trovato.")
+            return redirect('gestione_busta_paga')
+        form_carica_busta = CaricaBustaPaga(request.POST, request.FILES) # Carica il form con i dati POST
+        if form_carica_busta.is_valid(): # Controlla se il form è valido           
+            busta_paga = form_carica_busta.save(commit=False)
+            busta_paga.dipendente = dipendente
+            busta_paga.save()
+            messages.success(request, "Busta paga caricata con successo")            
         else:
             messages.error(request, "Errore nel caricamento della busta paga")
-            return redirect('gestione_busta_paga')
-    return redirect('gestione_busta_paga')
+    return redirect('gestione_busta_paga', ) # Reindirizza alla pagina di gestione busta paga con l'elenco delle buste paga
+
+def visualizza_busta_paga(request: HttpRequest, id):
+    dipendente = Dipendenti.objects.get(id = id) # Recupera l'utente loggato
+    buste_paga_form_set = modelformset_factory(BustePaga, form=CaricaBustaPaga, extra=0) # Crea un formset per la modifica delle buste paga
+    elenco_buste_paga = buste_paga_form_set(queryset = BustePaga.objects.filter(dipendente=dipendente).order_by('-data_emissione')) # Recupera tutte le buste paga del dipendente
+   
+    return render(request, 'hrms_app/modifica_busta_paga.html', {'dipendente': dipendente, 'elenco_buste_paga': elenco_buste_paga}) # Reindirizza alla pagina di gestione busta paga con l'elenco delle buste paga('gestione_busta_paga')    
+
+def modifica_busta_paga(request: HttpRequest):
+    return render(request, 'hrms_app/modifica_busta_paga.html') # Reindirizza alla pagina di modifica busta paga con l'id della busta paga da modificare
 
 def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')

@@ -279,7 +279,7 @@ class BustePaga(models.Model):
     anno = models.IntegerField(validators=[MinValueValidator(2000)])
     importo = models.DecimalField(max_digits=8, decimal_places=2) #max 999 999.99
     data_emissione=models.DateField(auto_now_add=True)
-    documento=models.FileField(upload_to='media/documenti_bustepaga/')
+    documento=models.FileField(upload_to='documenti_bustepaga/')
 
     def __str__(self):
         return f"{self.dipendente} - {self.mese}/{self.anno}"
