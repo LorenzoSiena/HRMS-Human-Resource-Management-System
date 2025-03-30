@@ -71,15 +71,14 @@
                 </tr>
             </thead>
             <tbody id="employeeList">
-                {% for dipendente in lista_dipendenti %}
-                    <tr>
+                {% for dipendente in lista_dipendenti %}                
+                    <tr>                        
                         <td> {{ forloop.counter }} </td>
                         <td> {{ dipendente.first_name }} </td>
                         <td> {{ dipendente.last_name }} </td>
                         <td> {{ dipendente.ruolo }} </td>
                         <td> {{ dipendente.email }} </td>                       
-                        <td>                            
-
+                        <td>
                             <a class="btn btn-info btn-sm btn-custom" href="{% url 'visualizza_busta_paga' dipendente.id %}">Visualizza Buste Paga</a>
                             <button class="btn btn-success btn-sm btn-custom" onclick="carica_busta_paga({{ dipendente.id }})">⬆️ Carica Busta Paga</button>                                   
 
