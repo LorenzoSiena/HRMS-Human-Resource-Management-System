@@ -6,6 +6,25 @@
 {% block content %}
 <div class="container-fluid d-flex flex-wrap main_container">
 
+    <!-- Modal "Work in Progress" -->
+    <div class="modal fade" id="workInProgressModal" tabindex="-1" aria-labelledby="workInProgressModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="workInProgressModalLabel">Work in Progress</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="font-size: 1rem;">
+            Ci scusiamo per il disagio, ma questa funzionalità non è ancora disponibile
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+            </div>
+        </div>
+        </div>
+    </div>
+  
+
     <!-- Form per la richiesta dei permessi o ferie -->
     <div class="container section_container container_permessi">
         <div class="container">
@@ -119,44 +138,57 @@
 
 </div>
 
-<!-- Modal di conferma -->
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="confirmModalLabel">Conferma azione</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="modalMessage" style="font-size: 1rem;">
-        Sei sicuro di voler approvare questa richiesta?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-        <button type="button" class="btn btn-primary" id="confirmButton">Conferma</button>
-      </div>
+    <!-- Modal di conferma -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="confirmModalLabel">Conferma azione</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modalMessage" style="font-size: 1rem;">
+            Sei sicuro di voler approvare questa richiesta?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+            <button type="button" class="btn btn-primary" id="confirmButton">Conferma</button>
+        </div>
+        </div>
     </div>
-  </div>
-</div>
+    </div>
 
 <script>
-  function confirmAction(action, requestId) {
-    var actionText = (action === 'approva') ? 'approvare' : 'rifiutare';
-    var confirmMessage = 'Sei sicuro di voler ' + actionText + ' questa richiesta?';
-    var actionUrl = (action === 'approva') ? '/approve-request/' + requestId + '/' : '/reject-request/' + requestId + '/';
-
-    // Imposta il messaggio della modal
-    document.getElementById('modalMessage').innerText = confirmMessage;
-
-    // Mostra la modal
-    var modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-    modal.show();
-
-    // Al clic su Conferma
-    document.getElementById('confirmButton').onclick = function () {
-        window.location.href = actionUrl;  // Redirige alla view per approvare o rifiutare
-        modal.hide(); // Chiude la modal dopo l'azione
-    };
-}
+    
+ 
+        function confirmAction(action, requestId) {
+          var actionText = (action === 'approva') ? 'approvare' : 'rifiutare';
+          var confirmMessage = 'Sei sicuro di voler ' + actionText + ' questa richiesta?';
+          var actionUrl = (action === 'approva') ? '/approve-request/' + requestId + '/' : '/reject-request/' + requestId + '/';
+      
+          // Imposta il messaggio della modal
+          document.getElementById('modalMessage').innerText = confirmMessage;
+      
+          // Mostra la modal di conferma
+          var modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+          modal.show();
+      
+          // Al clic su Conferma nella modal di conferma
+          document.getElementById('confirmButton').onclick = function () {
+              modal.hide();  // Chiude la modal di conferma
+      
+              // Mostra la modal "Work in progress"
+              var workInProgressModal = new bootstrap.Modal(document.getElementById('workInProgressModal'));
+              workInProgressModal.show();
+      
+              // Al clic su "Chiudi" nella modal "Work in Progress", ricarica la pagina corrente
+              document.getElementById('workInProgressModal').addEventListener('hidden.bs.modal', function () {
+                  window.location.href = window.location.href;  // Ricarica la stessa pagina
+              });
+          };
+      }
+      
+    
+      
 </script>
 
 {% endblock %}
