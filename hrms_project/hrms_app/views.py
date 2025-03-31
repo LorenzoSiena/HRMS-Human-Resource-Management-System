@@ -34,18 +34,24 @@ from datetime import datetime ,date , time
 def hrms_app(request: HttpRequest):
     if not request.user.is_authenticated:
         return redirect('login')
+    
     # Visualizza i messagi della bacheca
     messaggi_bacheca = Bacheca.objects.all().order_by('data_pubblicazione')
+
     # Verifico se esiste una timbratura di sola entrata con la data odierna
     dipendente = Dipendenti.objects.get(id = request.user.id)  # Dipendente loggato
+
     # Se non esiste imposto per la timbrature di entrata
     if Presenze.objects.filter(dipendente = dipendente, data = date.today(), ora_uscita = None).last() is None:
         button_timbra = "Timbra Entrata"
+
     # Se esiste imposto per la timbrature di uscita
     else:
         button_timbra = "Timbra Uscita"
+
     # Lista delle timbrature da visualizzare - Solo quelle della data odierna
     lista_presenze = Presenze.objects.filter(dipendente = dipendente, data = date.today()) # Lista timbrature odierna
+
     # Carico il form per la richiesta di permessi o ferie
     form = RichiediAssenza()
     lista_ferie = Ferie.objects.filter(dipendente = dipendente, stato = "In attesa")
@@ -300,7 +306,14 @@ def richiesta_permessi_ferie(request: HttpRequest):
                 retribuito = (tipo_permesso == "permesso")
                 Permessi.objects.create(dipendente = dipendente, data_ora_inizio = datetime.combine(data_inizio, ora_inizio), data_ora_fine = datetime.combine(data_fine, ora_fine), stato = "In attesa", retribuito = retribuito, motivo = motivo)
                 messages.success(request, 'Permesso richiesto con successo!')
-        return redirect('home')        
+        return redirect('home')  
+
+
+
+def gestione_assenze(request:HttpRequest):
+    pass 
+    
+
 
 #RESETTO LA PASSWORD
 
@@ -347,8 +360,7 @@ def gestione_dipendenti(request:HttpRequest):
             return render(request, "hrms_app/gestione_dipendenti.html", {"dipendenti": lista_dipendenti})
     return render(request, "hrms_app/gestione_dipendenti.html")
 
-def gestione_assenze(request:HttpRequest):
-    return render(request,'hrms_app/gestione_assenze.html')
+
 
 def assegna_ruolo(request:HttpRequest):
     if request.method == "POST":
@@ -360,8 +372,6 @@ def assegna_ruolo(request:HttpRequest):
         messages.success(request, f"Ruolo assegnato con successo {dipendente.nome} {dipendente.cognome} -> {dipendente.ruolo}")
     return redirect("gestione_ruoli")
     
-def gestione_assenze(request:HttpRequest):
-    return render(request,'hrms_app/gestione_assenze.html')
 
 def gestione_busta_paga(request: HttpRequest):
     if request.method == "POST":

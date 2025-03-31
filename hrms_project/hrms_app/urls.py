@@ -19,6 +19,7 @@ urlpatterns = [
 
     
     
+    
     path("gestione_assenze",views.gestione_assenze,name="gestione_assenze"),
     path("gestione_busta_paga",views.gestione_busta_paga,name="gestione_busta_paga"),
     path("consulta_documenti",views.consulta_documenti,name="consulta_documenti"),
