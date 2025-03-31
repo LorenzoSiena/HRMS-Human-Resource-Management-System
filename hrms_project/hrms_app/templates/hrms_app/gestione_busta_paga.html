@@ -45,14 +45,77 @@
                         <td> {{ dipendente.ruolo }} </td>
                         <td> {{ dipendente.email }} </td>                       
                         <td>
+
+                            <a class="btn btn-info btn-sm btn-custom" href="#" onclick="visualizza_busta_paga(event, {{ dipendente.id }})">Visualizza Buste Paga</a>
+                            <button class="btn btn-success btn-sm btn-custom" onclick="carica_busta_paga({{ dipendente.id }})">⬆️ Carica Busta Paga</button>                                   
+
                             <a class="btn btn-info btn-sm btn-custom" href="{% url 'visualizza_busta_paga' dipendente.id %}">Visualizza Buste Paga</a>
                             <button class="btn btn-success btn-sm btn-custom" onclick="carica_busta_paga({{ dipendente.id }})">⬆️ Carica Nuova Busta Paga</button>
+
                         </td>
                     </tr>
                 {% endfor %}                
             </tbody>
         </table>
+
+    </div>    
+
+    <p> {{ id }} {{ dipendente }} {{ mese }} {{ anno }} {{ importo }} {{ documento }} </p>
+
+    <!-- Modal per "Work in Progress" -->
+    <div class="modal" id="workInProgressModal" tabindex="-1" aria-labelledby="workInProgressModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="workInProgressModalLabel">Work in progress</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Ci scusiamo per il disagio, questa funzionalità non è ancora disponibile</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="window.location.reload();">Chiudi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per visualizzare le buste paga -->
+    <div class="modal" id="viewPayslipsModal" tabindex="-1" aria-labelledby="viewPayslipsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewPayslipsModalLabel">Buste Paga Dipendente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 id="employeeNameModal"></h6>
+
+                    <!-- Selezione mese e anno per filtro -->
+                    <div class="mb-3">
+                        <label for="monthYearFilter" class="form-label">Filtra per mese e anno</label>
+                        <input type="month" id="monthYearFilter" class="form-control" onchange="filterPayslips()">
+                    </div>
+
+                    {% for busta_paga in elenco_buste_paga %} 
+                        {{ busta_paga.dipendente }}
+                        {{ busta_paga.data_emissione }}        
+                        {{ form_carica_busta.mese }} {{ form_carica_busta.anno }} {{ busta_paga.mese }}
+                        {{ busta_paga.anno }}
+                        {{ busta_paga.importo }}
+                        {{ busta_paga.documento }} 
+                    {% endfor %}
+
+                    <div id="payslipsList"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </div>       
+
 
     <!-- Modal per caricare la busta paga -->
     <div class="modal" id="uploadPayslipModal" tabindex="-1" aria-labelledby="uploadPayslipModalLabel" aria-hidden="true">
@@ -89,6 +152,55 @@
                 </div>
             </div>
         </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    // Funzione per caricare la busta paga
+    function carica_busta_paga(dipendente_id) {
+        let modal = new bootstrap.Modal(document.getElementById('uploadPayslipModal'));
+        modal.show();
+        // Imposta l'ID del dipendente nel campo nascosto del form
+        let elemento_nascosto = document.getElementById('dipendente_id');
+        elemento_nascosto.value = dipendente_id;
+    }
+
+    // Funzione per visualizzare le buste paga di un dipendente
+    function visualizza_busta_paga(event, dipendente_id) {
+        event.preventDefault(); // Impedisce il comportamento di default del link
+        
+        // Mostra il pop-up "Work in Progress"
+        let workInProgressModal = new bootstrap.Modal(document.getElementById('workInProgressModal'));
+        workInProgressModal.show();
+    }
+
+    // Funzione per eliminare la busta paga
+    function deletePayslip(fileLink) {
+        if (confirm('Sei sicuro di voler eliminare questa busta paga?')) {
+            showDeleteToast();
+            // Trova il bottone cliccato e risali fino al contenitore della busta paga
+            let payslipElement = event.target.closest('.busta-paga-list');
+            if (payslipElement) {
+                payslipElement.remove();
+            } else {
+                alert('Errore: impossibile trovare la busta paga da eliminare.');
+            }
+        }
+    }
+
+    // Funzione per mostrare il toast di eliminazione
+    function showDeleteToast() {
+        var toast = new bootstrap.Toast(document.getElementById('deleteToast'));
+        toast.show();
+    }
+
+</script>
+
+{% endblock %}
+
     </div>  
     
 {% block script %}
@@ -96,3 +208,4 @@
 {% endblock script %}
 
 {% endblock %}
+
