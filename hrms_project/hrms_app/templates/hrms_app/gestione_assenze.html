@@ -1,5 +1,5 @@
 
-{% endblock %}{% extends 'hrms_app/base.html' %}
+{% extends 'hrms_app/base.html' %}
 {% load static %}
 
 {% block title %} Gestione Ferie e Permessi {% endblock title %}
@@ -39,33 +39,54 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <form action="{% url 'gestione_assenze' %}" method="POST">
-                                {% csrf_token %}
-                            <!-- Esempio Dipendente 1 -->
-                            <tr style="font-size: 0.9rem;">
-                                {% for richiesta in richieste %}
-                                    <tr>
-                                        <td>{{ richiesta.dipendente.first_name }}</td>
-                                        <td>{{ richiesta.dipendente.last_name }}</td>
-                                        <td>{{ richiesta.tipo }}</td>
-                                        <td>{{ richiesta.data_orario_inizio }}</td>
-                                        <td>{{ richiesta.data_orario_fine }}</td>
-                                        <td>{{ richiesta.motivo }}</td>
-                                        <td>
-                                            <span class="badge {% if richiesta.stato == 'Approvato' %}bg-success{% elif richiesta.stato == 'Rifiutato' %}bg-danger{% else %}bg-warning{% endif %}">
-                                                {{ richiesta.stato }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <a class="btn btn-success btn-sm" href="{% url 'approva_richiesta' richiesta.id %}" onclick="return confirmAction('approva');">Approva</a>
-                                            <a class="btn btn-danger btn-sm" href="{% url 'rifiuta_richiesta' richiesta.id %}" onclick="return confirmAction('rifiuta');">Rifiuta</a>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tr>
-                            </form>
-
-                        </tbody>
+                            {% for item in dipendenti %}
+                              <!-- Itera sulle ferie -->
+                              {% for ferie in item.ferie %}
+                              <tr>
+                                <td class="text-start">{{ item.dipendente.first_name }}</td>
+                                <td class="text-start">{{ item.dipendente.last_name }}</td>
+                                <td class="text-start">Ferie</td>
+                                <td class="text-start">{{ ferie.data_inizio }}</td>
+                                <td class="text-start">{{ ferie.data_fine }}</td>
+                                <td class="text-start">{{ ferie.motivo|default:"-" }}</td>
+                                <td class="text-start"><span class="badge bg-warning">{{ ferie.stato }}</span></td>
+                                <td class="text-center">
+                                  <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', {{ ferie.id }})">Approva</a>
+                                  <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', {{ ferie.id }})">Rifiuta</a>
+                                </td>
+                              </tr>
+                              {% empty %}
+                              <tr>
+                                <td colspan="8" class="text-center">Nessuna ferie trovata.</td>
+                              </tr>
+                              {% endfor %}
+                          
+                              <!-- Itera sui permessi -->
+                              {% for permesso in item.permessi %}
+                              <tr>
+                                <td class="text-start">{{ item.dipendente.first_name }}</td>
+                                <td class="text-start">{{ item.dipendente.last_name }}</td>
+                                <td class="text-start">Permesso</td>
+                                <td class="text-start">{{ permesso.data_ora_inizio }}</td>
+                                <td class="text-start">{{ permesso.data_ora_fine }}</td>
+                                <td class="text-start">{{ permesso.motivo|default:"-" }}</td>
+                                <td class="text-start"><span class="badge bg-warning">{{ permesso.stato }}</span></td>
+                                <td class="text-center">
+                                  <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', {{ permesso.id }})">Approva</a>
+                                  <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', {{ permesso.id }})">Rifiuta</a>
+                                </td>
+                              </tr>
+                              {% empty %}
+                              <tr>
+                                <td colspan="8" class="text-center">Nessun permesso trovato.</td>
+                              </tr>
+                              {% endfor %}
+                            {% empty %}
+                            <tr>
+                              <td colspan="8" class="text-center">Nessun dipendente trovato.</td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
                     </table>
                 </div>
             </div>
@@ -98,10 +119,12 @@
     let actionText = (action === 'approva') ? 'approvare' : 'rifiutare';
     let confirmMessage = 'Sei sicuro di voler ' + actionText + ' questa richiesta?';
 
-    if (!confirm("Sei sicuro di" + actionText +  "questa richiesta?")) {
+    if (!confirm("Sei sicuro di voler " + actionText +  " questa richiesta?")) {
         event.preventDefault();  // Blocca il redirect se l'utente preme "No"
     }
     
-
+ 
+  
 }
 </script>
+{% endblock %}

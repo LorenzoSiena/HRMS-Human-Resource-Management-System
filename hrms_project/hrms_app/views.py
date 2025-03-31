@@ -311,7 +311,19 @@ def richiesta_permessi_ferie(request: HttpRequest):
 
 
 def gestione_assenze(request:HttpRequest):
-    pass 
+    # carica tutti i dipendenti
+    dipendenti_all = Dipendenti.objects.all()
+    dipendenti_felici = []
+    # per ogni dipendente, carica tutte le Ferie Permessi 
+    for dipendente in dipendenti_all:
+        dipendenti_felici.append({
+            'dipendente': dipendente,
+            'ferie': Ferie.objects.filter(dipendente=dipendente),
+            'permessi': Permessi.objects.filter(dipendente=dipendente)
+        })
+        
+
+    return render(request,'hrms_app/gestione_assenze.html',{'dipendenti': dipendenti_felici})
     
 
 
