@@ -8,6 +8,10 @@
 
     <!-- Form per la richiesta dei permessi o ferie -->
     <div class="container section_container container_permessi">
+        <div class="container">
+            <div class="centered-content mb-4 text-center">
+                <h1>Elenco richieste</h1>
+            </div>
     
         {% if messages %}
             {% for message in messages %}
@@ -22,9 +26,7 @@
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-sm caption-top" style="font-size: 0.9rem;">
-                        <caption class="elenco-titolo" style="font-size: 1.1rem; text-align: center;">
-                            Elenco richieste
-                        </caption>
+                    
                         <thead>
                             <tr style="font-size: 0.9rem;">
                                 <th scope="col" style="width: 100px;">Nome</th>
