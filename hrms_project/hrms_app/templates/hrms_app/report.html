@@ -28,14 +28,21 @@
         <h3 class="card-title">Gestione Report</h3>
       </div>
       <div class="card-body">
+
+        <form id="searchForm" class="form-container" method="POST" action="{% url 'crea_report_finti' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary">Crea Report</button>
+        </form>
+        
         <form id="searchForm" class="form-container" method="POST" action="{% url 'gestione_dipendenti' %}">
           {% csrf_token %}
           <label for="ricerca-dipendente" class="form-label">Ricerca Dipendente</label>
-          <input type="text" name="dipendente" class="form-control" id="ricerca-dipendente" placeholder="Cerca per nome o cognome">
-          <div id="suggerimenti" class="list-group mt-2" style="display: none;"></div>
-          <input type="hidden" name="origine_form" value="report">
+            <input type="text" name="dipendente" class="form-control" id="ricerca-dipendente" placeholder="Cerca per nome o cognome">
+            <div id="suggerimenti" class="list-group mt-2" style="display: none;"></div>
+              <input type="hidden" name="origine_form" value="report">
           <button type="submit" class="btn btn-primary">Cerca Dipendente</button>
         </form>
+      
       </div>
     </div>
 
@@ -99,6 +106,17 @@
   <!-- Tabella dei dipendenti -->
   <div class="card mt-4 shadow-sm">
     <div class="card-body">
+
+      {% if report_mensile %}
+      report_mensile
+      <br>
+      report_mensile.get('presenze')
+      <br>
+      report_mensile.get('permessi')
+      <br>
+      report_mensile.get('ferie')
+      {% endif%}
+
       <div class="table-responsive">
         <table class="table table-bordered table-striped">
           <thead>

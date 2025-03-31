@@ -427,51 +427,116 @@ def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')
 
 def report_mensile(request:HttpRequest):
-    dipendenti = Dipendenti.objects.all()
+    
     report_mensile = []
 
     # Recupera il mese e l'anno scelti dall'utente
     if request.method == "POST":
+        id = request.POST.get("dipendente")
         mese = request.POST.get("month")
         anno = request.POST.get("year")
 
-        for dipendente in dipendenti:
-            # Ore lavorative totali
-            ore_lavorative = ReportPresenze.objects.get("ore_lavorate" , dipendente=dipendente.id, anno=anno, mese=mese)
-   
+        dipendente = Dipendenti.objects.get(id=id)
 
-           
-            
-
-            # Ferie totali
-            ferie = ReportFerie.objects.get("giorni_totali" , dipendente=dipendente.id, anno=anno, mese=mese)
+        if dipendente is None:
+            messages.error(request, "Nessun dipendente trovato")
+            return redirect('report')
         
 
-            # Permessi totali
-            permessi = ReportPermessi.objects.get("ore_totali_permesso_approvate", dipendente=dipendente.id, anno=anno, mese=mese)
-         
-
-            # # Ore di permesso non retribuite
-            # ore_permesso_non_retribuite = Permessi.objects.filter(
-
-
-            # Ore effettive lavorate
-            # ore_effettive = ore_lavorate_float - ore_permesso_non_retribuite
-
-            report_mensile.append({
-                "nome": dipendente.first_name,
-                "cognome": dipendente.last_name,
-                "ore_lavorative": ore_lavorative,
-                "ferie": ferie,
-                "permessi": permessi,
-                # "ore_permesso_non_retribuite": ore_permesso_non_retribuite,
-                # "ore_effettive": ore_effettive,
-            })
-
-    return render(request, "hrms_app/report.html", {"report_mensile": report_mensile, "dipendenti": dipendenti})
+        presenze = ReportPresenze.objects.get(dipendente=dipendente, anno=anno, mese=mese)
+        ferie = ReportFerie.objects.get(dipendente=dipendente, anno=anno, mese=mese)
+        permessi = ReportPermessi.objects.get(dipendente=dipendente, anno=anno, mese=mese)
+        
+        #generare robe in shell QUI
+        
+        report_mensile = [presenze, ferie, permessi]
+    return render(request, "hrms_app/report.html", {"report_mensile": report_mensile, "dipendente" :dipendente })
 
 
+def crea_report_finti(request:HttpRequest):
+    if request.method == "POST":
+        some_dipendente = Dipendenti.objects.get(id=1)
 
+        # Inserire Ferie
+        ferie_data = [
+            {'dipendente': some_dipendente, 'data_inizio': '2025-03-05', 'data_fine': '2025-03-10', 'stato': 'Approvata'},
+            {'dipendente': some_dipendente, 'data_inizio': '2025-03-15', 'data_fine': '2025-03-19', 'stato': 'Approvata'},
+            {'dipendente': some_dipendente, 'data_inizio': '2025-04-07', 'data_fine': '2025-04-13', 'stato': 'Approvata'},
+            {'dipendente': some_dipendente, 'data_inizio': '2025-05-08', 'data_fine': '2025-05-14', 'stato': 'Approvata'},
+            {'dipendente': some_dipendente, 'data_inizio': '2025-05-25', 'data_fine': '2025-05-29', 'stato': 'Approvata'},
+        ]
+        for ferie in ferie_data:
+            Ferie(**ferie).save()  # Invoca il metodo save del modello
+
+        # Inserire Permessi
+        permessi_data = [
+            {'dipendente': some_dipendente, 'data_ora_inizio': '2025-03-03 10:00:00', 'data_ora_fine': '2025-03-03 12:00:00', 'stato': 'Approvata', 'retribuito': True, 'motivo': 'a'},
+            {'dipendente': some_dipendente, 'data_ora_inizio': '2025-03-04 14:00:00', 'data_ora_fine': '2025-03-04 16:30:00', 'stato': 'Approvata', 'retribuito': True, 'motivo': 'b'},
+            {'dipendente': some_dipendente, 'data_ora_inizio': '2025-03-06 09:00:00', 'data_ora_fine': '2025-03-06 11:00:00', 'stato': 'Approvata', 'retribuito': True, 'motivo': 'e'},
+            {'dipendente': some_dipendente, 'data_ora_inizio': '2025-03-07 13:30:00', 'data_ora_fine': '2025-03-07 15:00:00', 'stato': 'Approvata', 'retribuito': True, 'motivo': 'f'},
+            {'dipendente': some_dipendente, 'data_ora_inizio': '2025-03-17 10:00:00', 'data_ora_fine': '2025-03-03 12:00:00', 'stato': 'Approvata', 'retribuito': True, 'motivo': 'c'},
+            {'dipendente': some_dipendente, 'data_ora_inizio': '2025-03-22 14:00:00', 'data_ora_fine': '2025-03-22 16:30:00', 'stato': 'Approvata', 'retribuito': True, 'motivo': 'd'},
+        ]
+        for permesso in permessi_data:
+            Permessi(**permesso).save()  # Invoca il metodo save del modello
+
+        # Inserire Presenze
+        presenze_data = [
+            {'dipendente': some_dipendente, 'data': '2025-03-03', 'ora_ingresso': '08:30:00', 'ora_uscita': '16:30:00'},
+            {'dipendente': some_dipendente, 'data': '2025-03-04', 'ora_ingresso': '09:15:00', 'ora_uscita': '17:15:00'},
+            {'dipendente': some_dipendente, 'data': '2025-03-05', 'ora_ingresso': '08:30:00', 'ora_uscita': '16:30:00'},
+            {'dipendente': some_dipendente, 'data': '2025-03-06', 'ora_ingresso': '09:15:00', 'ora_uscita': '17:15:00'},
+            {'dipendente': some_dipendente, 'data': '2025-03-19', 'ora_ingresso': '08:45:00', 'ora_uscita': '16:45:00'},
+            {'dipendente': some_dipendente, 'data': '2025-03-20', 'ora_ingresso': '09:00:00', 'ora_uscita': '17:00:00'},
+            {'dipendente': some_dipendente, 'data': '2025-03-21', 'ora_ingresso': '09:30:00', 'ora_uscita': '17:30:00'},
+        ]
+        for presenza in presenze_data:
+            Presenze(**presenza).save()  # Invoca il metodo save del modello
+
+        return render(request, 'hrms_app/report.html')
+
+    return render(request, 'hrms_app/report.html')
+
+
+
+
+def crea_report_finti_old(request:HttpRequest):
+    if request.method == "POST":
+        some_dipendente = Dipendenti.objects.get(id=1)
+
+        # Inserire Ferie
+        Ferie.objects.bulk_create([
+            Ferie(dipendente=some_dipendente, data_inizio='2025-03-05', data_fine='2025-03-10', stato='Approvata'),
+            Ferie(dipendente=some_dipendente, data_inizio='2025-03-15', data_fine='2025-03-19', stato='Approvata'),
+            Ferie(dipendente=some_dipendente, data_inizio='2025-04-07', data_fine='2025-04-13', stato='Approvata'),
+            Ferie(dipendente=some_dipendente, data_inizio='2025-05-08', data_fine='2025-05-14', stato='Approvata'),
+            Ferie(dipendente=some_dipendente, data_inizio='2025-05-25', data_fine='2025-05-29', stato='Approvata'),
+        ])
+
+        # Inserire Permessi
+        Permessi.objects.bulk_create([
+            Permessi(dipendente=some_dipendente, data_ora_inizio='2025-03-03 10:00:00', data_ora_fine='2025-03-03 12:00:00', stato='Approvata', retribuito=True, motivo='a'),
+            Permessi(dipendente=some_dipendente, data_ora_inizio='2025-03-04 14:00:00', data_ora_fine='2025-03-04 16:30:00', stato='Approvata', retribuito=True, motivo='b'),
+            Permessi(dipendente=some_dipendente, data_ora_inizio='2025-03-06 09:00:00', data_ora_fine='2025-03-06 11:00:00', stato='Approvata', retribuito=True, motivo='e'),
+            Permessi(dipendente=some_dipendente, data_ora_inizio='2025-03-07 13:30:00', data_ora_fine='2025-03-07 15:00:00', stato='Approvata', retribuito=True, motivo='f'),
+            Permessi(dipendente=some_dipendente, data_ora_inizio='2025-03-17 10:00:00', data_ora_fine='2025-03-03 12:00:00', stato='Approvata', retribuito=True, motivo='c'),
+            Permessi(dipendente=some_dipendente, data_ora_inizio='2025-03-22 14:00:00', data_ora_fine='2025-03-22 16:30:00', stato='Approvata', retribuito=True, motivo='d'),
+        ])
+
+        # Inserire Presenze
+        Presenze.objects.bulk_create([
+            Presenze(dipendente=some_dipendente, data='2025-03-03', ora_ingresso='08:30:00', ora_uscita='16:30:00'),
+            Presenze(dipendente=some_dipendente, data='2025-03-04', ora_ingresso='09:15:00', ora_uscita='17:15:00'),
+            Presenze(dipendente=some_dipendente, data='2025-03-05', ora_ingresso='08:30:00', ora_uscita='16:30:00'),
+            Presenze(dipendente=some_dipendente, data='2025-03-06', ora_ingresso='09:15:00', ora_uscita='17:15:00'),
+            Presenze(dipendente=some_dipendente, data='2025-03-19', ora_ingresso='08:45:00', ora_uscita='16:45:00'),
+            Presenze(dipendente=some_dipendente, data='2025-03-20', ora_ingresso='09:00:00', ora_uscita='17:00:00'),
+            Presenze(dipendente=some_dipendente, data='2025-03-21', ora_ingresso='09:30:00', ora_uscita='17:30:00'),
+        ])
+
+        return render(request,'hrms_app/report.html')
+
+    return render(request,'hrms_app/report.html')
 
 
 def gestione_ruoli(request:HttpRequest):
