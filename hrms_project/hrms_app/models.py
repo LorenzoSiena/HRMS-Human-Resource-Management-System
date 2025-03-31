@@ -144,6 +144,8 @@ class Ferie(models.Model):
         else:
             giorni_totali_approvati = 0
         return giorni_totali_approvati
+    
+    
     def __str__(self):
         
         return  f" ({self.stato}) - ({self.data_inizio} - {self.data_fine})"
@@ -154,16 +156,27 @@ class ReportFerie(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
     mese =  models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
     anno = models.IntegerField(validators=[MinValueValidator(2000)])
-    giorni_totali = models.DecimalField(max_digits=5, decimal_places=2)
+    giorni_totali_approvati = models.DecimalField(max_digits=5, decimal_places=2,default=0)
+    giorni_totali_previsti = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     
     def save(self, *args, **kwargs):
-        giorni_totali = Ferie.objects.filter(
+        ferie_approvate = Ferie.objects.filter(
+            dipendente=self.dipendente,
+            data_inizio__year=self.anno,
+            data_inizio__month=self.mese,
+            stato='Approvata'
+        )
+        giorni_totali_approvati = sum(calcola_giorni_totali(ferie.data_inizio, ferie.data_fine) for ferie in ferie_approvate)
+        
+        ferie_previste = Ferie.objects.filter(
             dipendente=self.dipendente,
             data_inizio__year=self.anno,
             data_inizio__month=self.mese
-        ).aggregate(Sum('giorni_totali_previsti'))['giorni_totali_previsti__sum'] or 0
+        )
+        giorni_totali_previsti = sum(calcola_giorni_totali(ferie.data_inizio, ferie.data_fine) for ferie in ferie_previste)
 
-        self.giorni_totali = giorni_totali 
+        self.giorni_totali_approvati = giorni_totali_approvati 
+        self.giorni_totali_previsti = giorni_totali_previsti
         super().save(*args, **kwargs)
 
 #---------------------------------------------------------------------------------------
@@ -197,13 +210,19 @@ class Permessi(models.Model):
         else:
             ore_totali_permesso_approvate = 0
         return ore_totali_permesso_approvate
-    @property
-    def ore_totali_permesso_approvate(self) -> str:
-        return formatta_ore(self.ore_totali_permesso_approvate_float or 0)
+  
 
     def __str__(self):
         #return  f" ({self.stato}) - ({self.data_ora_inizio} - {self.data_ora_fine} - sono previste {formatta_ore(self.ore_totali_permesso_previste_float)} ore)"
         return  f" ({self.stato}) - ({self.data_ora_inizio} - {self.data_ora_fine} - ??? ore)"
+    @property
+    def ore_totali_permesso_approvate_float(self) -> float:
+        if self.stato == 'Approvata':
+            ore_totali_permesso_approvate = self.ore_totali_permesso_previste_float
+        else:
+            ore_totali_permesso_approvate = 0
+        return ore_totali_permesso_approvate
+
 
 
 #BUG! Funziona solo se non sforo il mese @.@
@@ -214,6 +233,8 @@ class ReportPermessi(models.Model):
 
     ore_totali_permessi_float = models.DecimalField(max_digits=5, decimal_places=2) #999.99
 
+    
+    """ 
     def save(self, *args, **kwargs):
         ore_totali_permessi = Permessi.objects.filter(
             dipendente=self.dipendente,
@@ -223,9 +244,28 @@ class ReportPermessi(models.Model):
 
         self.ore_totali_permessi_float = ore_totali_permessi
         super().save(*args, **kwargs)   
+    """
+    
+    def save(self, *args, **kwargs):
+        # Get all permessi for the given dipendente, year, and month
+        permessi = Permessi.objects.filter(
+            dipendente=self.dipendente,
+            data_ora_inizio__year=self.anno, 
+            data_ora_inizio__month=self.mese
+        )
+        # Calculate the total approved hours manually
+        ore_totali_permessi = sum(permesso.ore_totali_permesso_approvate_float for permesso in permessi)
+        self.ore_totali_permessi_float = ore_totali_permessi
+        super().save(*args, **kwargs)   
+
+
+
+
     @property
     def ore_totali_permessi(self):
         return formatta_ore(self.ore_totali_permessi_float or 0)
+
+
 
 class Presenze(models.Model):
 
