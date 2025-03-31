@@ -23,6 +23,15 @@
             max-width: 900px; /* Limita la larghezza */
         }
 
+        /* Titolo h4 con linea separatrice */
+        .container_messaggi h4, 
+        .container_timbrature h4, 
+        .container_permessi h4 {
+            margin-bottom: 15px; /* Distanza tra il titolo e la linea */
+            border-bottom: 2px solid #ddd; /* Linea sottile grigia */
+            padding-bottom: 10px; /* Spazio sotto il testo prima della linea */
+        }
+
         .container_messaggi h5 {
             margin-bottom: 10px; /* Spazio tra il titolo e il messaggio */
         }
@@ -65,7 +74,6 @@
             margin-bottom: 20px;
         }
 
-
         /* Contenitore per l'orologio e il tasto timbratura */
         .orologio_timbra_container {
             display: flex;
@@ -89,6 +97,7 @@
 
     <!-- Sezione della bacheca -->
     <div class="container-fluid section_container container_messaggi">
+        <h4>Bacheca</h4>
         {% for messaggio_bacheca in messaggi_bacheca %}
             <h5>{{ messaggio_bacheca.titolo }}</h5>
             <p>{{ messaggio_bacheca.messaggio }}</p>
@@ -125,7 +134,7 @@
                     </tr>
                 </thead>
             </table>
-            <div style="max-height: 160px; overflow-Y: auto">
+            <div style="max-height: 145px; overflow-Y: auto">
                 <table class="table table-sm" style="margin-bottom:0">
                     <tbody>
                         {% for presenza in lista_presenze %}
