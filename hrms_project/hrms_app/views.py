@@ -363,6 +363,9 @@ def assegna_ruolo(request:HttpRequest):
 def gestione_assenze(request:HttpRequest):
     return render(request,'hrms_app/gestione_assenze.html')
 
+def busta_paga(request:HttpRequest):
+    return render(request,'hrms_app/busta_paga.html')
+
 def gestione_busta_paga(request: HttpRequest):
     if request.method == "POST":
         dipendente = request.POST.get("dipendente")        
