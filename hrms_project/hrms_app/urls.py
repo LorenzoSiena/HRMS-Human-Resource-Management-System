@@ -41,6 +41,8 @@ urlpatterns = [
     path("modifica_dipendente/<int:id>",views.modifica_dipendente,name="modifica_dipendente"),
     path("elimina_dipendente/<int:id>",views.elimina_dipendente,name="elimina_dipendente"),
 
+    
+
 #----azioni Bacheca---------------------------------------------------------------------    
     path("aggiungi_messaggio_bacheca",views.aggiungi_messaggio_bacheca,name="aggiungi_messaggio_bacheca"),
     path("modifica_messaggio_bacheca/<int:id>",views.modifica_messaggio_bacheca,name="modifica_messaggio_bacheca"),
@@ -60,6 +62,10 @@ urlpatterns = [
     path("mostra_permessi",views.mostra_permessi,name="mostra_permessi"),
     path("assegna_ruolo",views.assegna_ruolo,name="assegna_ruolo"),
 
+    #---------gestire report mensile------------
+
+    path("report_mensile/",views.report_mensile,name="report_mensile"), 
+    path("crea_report_finti/",views.crea_report_finti,name="crea_report_finti"),
 
 
 # per resettare la password
