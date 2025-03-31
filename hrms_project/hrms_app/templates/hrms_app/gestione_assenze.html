@@ -1,3 +1,4 @@
+
 {% extends 'hrms_app/base.html' %}
 {% load static %}
 
@@ -58,78 +59,58 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Esempio Dipendente 1 -->
-                            <tr>
-                                <td class="text-start">Mario</td>
-                                <td class="text-start">Rossi</td>
+
+                            {% for item in dipendenti %}
+                              <!-- Itera sulle ferie -->
+                              {% for ferie in item.ferie %}
+                              <tr>
+                                <td class="text-start">{{ item.dipendente.first_name }}</td>
+                                <td class="text-start">{{ item.dipendente.last_name }}</td>
                                 <td class="text-start">Ferie</td>
-                                <td class="text-start">10/04/2025</td>
-                                <td class="text-start">15/04/2025</td>
-                                <td class="text-start"></td>
-                                <td class="text-start"><span class="badge bg-warning">In attesa</span></td>
+                                <td class="text-start">{{ ferie.data_inizio }}</td>
+                                <td class="text-start">{{ ferie.data_fine }}</td>
+                                <td class="text-start">{{ ferie.motivo|default:"-" }}</td>
+                                <td class="text-start"><span class="badge bg-warning">{{ ferie.stato }}</span></td>
                                 <td class="text-center">
-                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 1)">Approva</a>
-                                    <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', 1)">Rifiuta</a>
+                                  <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', {{ ferie.id }})">Approva</a>
+                                  <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', {{ ferie.id }})">Rifiuta</a>
                                 </td>
-                            </tr>
-                            <!-- Esempio Dipendente 2 -->
-                            <tr>
-                                <td class="text-start">Giulia</td>
-                                <td class="text-start">Bianchi</td>
+                              </tr>
+                              {% empty %}
+                              <tr>
+                                <td colspan="8" class="text-center">Nessuna ferie trovata.</td>
+                              </tr>
+                              {% endfor %}
+                          
+                              <!-- Itera sui permessi -->
+                              {% for permesso in item.permessi %}
+                              <tr>
+                                <td class="text-start">{{ item.dipendente.first_name }}</td>
+                                <td class="text-start">{{ item.dipendente.last_name }}</td>
                                 <td class="text-start">Permesso</td>
-                                <td class="text-start">12/04/2025 09:00</td>
-                                <td class="text-start">12/04/2025 17:00</td>
-                                <td class="text-start">Malattia</td>
-                                <td class="text-start"><span class="badge bg-warning">In attesa</span></td>
+                                <td class="text-start">{{ permesso.data_ora_inizio }}</td>
+                                <td class="text-start">{{ permesso.data_ora_fine }}</td>
+                                <td class="text-start">{{ permesso.motivo|default:"-" }}</td>
+                                <td class="text-start"><span class="badge bg-warning">{{ permesso.stato }}</span></td>
                                 <td class="text-center">
-                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 2)">Approva</a>
-                                    <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', 2)">Rifiuta</a>
+                                  <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', {{ permesso.id }})">Approva</a>
+                                  <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', {{ permesso.id }})">Rifiuta</a>
+
+
                                 </td>
-                            </tr>
-                            <!-- Esempio Dipendente 3 -->
+                              </tr>
+                              {% empty %}
+                              <tr>
+                                <td colspan="8" class="text-center">Nessun permesso trovato.</td>
+                              </tr>
+                              {% endfor %}
+                            {% empty %}
                             <tr>
-                                <td class="text-start">Luca</td>
-                                <td class="text-start">Verdi</td>
-                                <td class="text-start">Ferie</td>
-                                <td class="text-start">20/04/2025</td>
-                                <td class="text-start">30/04/2025</td>
-                                <td class="text-start"></td>
-                                <td class="text-start"><span class="badge bg-warning">In attesa</span></td>
-                                <td class="text-center">
-                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 3)">Approva</a>
-                                    <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', 3)">Rifiuta</a>
-                                </td>
+                              <td colspan="8" class="text-center">Nessun dipendente trovato.</td>
                             </tr>
-                            <!-- Esempio Dipendente 4 -->
-                            <tr>
-                                <td class="text-start">Martina</td>
-                                <td class="text-start">Neri</td>
-                                <td class="text-start">Permesso</td>
-                                <td class="text-start">25/04/2025 09:00</td>
-                                <td class="text-start">25/04/2025 13:00</td>
-                                <td class="text-start">Motivi personali</td>
-                                <td class="text-start"><span class="badge bg-warning">In attesa</span></td>
-                                <td class="text-center">
-                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 4)">Approva</a>
-                                    <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', 4)">Rifiuta</a>
-                                </td>
-                            </tr>
-                            <!-- Esempio Dipendente 5 -->
-                            <tr>
-                                <td class="text-start">Federico</td>
-                                <td class="text-start">Gialli</td>
-                                <td class="text-start">Ferie</td>
-                                <td class="text-start">01/05/2025</td>
-                                <td class="text-start">10/05/2025</td>
-                                <td class="text-start"></td>
-                                <td class="text-start"><span class="badge bg-warning">In attesa</span></td>
-                                <td class="text-center">
-                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 5)">Approva</a>
-                                    <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', 5)">Rifiuta</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                        
+                            {% endfor %}
+                          </tbody>
+
                     </table>
                 </div>
             </div>
@@ -158,37 +139,17 @@
     </div>
 
 <script>
+  function confirmAction(action, requestId) {
+    let actionText = (action === 'approva') ? 'approvare' : 'rifiutare';
+    let confirmMessage = 'Sei sicuro di voler ' + actionText + ' questa richiesta?';
+
+    if (!confirm("Sei sicuro di voler " + actionText +  " questa richiesta?")) {
+        event.preventDefault();  // Blocca il redirect se l'utente preme "No"
+    }
     
  
-        function confirmAction(action, requestId) {
-          var actionText = (action === 'approva') ? 'approvare' : 'rifiutare';
-          var confirmMessage = 'Sei sicuro di voler ' + actionText + ' questa richiesta?';
-          var actionUrl = (action === 'approva') ? '/approve-request/' + requestId + '/' : '/reject-request/' + requestId + '/';
-      
-          // Imposta il messaggio della modal
-          document.getElementById('modalMessage').innerText = confirmMessage;
-      
-          // Mostra la modal di conferma
-          var modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-          modal.show();
-      
-          // Al clic su Conferma nella modal di conferma
-          document.getElementById('confirmButton').onclick = function () {
-              modal.hide();  // Chiude la modal di conferma
-      
-              // Mostra la modal "Work in progress"
-              var workInProgressModal = new bootstrap.Modal(document.getElementById('workInProgressModal'));
-              workInProgressModal.show();
-      
-              // Al clic su "Chiudi" nella modal "Work in Progress", ricarica la pagina corrente
-              document.getElementById('workInProgressModal').addEventListener('hidden.bs.modal', function () {
-                  window.location.href = window.location.href;  // Ricarica la stessa pagina
-              });
-          };
-      }
-      
-    
-      
-</script>
+  
+}
 
+</script>
 {% endblock %}
