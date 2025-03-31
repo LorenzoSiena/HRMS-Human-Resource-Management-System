@@ -7,8 +7,31 @@
 {% block content %}
 <div class="container-fluid d-flex flex-wrap main_container">
 
+    <!-- Modal "Work in Progress" -->
+    <div class="modal fade" id="workInProgressModal" tabindex="-1" aria-labelledby="workInProgressModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="workInProgressModalLabel">Work in Progress</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="font-size: 1rem;">
+            Ci scusiamo per il disagio, ma questa funzionalità non è ancora disponibile
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+            </div>
+        </div>
+        </div>
+    </div>
+  
+
     <!-- Form per la richiesta dei permessi o ferie -->
     <div class="container section_container container_permessi">
+        <div class="container">
+            <div class="centered-content mb-4 text-center">
+                <h1>Elenco richieste</h1>
+            </div>
     
         {% if messages %}
             {% for message in messages %}
@@ -22,23 +45,21 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-sm caption-top" style="font-size: 0.9rem;">
-                        <caption class="elenco-titolo" style="font-size: 1.1rem; text-align: center;">
-                            Elenco richieste
-                        </caption>
+                    <table class="table table-sm caption-top">
                         <thead>
-                            <tr style="font-size: 0.9rem;">
-                                <th scope="col" style="width: 100px;">Nome</th>
-                                <th scope="col" style="width: 100px;">Cognome</th>
-                                <th scope="col" style="width: 50px;">Richiesta</th>
-                                <th scope="col" style="width: 100px;">Data inizio</th>
-                                <th scope="col" style="width: 100px;">Data fine</th>
-                                <th scope="col" style="width: 50px;">Motivo</th>
-                                <th scope="col" style="width: 50px;">Stato</th>
-                                <th scope="col" style="width: 150px;">Azioni</th>
+                            <tr>
+                                <th scope="col" style="width: 100px;" class="text-start">Nome</th>
+                                <th scope="col" style="width: 100px;" class="text-start">Cognome</th>
+                                <th scope="col" style="width: 50px;" class="text-start">Richiesta</th>
+                                <th scope="col" style="width: 110px;" class="text-start">Data inizio</th>
+                                <th scope="col" style="width: 110px;" class="text-start">Data fine</th>
+                                <th scope="col" style="width: 120px;" class="text-start">Motivo</th> <!-- Maggiore larghezza per la colonna Motivo -->
+                                <th scope="col" style="width: 50px;" class="text-start">Stato</th>
+                                <th scope="col" class="text-center" style="width: 120px;">Azioni</th> <!-- Colonna Azioni più stretta -->
                             </tr>
                         </thead>
                         <tbody>
+
                             {% for item in dipendenti %}
                               <!-- Itera sulle ferie -->
                               {% for ferie in item.ferie %}
@@ -74,6 +95,8 @@
                                 <td class="text-center">
                                   <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', {{ permesso.id }})">Approva</a>
                                   <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', {{ permesso.id }})">Rifiuta</a>
+
+
                                 </td>
                               </tr>
                               {% empty %}
@@ -87,6 +110,7 @@
                             </tr>
                             {% endfor %}
                           </tbody>
+
                     </table>
                 </div>
             </div>
@@ -95,24 +119,24 @@
 
 </div>
 
-<!-- Modal di conferma -->
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="confirmModalLabel">Conferma azione</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="modalMessage" style="font-size: 1rem;">
-        Sei sicuro di voler approvare questa richiesta?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-        <button type="button" class="btn btn-primary" id="confirmButton">Conferma</button>
-      </div>
+    <!-- Modal di conferma -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="confirmModalLabel">Conferma azione</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modalMessage" style="font-size: 1rem;">
+            Sei sicuro di voler approvare questa richiesta?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+            <button type="button" class="btn btn-primary" id="confirmButton">Conferma</button>
+        </div>
+        </div>
     </div>
-  </div>
-</div>
+    </div>
 
 <script>
   function confirmAction(action, requestId) {
@@ -126,5 +150,6 @@
  
   
 }
+
 </script>
 {% endblock %}

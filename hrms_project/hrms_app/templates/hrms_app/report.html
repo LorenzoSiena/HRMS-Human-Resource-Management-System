@@ -16,10 +16,7 @@
       </div>
       <div class="card-body">
 
-        <form id="searchForm" class="form-container" method="POST" action="{% url 'crea_report_finti' %}">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-primary">Crea Report</button>
-        </form>
+       
         
         <form id="searchForm" class="form-container" method="POST" action="{% url 'gestione_dipendenti' %}">
           {% csrf_token %}
@@ -47,7 +44,8 @@
                 <ul class="list-group" id="personList1">
                   {% for dipendente in dipendenti|slice:":10" %}
                     <li class="form-check">
-                      <input class="form-check-input" type="radio" name="dipendente" value="{{ dipendente.id }}" id="flexRadioDefault1">
+                      <input class="form-check-input" type="radio" name="dipendente" value="{{ dipendente.id }}" id="flexRadioDefault1"
+                      {% if forloop.first %}checked{% endif %}>
                       <label class="form-check-label" for="flexRadioDefault1">
                         {{ dipendente.nome }} {{ dipendente.cognome }}
                       </label>
@@ -59,18 +57,17 @@
           {% endif %}
           
           <div class="col-12 col-sm-6 col-md-3">
-            <label for="month">Mese:</label>
-            <select id="month" name="month" class="form-select">
-              <option value="">Seleziona mese</option>
-              <option value="01">Gennaio</option>
-              <option value="02">Febbraio</option>
-              <option value="03">Marzo</option>
-              <option value="04">Aprile</option>
-              <option value="05">Maggio</option>
-              <option value="06">Giugno</option>
-              <option value="07">Luglio</option>
-              <option value="08">Agosto</option>
-              <option value="09">Settembre</option>
+            <label for="month">Mese</label>
+            <select id="month" name="month" class="form-select">    
+              <option value="1">Gennaio</option>
+              <option value="2">Febbraio</option>
+              <option value="3">Marzo</option>
+              <option value="4">Aprile</option>
+              <option value="5">Maggio</option>
+              <option value="6">Giugno</option>
+              <option value="7">Luglio</option>
+              <option value="8">Agosto</option>
+              <option value="9">Settembre</option>
               <option value="10">Ottobre</option>
               <option value="11">Novembre</option>
               <option value="12">Dicembre</option>
@@ -82,9 +79,11 @@
             <select id="selectedYear" name="year"  class="form-select"></select>
           </div>
 
+          {% if dipendenti %}
           <div class="col-12 col-sm-6 col-md-2 d-flex align-items-end">
             <button type="submit" class="btn btn-primary">Cerca Report</button>
           </div>
+          {% endif %}
         </div>
       </form>
     </div>
@@ -94,44 +93,41 @@
   <div class="card mt-4 shadow-sm">
     <div class="card-body">
 
-      {% if report_mensile %}
-      report_mensile
-      <br>
-      report_mensile.get('presenze')
-      <br>
-      report_mensile.get('permessi')
-      <br>
-      report_mensile.get('ferie')
-      {% endif%}
+      
 
       <div class="table-responsive">
         <table class="table table-bordered table-striped">
           <thead>
             <tr>
-              <th>Nome</th>
-              <th>Ore Lavorative</th>
-              <th>Ferie</th>
-              <th>Permessi</th>
-              <th>Ore di Permesso Non Retribuite</th>
-              <th>Tot. Ore Lavorative Effettive</th>
+              <th>Dipendente</th>
+              <th>Ore lavorate</th>
+              <th>Ore di permessi</th>
+              <th>Ferie previste</th>
+              <th>Ferie approvate</th>
+              
+              
             </tr>
           </thead>
+
+
           <tbody>
-            {% for dipendente in report_mensile %}
+            {% if report %}
+           
               <tr>
-                <td>{{ dipendente.nome }}</td>
-                <td>{{ dipendente.ore_lavorative }}</td>
-                <td>{{ dipendente.ferie }}</td>
-                <td>{{ dipendente.permessi }}</td>
-                {% comment %} <td>{{ dipendente.ore_permesso_non_retribuite }}</td> {% endcomment %}
-                {% comment %} <td>{{ dipendente.ore_effettive }}</td> {% endcomment %}
-              </tr>
-            {% empty %}
+                <td>{{ dipendente.nome }} {{ dipendente.cognome }}</td>
+                <td>{{ report.ore_totali_presenze }}</td>
+                <td>{{ report.ore_totali_permessi }}</td>
+                <td>{{ report.giorni_totali_ferie_approvate }}</td>
+                <td>{{ report.giorni_totali_ferie_previste }}</td>
+                  </tr>
+            {% else %}
               <tr>
                 <td colspan="6" class="text-center">Nessun dipendente trovato con i criteri selezionati.</td>
               </tr>
-            {% endfor %}
+            {% endif %}
           </tbody>
+
+
         </table>
       </div>
     </div>

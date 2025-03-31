@@ -2,7 +2,87 @@
 {% load static %}
 {% block style %}
     <link href="{% static '/css/home.css' %}" type="text/css" rel="stylesheet">
-{% endblock style %}        
+    <style>
+        /* Utilizzare Flexbox per disporre gli elementi in colonna e centrarli */
+        .main_container {
+            display: flex;
+            flex-direction: column; /* Disposizione in colonna */
+            min-height: 100vh; /* Assicura che la pagina occupi almeno tutta l'altezza */
+            gap: 20px; /* Distanza tra gli elementi */
+            justify-content: center; /* Centra gli elementi verticalmente */
+            align-items: center; /* Centra gli elementi orizzontalmente */
+        }
+
+        /* Sezione della bacheca */
+        .container_messaggi {
+            padding: 20px;
+            background-color: #fff; /* Colore di sfondo della bacheca */
+            border-radius: 10px; /* Bordi più rotondi */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Leggera ombra */
+            width: 100%;
+            max-width: 900px; /* Limita la larghezza */
+        }
+
+        /* Titolo h4 con linea separatrice */
+        .container_messaggi h4, 
+        .container_timbrature h4, 
+        .container_permessi h4 {
+            margin-bottom: 15px; /* Distanza tra il titolo e la linea */
+            border-bottom: 2px solid #ddd; /* Linea sottile grigia */
+            padding-bottom: 10px; /* Spazio sotto il testo prima della linea */
+        }
+
+        .container_messaggi h5 {
+            margin-bottom: 10px; /* Spazio tra il titolo e il messaggio */
+        }
+
+        /* Separazione tra i messaggi */
+        .container_messaggi p {
+            margin-bottom: 10px; /* Aggiungi spazio tra i paragrafi */
+            padding-bottom: 10px; /* Aggiungi un po' di spazio sotto i messaggi */
+            border-bottom: 1px solid #ddd; /* Aggiungi una linea sottile grigia per separare i messaggi */
+        }
+
+        /* Rimuovi il bordo dall'ultimo messaggio */
+        .container_messaggi p:last-child {
+            border-bottom: none;
+        }
+
+        /* Sezione per la timbratura */
+        .container_timbrature {
+            padding: 20px;
+            background-color: #fff; /* Colore di sfondo della sezione timbratura */
+            border-radius: 10px; /* Bordi più rotondi */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Leggera ombra */
+            width: 100%;
+            max-width: 850px; /* Aumentato il valore per renderla più larga */
+            margin: 0 auto; /* Centra la sezione */
+        }
+
+        /* Sezione per la richiesta di assenze */
+        .container_permessi {
+            padding: 20px;
+            background-color: #fff; /* Colore di sfondo della richiesta ferie */
+            border-radius: 10px; /* Bordi più rotondi */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Leggera ombra */
+            width: 100%;
+            max-width: 900px; /* Limita la larghezza */
+        }
+
+        /* Aggiungere un po' di spaziatura tra i vari elementi */
+        .container {
+            margin-bottom: 20px;
+        }
+
+        /* Contenitore per l'orologio e il tasto timbratura */
+        .orologio_timbra_container {
+            display: flex;
+            justify-content: space-between; /* Allinea orologio a sinistra e bottone a destra */
+            align-items: center; /* Allinea verticalmente l'orologio e il pulsante */
+            gap: 10px; /* Spaziatura tra l'orologio e il pulsante */
+        }
+    </style>
+{% endblock style %}
 
 {% block title %} Home {% endblock title %}
 
@@ -12,39 +92,41 @@
 
 {% block content %}
 
-<!-- Contenitore generale homepage -->
+<!-- Contenitore principale (la struttura in colonna) -->
 <div class="container-fluid d-flex flex-wrap main_container">
 
-    <!-- Visualizza la bacheca -->
+    <!-- Sezione della bacheca -->
     <div class="container-fluid section_container container_messaggi">
+        <h4>Bacheca</h4>
         {% for messaggio_bacheca in messaggi_bacheca %}
             <h5>{{ messaggio_bacheca.titolo }}</h5>
             <p>{{ messaggio_bacheca.messaggio }}</p>
         {% endfor %}
     </div>
     
-    <!-- Form per la timbratura delle presenze -->
+    <!-- Sezione per la timbratura delle presenze -->
     <div class="container section_container container_timbrature">
-
-        <!-- Orologio -->
-        <div class="orologio">
-            <span id="data" class="orologio_data"></span><br>
-            <span id="ora" class="orologio_ora"></span>        
-        </div>
+        <h4>Timbrature</h4>
+        <!-- Contenitore Flex per orologio e pulsante timbratura -->
+        <div class="orologio_timbra_container d-flex align-items-center gap-3">
+            <!-- Orologio -->
+            <div class="orologio">
+                <span id="ora" class="orologio_ora"></span><br>
+                <span id="data" class="orologio_data"></span>       
+            </div>
         
-        <!-- Pulsante di timbratura -->
+            <!-- Pulsante di timbratura -->
+            <form action="{% url 'gestione_timbratura' %}" method="POST">
+                {% csrf_token %}       
+                <button type="submit" class="btn btn-primary btn-large button_timbra">   
+                    {{ button_timbra }}
+                </button>
+            </form>
+        </div>
 
-        <form action="{% url 'gestione_timbratura' %}" method="POST">
-            {% csrf_token %}       
-            <button type="submit" class="btn btn-primary btn-large button_timbra">   
-                {{ button_timbra }}
-            </button>
-        </form>
-
-        <!--Tabella delle timbrature del giorno-->
+        <!-- Tabella delle timbrature del giorno -->
         <div class="table-responsive">
             <table class="table table-sm caption-top" style="margin-bottom:0">
-                <caption class="caption_timbra">Lista timbrature</caption>
                 <thead>
                     <tr>
                         <th scope="col">Entrata</th>
@@ -52,7 +134,7 @@
                     </tr>
                 </thead>
             </table>
-            <div style="max-height: 85px; overflow-Y: auto">
+            <div style="max-height: 145px; overflow-Y: auto">
                 <table class="table table-sm" style="margin-bottom:0">
                     <tbody>
                         {% for presenza in lista_presenze %}
@@ -72,18 +154,20 @@
         {% endif %}
     </div>    
     
-    <!-- Form per la richiesta dei permessi o ferie -->
-    <div class="container section_container container_permessi" style="">
-
+    <!-- Sezione per la richiesta dei permessi o ferie -->
+    <div class="container section_container container_permessi">
         {% if messages %}
-        <div class="container mt-3">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-        </div>
+                {% for message in messages %}
+                <div class="alert {% if message.tags %}
+                    {% if 'error' in message.tags %}
+                        alert-danger
+                    {% else %}
+                        alert-{{ message.tags }}
+                    {% endif %}
+                {% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
         {% endif %}
 
         {% if form.errors %}
@@ -146,7 +230,7 @@
             <button type="submit" class="btn btn-primary">Invia Richiesta</button>
         </form>
         
-        <!--Tabella delle assenze richieste inevase-->
+        <!-- Tabella delle assenze richieste inevase -->
         <table class="table table-sm caption-top" style="width: 100%; margin-bottom: 0px">
             <caption style="font-size: small; padding: 0px; text-align: center">Elenco richieste inevase</caption>
             <thead>
@@ -195,7 +279,4 @@
 
 </div>
 
-
-
 {% endblock %}
-

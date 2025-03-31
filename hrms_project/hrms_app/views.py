@@ -385,6 +385,9 @@ def assegna_ruolo(request:HttpRequest):
     return redirect("gestione_ruoli")
     
 
+def busta_paga(request:HttpRequest):
+    return render(request,'hrms_app/busta_paga.html')
+
 def gestione_busta_paga(request: HttpRequest):
     if request.method == "POST":
         dipendente = request.POST.get("dipendente")        
@@ -429,32 +432,27 @@ def visualizza_busta_paga(request: HttpRequest, id):
 
 def modifica_busta_paga(request: HttpRequest):
     if request.method == "POST":
-        form = ModificaBustaPaga(request.POST, request.FILES) # Carica il form con i dati POST
-        if form.is_valid(): # Controlla se il form é valido
-            busta_paga = form.save(commit=False) # Salva la busta paga senza committare al database
-            busta_paga.dipendente = Dipendenti.objects.get(id = request.POST.get("dipendente_id")) # Recupera l'utente selezionato
-            busta_paga.save() # Salva la busta paga nel database
-            messages.success(request, "Busta paga modificata con successo")
+        #busta_paga = BustePaga.objects.get(id = id)
+        #if not busta_paga:
+        #    messages.error(request, "Busta paga non trovata.")
+        #    return redirect('gestione_busta_paga')
+        form_carica_busta = CaricaBustaPaga(request.POST, request.FILES)
+        if form_carica_busta.is_valid(): # Controlla se il form è valido
+            form_carica_busta.save() # Salva la busta paga
+            messages.success(request, "Busta paga modificata con successo")            
         else:
             messages.error(request, "Errore nella modifica della busta paga")
-    else:
-        messages.error(request, "Errore nella modifica della busta paga")
-    return render(request, 'hrms_app/visualizza_busta_paga.html') # Reindirizza alla pagina di modifica busta paga con l'id della busta paga da modificare  
-
-def crea_busta_paga():
-    pass
-
-def busta_paga(request:HttpRequest):
-    return render(request,'hrms_app/busta_paga.html')
+    return render(request, 'hrms_app/modifica_busta_paga.html') # Reindirizza alla pagina di modifica busta paga con l'id della busta paga da modificare
 
 def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')
 
-def report_mensile(request:HttpRequest):
-    
-    report_mensile = []
+def get_or_create_report(model, dipendente, anno, mese):
+    report, created = model.objects.get_or_create(dipendente=dipendente, anno=anno, mese=mese)
+    return report
 
-    # Recupera il mese e l'anno scelti dall'utente
+
+def report_mensile(request: HttpRequest):
     if request.method == "POST":
         id = request.POST.get("dipendente")
         mese = request.POST.get("month")
@@ -466,16 +464,23 @@ def report_mensile(request:HttpRequest):
             messages.error(request, "Nessun dipendente trovato")
             return redirect('report')
         
-
-        presenze = ReportPresenze.objects.get(dipendente=dipendente, anno=anno, mese=mese)
-        ferie = ReportFerie.objects.get(dipendente=dipendente, anno=anno, mese=mese)
-        permessi = ReportPermessi.objects.get(dipendente=dipendente, anno=anno, mese=mese)
+        report_mensile_presenze = get_or_create_report(ReportPresenze, dipendente, anno, mese)
+        report_mensile_ferie = get_or_create_report(ReportFerie, dipendente, anno, mese)
+        report_mensile_permessi = get_or_create_report(ReportPermessi, dipendente, anno, mese)
         
-        #generare robe in shell QUI
-        
-        report_mensile = [presenze, ferie, permessi]
-    return render(request, "hrms_app/report.html", {"report_mensile": report_mensile, "dipendente" :dipendente })
+        ore_totali_presenze = report_mensile_presenze.ore_totali
+        ore_totali_permessi = report_mensile_permessi.ore_totali_permessi
+        giorni_totali_ferie_approvate = report_mensile_ferie.giorni_totali_approvati
+        giorni_totali_ferie_previste = report_mensile_ferie.giorni_totali_previsti
 
+        report = {
+            'ore_totali_presenze': ore_totali_presenze,
+            'ore_totali_permessi': ore_totali_permessi,
+            'giorni_totali_ferie_approvate': giorni_totali_ferie_approvate,
+            'giorni_totali_ferie_previste': giorni_totali_ferie_previste,
+        }
+    
+        return render(request, "hrms_app/report.html", {"report": report, "dipendente": dipendente})
 
 def crea_report_finti(request:HttpRequest):
     if request.method == "POST":
