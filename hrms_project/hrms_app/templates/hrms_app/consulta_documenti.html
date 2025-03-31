@@ -14,7 +14,7 @@ Gestione_documenti
 
         <div class="card shadow-lg">
             <div class="card-body">
-                <form method="POST" action="{% url 'gestione_dipendenti' %}">
+                <form method="POST" >
                     {% csrf_token %}
                     <div class="search-container">
                         <input type="search" class="form-control me-2" id="searchPerson" name="dipendente" placeholder="Cerca per nome" aria-label="Search">
