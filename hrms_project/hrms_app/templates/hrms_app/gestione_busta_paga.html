@@ -46,8 +46,7 @@
                         <td> {{ dipendente.email }} </td>                       
                         <td>
 
-                            <a class="btn btn-info btn-sm btn-custom" href="#" onclick="visualizza_busta_paga(event, {{ dipendente.id }})">Visualizza Buste Paga</a>
-                            <button class="btn btn-success btn-sm btn-custom" onclick="carica_busta_paga({{ dipendente.id }})">⬆️ Carica Busta Paga</button>                                   
+                                                              
 
                             <a class="btn btn-info btn-sm btn-custom" href="{% url 'visualizza_busta_paga' dipendente.id %}">Visualizza Buste Paga</a>
                             <button class="btn btn-success btn-sm btn-custom" onclick="carica_busta_paga({{ dipendente.id }})">⬆️ Carica Nuova Busta Paga</button>
