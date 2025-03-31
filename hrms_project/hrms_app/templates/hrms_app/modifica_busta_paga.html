@@ -1,27 +1,21 @@
 {% extends 'hrms_app/base.html' %}
+{% load static %}
+{% block style %}    
+    <link href="{% static '/css/bustapaga.css' %}" type="text/css" rel="stylesheet">
+{% endblock style %}
 {% block title %} Modifica Buste Paga {% endblock title %}
+    
 {% block content %}
 
-<style>
-    /* Impostiamo un'altezza massima per la card e abilitiamo lo scroll */
-    .card-body {
-        overflow-y: auto;  /* Abilita lo scroll verticale */
-    }
-    /* Garantiamo che il footer stia sempre in fondo */
-    footer {
-        margin-top: 5px; /* Separazione dal contenuto */
-    }
-</style>
-
 {% if messages %}
-        {% for message in messages %}
-            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
 
-    {% if form.errors %}
+{% if form.errors %}
     <div class="alert alert-danger">
         <strong>Errore!</strong>
         <ul>
@@ -40,149 +34,142 @@
     </div>
 {% endif %}
 
-<div class="container mt-5">
-    <div class="card">
-        <div class="card-header">
-            <h5>Elenco Buste Paga del dipendente: {{ dipendente }}</h5>
+<div class="container mt-4">
+    <div class="table-container">
+        <div class="d-flex justify-content-between align-items-center card-header p-2">
+            <span><strong>Elenco Buste Paga del dipendente: {{ dipendente }}</strong></span>
+            <button type="submit" href="{% url 'gestione_busta_paga' %}" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-
-        {% for busta_paga in elenco_buste_paga %} 
-        {{ busta_paga.dipendente }}
-        {{ busta_paga.mese.label_tag }}
-            {{ busta_paga.mese }}
-           
-        {% endfor %}
-
-        <!--
-        <div class="card-body">
-             <h1> {{dipendente.id}} </h1>
-            {% comment %} <form method="post" action="{% url 'modifica_dipendente' %}" enctype="multipart/form-data" > {% endcomment %} 
-            <form method="post" action="{% url 'modifica_dipendente' dipendente.id %}"  > 
-                {% csrf_token %}
-                 Nome 
-                <div class="mb-3 row">
-                    <label for="nome" class="col-sm-2 col-form-label">Nome</label>
-                    <div class="col-sm-10">
-                        {{ form.first_name}}
-                    </div>
-                </div>
-                
-                 Cognome
-                <div class="mb-3 row">
-                    <label for="cognome" class="col-sm-2 col-form-label">Cognome</label>
-                    <div class="col-sm-10">
-                        {{ form.last_name}}
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label for="data_nascita" class="col-sm-2 col-form-label">Data di Nascita</label>
-                    <div class="col-sm-10">
-                        {{ form.data_nascita}}
-                    </div>
-                </div>
-
-                 Codice Fiscale 
-                <div class="mb-3 row">
-                    <label for="codice_fiscale" class="col-sm-2 col-form-label">Codice Fiscale</label>
-                    <div class="col-sm-10">
-                        {{ form.codice_fiscale}}
-                    </div>
-                </div>
-
-                 Email 
-                <div class="mb-3 row">
-                    <label for="email" class="col-sm-2 col-form-label">Email</label>
-                    <div class="col-sm-10">
-                        {{ form.email}}
-                    </div>
-                </div>
-
-                 Indirizzo 
-                <div class="mb-3 row">
-                    <label for="indirizzo" class="col-sm-2 col-form-label">Indirizzo</label>
-                    <div class="col-sm-10">
-                        {{ form.indirizzo_completo}}
-                    </div>
-                </div>
-
-                 Telefono 
-                <div class="mb-3 row">
-                    <label for="telefono" class="col-sm-2 col-form-label">Telefono</label>
-                    <div class="col-sm-10">
-                        {{ form.telefono}}
-                    </div>
-                </div>
-
-                 Ruolo 
-                <div class="mb-3 row">
-                    <label for="ruolo" class="col-sm-2 col-form-label">Ruolo</label>
-                    <div class="col-sm-10">
-                        {{ form.ruolo }}
-                    </div>
-                </div>
-
-                 Responsabile 
-                <div class="mb-3 row">
-                    <label for="responsabile" class="col-sm-2 col-form-label">Responsabile</label>
-                    <div class="col-sm-10">
-                        {{ form.superiore }}
-                    </div>
-                </div>
-
-                 Data di assunzione 
-                <div class="mb-3 row">
-                    <label for="data_assunzione" class="col-sm-2 col-form-label">Data di Assunzione</label>
-                    <div class="col-sm-10">
-                        {{ form.data_assunzione }}
-                    </div>
-                </div>
-
-                  Stipendio 
-                <div class="mb-3 row">
-                    <label for="stipendio" class="col-sm-2 col-form-label">Stipendio</label>
-                    <div class="col-sm-10">
-                        {{ form.stipendio }}
-                        
-                    </div>
-                </div>
-
-                 Pulsanti per modifica e eliminazione
-                <div class="text-center mt-3">
-                    <button type="button" class="btn btn-warning" id="btn-modifica">Modifica</button>
-                    <button type="submit" class="btn btn-success" id="btn-aggiorna"  style="display:none;">Aggiorna</button>
-                </form>
-                    <a href="{% url 'elimina_dipendente' dipendente.id %}" type="button" class="btn btn-danger" id="btn-elimina">Elimina</a>
-                </div>
+        <div class="d-flex justify-content-between align-items-center card-header p-2">
+            <span><strong>Filtra per Anno: </strong></span>
             
-        </div>--> 
+        </div>
+        <div class="table-row table-header">           
+            <div class="table-cell">Mese</div>
+            <div class="table-cell">Anno</div>
+            <div class="table-cell">Importo</div>
+            <div class="table-cell">File</div>
+            <div class="table-cell"></div>
+        </div>
+        {% for busta_paga in elenco_buste_paga %}
+        <form method="post" action="{% url 'modifica_busta_paga' %}">
+            {% csrf_token %}
+            <div class="table-row" id ="row{{ forloop.counter }}">
+                <div class="table-cell hidden">{{ busta_paga.id }}</div>         
+                <div class="table-cell">{{ busta_paga.mese }}</div>
+                <div class="table-cell">{{ busta_paga.anno }}</div>
+                <div class="table-cell">{{ busta_paga.importo }}</div>
+                <div class="table-cell">{{ busta_paga.documento|cut:"documenti_bustepaga/"|cut:".pdf" }}</div>
+                <div class="table-cell">
+                    <button type="button" class="btn-modifica btn btn-outline-primary btn-sm btn-custom" Onclick="modifica('row{{ forloop.counter }}')" title="Modifica">📝</button>                                
+                    <a class="btn-scarica btn btn-outline-primary btn-sm btn-custom"  title="Scarica">📥</a>
+                    <a class="btn-condividi btn btn-outline-primary btn-sm btn-custom"  title="Condividi">🔁</a>                                
+                    <a class="btn-elimina btn btn-outline-danger btn-sm btn-custom"  title="Elimina">🗑️</a>
+                    <button type="submit" class="btn-aggiorna btn btn-outline-success btn-sm btn-custom hidden" type="submit" title="Aggiorna">✅</button>
+                    <a class="btn-annulla btn btn-outline-secondary btn-sm btn-custom hidden" href="{% url 'visualizza_busta_paga' dipendente.id %}" title="Chiudi">❌</a>
+                </div>                   
+            </div>
+        </form>
+        {% endfor %}
+                    <!-- <tr>
+                        <form method="post" action="{% url 'modifica_busta_paga' %}"> 
+                            {% csrf_token %}
+                            <td class="hidden"> {{ busta_paga.id }} </td>
+                            <td class="Riga hidden"> {{ forloop.counter }} </td>                            
+                            <td> {{ busta_paga.mese }} </td>
+                            <td> {{ busta_paga.anno }} </td>
+                            <td> {{ busta_paga.importo }} </td>                             
+                            <td>
+                                {{ busta_paga.documento|cut:"documenti_bustepaga/"|cut:".pdf" }}-->
+                            <!-- <a href="{{ busta_paga.documento.url }}" target="_blank" class="btn btn-primary btn-sm btn-custom">Visualizza</a> --> 
+                            <!-- <td>
+                                <a id="btn-modifica" class="btn btn-outline-primary btn-sm btn-custom" title="Modifica">📝</a>                                
+                                <a id="btn-scarica" class="btn btn-outline-primary btn-sm btn-custom"  title="Scarica">📥</a>
+                                <a id="btn-condividi" class="btn btn-outline-primary btn-sm btn-custom"  title="Condividi">🔁</a>                                
+                                <a id="btn-elimina" class="btn btn-outline-danger btn-sm btn-custom"  title="Elimina">🗑️</a>
+                                <button type="submit" id="btn-aggiorna" class="btn btn-outline-success btn-sm btn-custom hidden" type="submit" title="Aggiorna">✅</button>
+                                <a id="btn-annulla" class="btn btn-outline-secondary btn-sm btn-custom hidden" href="{% url 'visualizza_busta_paga' dipendente.id %}" title="Chiudi">❌</a>        
+                            </td>
+                        </form>
+                    </tr>-->
+                        
+        </div>
     </div>
 </div>
 
-
 <script>
- document.getElementById('btn-modifica').addEventListener('click', function () {
-    const inputs = document.querySelectorAll('input, select');
-    inputs.forEach(input => {
-        input.disabled = false;
-    });
-    document.getElementById('btn-aggiorna').style.display = 'inline-block'; // Mostra il bottone "Aggiorna"
-    document.getElementById('btn-modifica').style.display = 'none'; // Nasconde il bottone "Modifica"
-});
+
+    function modifica(row_id) {        
+        
+        const row_element = document.getElementById(row_id);
+        const inputs = row_element.querySelectorAll("input"); // Trova tutte gli input della riga
+        const btn_modifica = row_element.querySelector(".btn-modifica");
+        const btn_scarica = row_element.querySelector(".btn-scarica");
+        const btn_condividi = row_element.querySelector(".btn-condividi");
+        const btn_elimina = row_element.querySelector(".btn-elimina");
+        const btn_aggiorna = row_element.querySelector(".btn-aggiorna");
+        const btn_annulla = row_element.querySelector(".btn-annulla");
+
+        inputs.forEach(input => {
+            input.disabled = false;            
+        });
+              
+        btn_modifica.classList.toggle('hidden'); // Toggle the 'hidden' class to show or hide the button.
+        btn_scarica.classList.toggle('hidden');
+        btn_condividi.classList.toggle('hidden');
+        btn_elimina.classList.toggle('hidden');
+        btn_aggiorna.classList.toggle('hidden');
+        btn_annulla.classList.toggle('hidden');  
+        
+    }
+    
 
 
+    {/* document.getElementById('btn-modifica').addEventListener('click', function () {
+        row = this.closest('tr'); // Trova la riga corrente
+        const cells = row.querySelectorAll('td'); // Trova tutte le celle della riga
+        cells.forEach(cell => {
+            
+        })
+        const inputs = row.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.disabled = false;            
+        });
 
-document.getElementById('btn-elimina').addEventListener('click', function (event) {
+        const buttons = row.querySelectorAll('a');
+        buttons.forEach(button => {            
+            button.classList.toggle('hidden'); // Toggle the 'hidden' class to show or hide the button.
+        });
+    }); */}
+
+    {% comment %} document.getElementById('btn-annulla').addEventListener('click', function () {
+        row = this.closest('tr'); // Trova la riga corrente
+        const cells = row.querySelectorAll('td'); // Trova tutte le celle della riga
+        cells.forEach(cell => {
+            
+        })
+        const inputs = row.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.disabled = true;            
+        });
+
+        const buttons = row.querySelectorAll('a');
+        buttons.forEach(button => {            
+            button.classList.toggle('hidden'); // Toggle the 'hidden' class to show or hide the button.
+        });
+    }); {% endcomment %}
+
+{% comment %} document.getElementById('btn-elimina').addEventListener('click', function (event) {
     if (!confirm("Sei sicuro di voler eliminare questo dipendente?")) {
         event.preventDefault();  // Blocca il redirect se l'utente preme "No"
     }
-});
+}); {% endcomment %}
 
 // Funzione per aggiornare i dati
-document.getElementById('btn-aggiorna').addEventListener('click', function () {
+{% comment %} document.getElementById('btn-aggiorna').addEventListener('click', function () {
     alert("Modifiche aggiornate correttamente!");
    
-});
+}); {% endcomment %}
 </script> 
 
-{% endblock %} 
+{% endblock content%}
