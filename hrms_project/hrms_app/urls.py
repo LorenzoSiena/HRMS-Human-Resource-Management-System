@@ -34,7 +34,7 @@ urlpatterns = [
     path("visualizza_busta_paga/<int:id>",views.visualizza_busta_paga,name="visualizza_busta_paga"),
     path("modifica_busta_paga",views.modifica_busta_paga,name="modifica_busta_paga"),
     path("crea_busta_paga",views.crea_busta_paga,name="crea_busta_paga"),
-    path("crea_dipendente",views.crea_dipendente,name="crea_dipendente"),
+  
     path("salva_busta_paga",views.salva_busta_paga,name="salva_busta_paga"),
 
     path("gestione_ruoli",views.gestione_ruoli,name="gestione_ruoli"),

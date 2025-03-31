@@ -83,32 +83,6 @@ def profilo(request:HttpRequest):
     return render(request,'hrms_app/profilo.html')
 
 
-def crea_dipendente(request: HttpRequest):
-    if request.method == "POST":
-        nome = request.POST.get('nome', '').strip()
-        cognome = request.POST.get('cognome', '').strip()
-        email = request.POST.get('email', '').strip()
-        ruolo = request.POST.get('ruolo', '').strip()
-        data_assunzione = request.POST.get('data_assunzione', '').strip()
-        livello_accesso = request.POST.get('livello_accesso', '').strip()
-
-        if nome and cognome and email and ruolo and data_assunzione and livello_accesso:
-
-            Dipendenti.objects.create(
-                nome=nome,
-                cognome=cognome,
-                email=email,
-                ruolo=ruolo,
-                data_assunzione=data_assunzione,
-                livello_accesso=livello_accesso
-            )
-            
-            messages.success(request, f"✅ Dipendente '{nome} {cognome}' aggiunto con successo!")
-        else:
-            messages.error(request, "⚠️ Tutti i campi sono obbligatori!")
-
-    return redirect('dipendenti')
-
 def report(request:HttpRequest):
     return render(request,'hrms_app/report.html')
 
