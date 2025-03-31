@@ -227,8 +227,6 @@ class EditUserForm(forms.ModelForm):
 
 class CaricaBustaPaga(forms.ModelForm):
 
-    #id = forms.IntegerField(widget=forms.HiddenInput())
-
     mese = forms.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(12)],
         widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 12, 'placeholder': 'Mese (1-12)'})
@@ -261,35 +259,35 @@ class ModificaBustaPaga(forms.ModelForm):
     
     mese = forms.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(12)],
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 12, 'placeholder': 'Mese (1-12)'})
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 12, 'placeholder': 'Mese (1-12)', 'disabled': 'disabled'})
     )
     anno = forms.IntegerField(
         validators=[MinValueValidator(2000)],
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 2000, 'placeholder': 'Anno (2000+)'})
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 2000, 'placeholder': 'Anno (2000+)', 'disabled': 'disabled'})
     )
     importo = forms.DecimalField(
         label="Importo",
         max_digits=10, 
         decimal_places=2,
         min_value=0,
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Importo', 'min': 0})
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Importo', 'min': 0, 'disabled': 'disabled'})
     )    
         
-    documento = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.doc,.docx'}))
+    documento = forms.FileField(widget=forms.TextInput(attrs={'class': 'form-control', 'accept': '.pdf,.doc,.docx', 'disabled': 'disabled'}))
 
-    def __init__(self, *args, **kwargs):
-        super(ModificaBustaPaga, self).__init__(*args, **kwargs)
-        #self.field['data_emissione'].widget.attrs['readonly'] = True
+    # def __init__(self, *args, **kwargs):
+    #     super(ModificaBustaPaga, self).__init__(*args, **kwargs)
+    #     #self.field['data_emissione'].widget.attrs['readonly'] = True
         
-        for field_name, field in self.fields.items():
+    #     for field_name, field in self.fields.items():
             
-            field.widget.attrs['disabled'] = 'disabled'#
-            if isinstance(field.widget, forms.TextInput) or isinstance(field.widget, forms.EmailInput):
-                field.widget.attrs.update({'class': 'form-control'})
-            elif isinstance(field.widget, forms.Select):
-                field.widget.attrs.update({'class': 'form-select'})            
-            #elif isinstance(field.widget, forms.FileInput):
-                #field.widget.attrs.update({'class': 'form-control'})
+    #         field.widget.attrs['disabled'] = 'disabled'#
+    #         if isinstance(field.widget, forms.TextInput) or isinstance(field.widget, forms.EmailInput):
+    #             field.widget.attrs.update({'class': 'form-control'})
+    #         elif isinstance(field.widget, forms.Select):
+    #             field.widget.attrs.update({'class': 'form-select'})            
+    #         #elif isinstance(field.widget, forms.FileInput):
+    #             #field.widget.attrs.update({'class': 'form-control'})
 
     class Meta:
         model = BustePaga
