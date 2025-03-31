@@ -25,96 +25,92 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-sm caption-top" style="font-size: 0.9rem;">
-                    
+                    <table class="table table-sm caption-top">
                         <thead>
-                            <tr style="font-size: 0.9rem;">
-                                <th scope="col" style="width: 100px;">Nome</th>
-                                <th scope="col" style="width: 100px;">Cognome</th>
-                                <th scope="col" style="width: 50px;">Richiesta</th>
-                                <th scope="col" style="width: 100px;">Data inizio</th>
-                                <th scope="col" style="width: 100px;">Data fine</th>
-                                <th scope="col" style="width: 50px;">Motivo</th>
-                                <th scope="col" style="width: 50px;">Stato</th>
-                                <th scope="col" style="width: 150px;">Azioni</th>
+                            <tr>
+                                <th scope="col" style="width: 100px;" class="text-start">Nome</th>
+                                <th scope="col" style="width: 100px;" class="text-start">Cognome</th>
+                                <th scope="col" style="width: 50px;" class="text-start">Richiesta</th>
+                                <th scope="col" style="width: 110px;" class="text-start">Data inizio</th>
+                                <th scope="col" style="width: 110px;" class="text-start">Data fine</th>
+                                <th scope="col" style="width: 120px;" class="text-start">Motivo</th> <!-- Maggiore larghezza per la colonna Motivo -->
+                                <th scope="col" style="width: 50px;" class="text-start">Stato</th>
+                                <th scope="col" class="text-center" style="width: 120px;">Azioni</th> <!-- Colonna Azioni più stretta -->
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Esempio Dipendente 1 -->
-                            <tr style="font-size: 0.9rem;">
-                                <td>Mario</td>
-                                <td>Rossi</td>
-                                <td>Ferie</td>
-                                <td>10/04/2025</td>
-                                <td>15/04/2025</td>
-                                <td></td>
-                                <td><span class="badge bg-warning">In attesa</span></td>
-                                <td>
-                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 1)">Approva</a> 
+                            <tr>
+                                <td class="text-start">Mario</td>
+                                <td class="text-start">Rossi</td>
+                                <td class="text-start">Ferie</td>
+                                <td class="text-start">10/04/2025</td>
+                                <td class="text-start">15/04/2025</td>
+                                <td class="text-start"></td>
+                                <td class="text-start"><span class="badge bg-warning">In attesa</span></td>
+                                <td class="text-center">
+                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 1)">Approva</a>
                                     <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', 1)">Rifiuta</a>
                                 </td>
                             </tr>
-                            
                             <!-- Esempio Dipendente 2 -->
-                            <tr style="font-size: 0.9rem;">
-                                <td>Giulia</td>
-                                <td>Bianchi</td>
-                                <td>Permesso</td>
-                                <td>12/04/2025 09:00</td>
-                                <td>12/04/2025 17:00</td>
-                                <td>Malattia</td>
-                                <td><span class="badge bg-warning">In attesa</span></td>
-                                <td>
-                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 2)">Approva</a> 
+                            <tr>
+                                <td class="text-start">Giulia</td>
+                                <td class="text-start">Bianchi</td>
+                                <td class="text-start">Permesso</td>
+                                <td class="text-start">12/04/2025 09:00</td>
+                                <td class="text-start">12/04/2025 17:00</td>
+                                <td class="text-start">Malattia</td>
+                                <td class="text-start"><span class="badge bg-warning">In attesa</span></td>
+                                <td class="text-center">
+                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 2)">Approva</a>
                                     <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', 2)">Rifiuta</a>
                                 </td>
                             </tr>
-
                             <!-- Esempio Dipendente 3 -->
-                            <tr style="font-size: 0.9rem;">
-                                <td>Luca</td>
-                                <td>Verdi</td>
-                                <td>Ferie</td>
-                                <td>20/04/2025</td>
-                                <td>30/04/2025</td>
-                                <td></td>
-                                <td><span class="badge bg-warning">In attesa</span></td>
-                                <td>
-                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 3)">Approva</a> 
+                            <tr>
+                                <td class="text-start">Luca</td>
+                                <td class="text-start">Verdi</td>
+                                <td class="text-start">Ferie</td>
+                                <td class="text-start">20/04/2025</td>
+                                <td class="text-start">30/04/2025</td>
+                                <td class="text-start"></td>
+                                <td class="text-start"><span class="badge bg-warning">In attesa</span></td>
+                                <td class="text-center">
+                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 3)">Approva</a>
                                     <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', 3)">Rifiuta</a>
                                 </td>
                             </tr>
-                            
                             <!-- Esempio Dipendente 4 -->
-                            <tr style="font-size: 0.9rem;">
-                                <td>Martina</td>
-                                <td>Neri</td>
-                                <td>Permesso</td>
-                                <td>25/04/2025 09:00</td>
-                                <td>25/04/2025 13:00</td>
-                                <td>Motivi personali</td>
-                                <td><span class="badge bg-warning">In attesa</span></td>
-                                <td>
-                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 4)">Approva</a> 
+                            <tr>
+                                <td class="text-start">Martina</td>
+                                <td class="text-start">Neri</td>
+                                <td class="text-start">Permesso</td>
+                                <td class="text-start">25/04/2025 09:00</td>
+                                <td class="text-start">25/04/2025 13:00</td>
+                                <td class="text-start">Motivi personali</td>
+                                <td class="text-start"><span class="badge bg-warning">In attesa</span></td>
+                                <td class="text-center">
+                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 4)">Approva</a>
                                     <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', 4)">Rifiuta</a>
                                 </td>
                             </tr>
-
                             <!-- Esempio Dipendente 5 -->
-                            <tr style="font-size: 0.9rem;">
-                                <td>Federico</td>
-                                <td>Gialli</td>
-                                <td>Ferie</td>
-                                <td>01/05/2025</td>
-                                <td>10/05/2025</td>
-                                <td></td>
-                                <td><span class="badge bg-warning">In attesa</span></td>
-                                <td>
-                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 5)">Approva</a> 
+                            <tr>
+                                <td class="text-start">Federico</td>
+                                <td class="text-start">Gialli</td>
+                                <td class="text-start">Ferie</td>
+                                <td class="text-start">01/05/2025</td>
+                                <td class="text-start">10/05/2025</td>
+                                <td class="text-start"></td>
+                                <td class="text-start"><span class="badge bg-warning">In attesa</span></td>
+                                <td class="text-center">
+                                    <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', 5)">Approva</a>
                                     <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', 5)">Rifiuta</a>
                                 </td>
                             </tr>
                         </tbody>
+                        
                     </table>
                 </div>
             </div>
