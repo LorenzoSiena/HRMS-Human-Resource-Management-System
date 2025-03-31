@@ -45,13 +45,19 @@
                         <td> {{ dipendente.ruolo }} </td>
                         <td> {{ dipendente.email }} </td>                       
                         <td>
+
                             <a class="btn btn-info btn-sm btn-custom" href="#" onclick="visualizza_busta_paga(event, {{ dipendente.id }})">Visualizza Buste Paga</a>
                             <button class="btn btn-success btn-sm btn-custom" onclick="carica_busta_paga({{ dipendente.id }})">⬆️ Carica Busta Paga</button>                                   
+
+                            <a class="btn btn-info btn-sm btn-custom" href="{% url 'visualizza_busta_paga' dipendente.id %}">Visualizza Buste Paga</a>
+                            <button class="btn btn-success btn-sm btn-custom" onclick="carica_busta_paga({{ dipendente.id }})">⬆️ Carica Nuova Busta Paga</button>
+
                         </td>
                     </tr>
                 {% endfor %}                
             </tbody>
         </table>
+
     </div>    
 
     <p> {{ id }} {{ dipendente }} {{ mese }} {{ anno }} {{ importo }} {{ documento }} </p>
@@ -108,6 +114,9 @@
         </div>
     </div>
 
+    </div>       
+
+
     <!-- Modal per caricare la busta paga -->
     <div class="modal" id="uploadPayslipModal" tabindex="-1" aria-labelledby="uploadPayslipModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -135,26 +144,15 @@
                             {{ form_carica_busta.documento.label_tag }}
                             {{ form_carica_busta.documento }}   
                         </div>
-                        <button type="submit" class="btn btn-success">Carica</button>
+                        <button type="submit" class="btn btn-success">💾 Salva</button>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Chiudi</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Toast per conferma eliminazione -->
-    <div class="toast-container position-fixed top-0 end-0 p-3">
-        <div id="deleteToast" class="toast align-items-center text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <strong>Successo!</strong> La busta paga è stata eliminata con successo.
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
     </div>
 
 </div>
@@ -202,3 +200,12 @@
 </script>
 
 {% endblock %}
+
+    </div>  
+    
+{% block script %}
+    <script type="text/javascript" src="{% static '/js/gestione_busta_paga.js' %}" defer></script>
+{% endblock script %}
+
+{% endblock %}
+

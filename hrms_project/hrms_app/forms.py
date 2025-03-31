@@ -227,16 +227,16 @@ class EditUserForm(forms.ModelForm):
 
 class CaricaBustaPaga(forms.ModelForm):
 
-    id = forms.IntegerField(widget=forms.HiddenInput())
+    #id = forms.IntegerField(widget=forms.HiddenInput())
 
     mese = forms.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(12)],
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 12, 'placeholder': 'Mese (1-12)', 'disabled': 'disabled'})
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 12, 'placeholder': 'Mese (1-12)'})
     )
 
     anno = forms.IntegerField(
         validators=[MinValueValidator(2000)],
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 2000, 'placeholder': 'Anno (2000+)', 'disabled': 'disabled'})
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 2000, 'placeholder': 'Anno (2000+)'})
     )
 
     importo = forms.DecimalField(
@@ -244,16 +244,16 @@ class CaricaBustaPaga(forms.ModelForm):
         max_digits=10, 
         decimal_places=2,
         min_value=0,
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Importo', 'min': 0, 'disabled': 'disabled'})
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Importo', 'min': 0})
     )    
         
     documento = forms.FileField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'accept': '.pdf,.doc,.docx', 'disabled': 'disabled'})
+       widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.doc,.docx'})
     )
 
     class Meta:
         model = BustePaga
-        fields = ['id', 'mese', 'anno', 'importo', 'documento']
+        fields = ['mese', 'anno', 'importo', 'documento']
 
 class ModificaBustaPaga(forms.ModelForm):
 
@@ -275,7 +275,7 @@ class ModificaBustaPaga(forms.ModelForm):
         widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Importo', 'min': 0})
     )    
         
-    documento = forms.FileField(widget=forms.TextInput(attrs={'class': 'form-control', 'accept': '.pdf,.doc,.docx'}))
+    documento = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.doc,.docx'}))
 
     def __init__(self, *args, **kwargs):
         super(ModificaBustaPaga, self).__init__(*args, **kwargs)
