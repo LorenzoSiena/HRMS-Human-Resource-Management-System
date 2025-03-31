@@ -1,130 +1,188 @@
 {% extends 'hrms_app/base.html' %}
+{% load static %}
+{% block style %}
+    <link href="{% static '/css/gestione_ruoli.css' %}" type="text/css" rel="stylesheet">
+{% endblock style %}         
 {% block title %} Gestione Ruoli {% endblock title %}
 {% block content %}
    
 
-<style>
-    /* Centrare il contenuto */
-    .container.mt-5 {
-        max-width: 900px; /* Larghezza massima del container */
-        margin-left: auto;
-        margin-right: auto;
-        width: 100%; /* Utilizzare tutta la larghezza disponibile */
-        padding: 0 15px; /* Aggiungere un po' di padding laterale */
-    }
-    
-    /* Posizionare l'alert in alto a destra */
-    #avviso {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        width: auto;
-        z-index: 1050;
-    }
 
-    /* Modifica dell'aspetto della card per dispositivi mobili */
-    .card {
-        margin-bottom: 1rem;
-    }
-    /* Impedisci lo zoom su dispositivi mobili quando si clicca */
-#btn-crea-ruolo {
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-}
-</style>
+
+
+
 
 <div class="container mt-5">
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}
+            {% if 'error' in message.tags %}
+                alert-danger
+            {% else %}
+                alert-{{ message.tags }}
+            {% endif %}
+        {% endif %}">
+        {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+
+
+
+
+    
+
+
+
+
+
 <!-- Sezione 1: Aggiungi Ruolo a Dipendente -->
     <div class="card">
     <div class="card-header">
         <h5>Assegna Ruolo a Dipendente</h5>
     </div>
     <div class="card-body">
+
         <form method="POST" action="{% url 'gestione_dipendenti' %}">
           {% csrf_token %}
             <div class="mb-3">
-                <label for="ricerca-dipendente" class="form-label">Ricerca Dipendente</label>
-                <input type="text" class="form-control" id="ricerca-dipendente" placeholder="Cerca per nome..." oninput="ricercaDipendenti()">
-                <div id="suggerimenti" class="list-group mt-2" style="display: none;"></div>
-            </div>
-            <button type="submit" class="btn btn-primary">Cerca Dipendente</button>
 
-            <div class="mb-3">
-                <label for="ruolo" class="form-label">Seleziona Ruolo</label>
-                <select class="form-select" id="ruolo">
-                    <!-- I ruoli saranno aggiunti dinamicamente -->
-                </select>
+                <label for="ricerca-dipendente" class="form-label">Ricerca Dipendente</label>
+                <input type="text" name="dipendente" class="form-control" id="ricerca-dipendente" placeholder="Cerca per nome o cognome" >
+                <div id="suggerimenti" class="list-group mt-2" style="display: none;"></div>
+           
             </div>
-            <div class="mb-3">
-                <label for="livello" class="form-label">Livello Ruolo</label>
-                <input type="number" class="form-control" id="livello" min="1" max="100" placeholder="Inserisci livello">
-            </div>
-            <button type="submit" class="btn btn-primary">Aggiungi Ruolo</button>
+            <input type="hidden" name="origine_form" value="ruoli">
+            <button type="submit" class="btn btn-primary">Cerca Dipendente</button>
         </form>
+        {% comment %}  {% endcomment %}
+        
+          
+
+
+
+        <form method="POST" action="{% url 'assegna_ruolo' %}">
+            {% csrf_token %}
+            <br>
+             {%if dipendenti%}
+             <h6>Seleziona il dipendente da assegnare</h6>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <ul class="list-group" id="personList1">
+                        {% for dipendente in dipendenti|slice:":10" %}
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="dipendente" value={{ dipendente.id }} id="flexRadioDefault1">
+                            <label class="form-check-label" for="flexRadioDefault1">
+                                {{dipendente.nome}} {{ dipendente.cognome }} <br>Ruolo attuale: {{ dipendente.ruolo }}
+                            </label>
+                          </div>
+                        
+                        {% endfor %}
+                    </ul>
+
+                </div>          
+            </div>
+            {%endif%}
+            <div class="mb-3">
+                <label for="ruolo" class="form-label">Seleziona nuovo ruolo</label>
+                <select class="form-select" name ="ruolo" id="ruolo">
+                        {% for r in ruoli %}
+                            <option value="{{ r.id }}"{% if ruolo == r %}selected{% endif %}>{{ r }} ID: {{r.id}}</option>
+                        {% endfor %}
+                </select>
+            </div>           
+            <button type="submit" class="btn btn-primary">Assegna Ruolo</button>
+        
+
+        </form>
+
+
+
     </div>
+
 </div>
 
 
 <!-- Sezione 2: Permessi e Autorizzazioni -->
 <div class="card mt-4">
-<div class="card-header">
-    <h5>Permessi e Autorizzazioni</h5>
-</div>
-<div class="card-body">
-    <form id="form-permessi">
-        <!-- Sezione di ricerca dipendente -->
-        <div class="mb-3">
-            <label for="ricerca-dipendente-permesso" class="form-label">Ricerca Ruolo</label>
-            <input type="text" class="form-control" id="ricerca-dipendente-permesso" placeholder="Cerca per nome..." oninput="ricercaDipendentiPermessi()">
-            <div id="suggerimenti-permessi" class="list-group mt-2" style="display: none;"></div>
+  <div class="card-header">
+      <h5>Permessi e Autorizzazioni</h5>
+  </div>
+
+
+  <div class="card-body">
+
+
+          <form id="form-cerca-ruoli" method="GET" action="{% url 'cerca_ruolo_id' %}">
+
+          <div class="mb-3">
+            <label for="ruolo" class="form-label">Seleziona Ruolo</label>
+            <select class="form-select" name="id" id="ruolo">
+                {% for r in ruoli %}
+                    <option value="{{ r.id }}"{% if ruolo == r %}selected{% endif %}>{{ r }} ID: {{r.id}}
+           </option>
+                {% endfor %}
+            </select>
         </div>
 
-        <!-- Lista dei Permessi -->
-        <div id="permessi-lista" class="mb-3" style="display: none;">
-            <h6>Assegna Permessi e Autorizzazioni</h6>
-            <!-- Permessi e Autorizzazioni -->
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="accesso-admin" id="accesso-admin">
-                <label class="form-check-label" for="accesso-admin">
-                    Accesso Amministratore
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="visualizza-report" id="visualizza-report">
-                <label class="form-check-label" for="visualizza-report">
-                    Visualizzare Report
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="modifica-dati" id="modifica-dati">
-                <label class="form-check-label" for="modifica-dati">
-                    Modificare Dati Aziendali
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="gestione-ruoli" id="gestione-ruoli">
-                <label class="form-check-label" for="gestione-ruoli">
-                    Gestire Ruoli e Permessi
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="accesso-dashboard" id="accesso-dashboard">
-                <label class="form-check-label" for="accesso-dashboard">
-                    Accesso alla Dashboard
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="crea-utenti" id="crea-utenti">
-                <label class="form-check-label" for="crea-utenti">
-                    Creare Nuovi Utenti
-                </label>
-            </div>
-
-            <button type="submit" class="btn btn-primary mt-3">Salva Permessi</button>
-        </div>
+          <button type="submit" class="btn btn-primary">Cerca</button>
     </form>
-    </div>
+
+        <div class ="form-check-label" >
+
+            <h5>{% if ruolo %}
+                {{ ruolo }}</h5>
+            
+               
+
+
+
+
+            <form id="form-permessi" method="POST" action="{% url 'modifica_autorizzazioni' ruolo.id %}">
+                    {% csrf_token %}
+
+                    <h6>Assegna Permessi e Autorizzazioni</h6>
+
+                    <br>
+
+
+                    {% for permesso, attivo in permessi_disponibili.items %}
+                    <div class="form-check">
+                        <input class="form-check-input" 
+                               type="checkbox" 
+                               name="permessi"  
+                               value="{{ permesso }}"  
+                               id="permesso_{{ permesso }}"
+                               {% if attivo %} checked {% endif %}>
+            
+                        <label class="form-check-label" for="permesso_{{ permesso }}">
+                            {{ permesso }}
+                        </label>
+                    </div>
+                {% endfor %}
+        
+        
+                      <button type="submit" class="btn btn-primary mt-3">Salva Permessi</button>
+        
+                    </form>
+
+            {% else %}
+            Nessun ruolo selezionato
+            {% endif %}
+        
+       
+ 
+          </div>
+      
+  </div>
+
 </div>
+
+
+
+
+
 
 
 <!-- Area per Visualizzare il Messaggio di Successo o Errore -->
@@ -133,47 +191,59 @@
 </div>
 
 
-<!-- Sezione 3: Ruoli Esistenti e Creazione Nuovo Ruolo -->
-<div class="card mt-4">
-    <div class="card-header justify-content-between align-items-center">
-        <h5>Ruoli Esistenti e Creazione Nuovo Ruolo</h5>
-    </div>
-    <div class="card-body">
-        <!-- Form per la creazione di un nuovo ruolo (sempre visibile) -->
-        <div id="form-nuovo-ruolo">
-            <h6>Crea un nuovo ruolo</h6>
-            <form id="form-crea-ruolo">
-                <div class="mb-3">
-                    <input type="text" class="form-control" id="nuovo-ruolo" placeholder="Nome del ruolo">
-                </div>
-                <div class="mb-3">
+
+    <!-- Sezione 3: Ruoli Esistenti e Creazione Nuovo Ruolo -->
+    <div class="card mt-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5>Ruoli Esistenti e Creazione Nuovo Ruolo</h5>
+        </div>
+        <div class="card-body">
+            <!-- Form per la creazione di un nuovo ruolo -->
+            <div id="form-nuovo-ruolo" >
+                
+                {% comment %} TODO {% endcomment %}
+                
+
+
+                <h6>Crea un nuovo ruolo</h6>
+                <form id="form-crea-ruolo" method="post" action="{% url 'crea_ruolo' %}">
+                    {% csrf_token %}
                     <div class="mb-3">
-                        <label for="creazioneLivello" class="form-label">Creazione Nuovo Livello</label>
-                        <input type="number" class="form-control" id="creazioneLivello" min="1" max="100" placeholder="Inserisci valore numerico per il ruolo">
+                        
+                        
+                        <input type="text" class="form-control" id="nuovo-ruolo" name= "name" placeholder="Nome del ruolo">
+ 
+
                     </div>
-                </div>
-                <button type="submit" class="btn btn-primary">Conferma</button>
-            </form>
+                    <div class="mb-3">
+                        <div class="mb-3">
+                            <label for="creazioneLivello" class="form-label">Creazione Nuovo Livello</label>
+
+                            <input type="number" class="form-control" id="creazioneLivello" min="1" max="100" name="livello_accesso" placeholder="Inserisci valore numerico per il ruolo">
+                        
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Crea Nuovo Ruolo</button>
+                </form>
+                
+
+
+
+
+
+            </div>
+
+        
         </div>
 
-        <!-- Tabella dei ruoli esistenti -->
-        <table class="table mt-4">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Nome Dipendente</th>
-                    <th>Ruolo Assegnato</th>
-                    <th>Livello Ruolo</th>
-                    <th>Azione</th>
-                </tr>
-            </thead>
-            <tbody id="tabella-ruoli">
-                <!-- I ruoli esistenti saranno aggiunti dinamicamente -->
-            </tbody>
-        </table>
+        
     </div>
 </div>
-    
+
+
+
+
+
 <!-- Sezione per l'alert (avviso colorato) -->
 <div id="avviso" class="alert alert-dismissible fade show" role="alert" style="display: none;">
     <strong></strong> <!-- Titolo del messaggio (es. errore o successo) -->
@@ -206,12 +276,8 @@
 
 
 <script>
-    // Funzione per capitalizzare la prima lettera di ogni parola
-    function capitalizeWords(str) {
-        return str.replace(/\b\w/g, function(char) {
-            return char.toUpperCase();
-        });
-    }
+    
+   
 
     // Array di dipendenti con i relativi ruoli
     let dipendenti = [
@@ -331,6 +397,8 @@
             return false;
         }
 
+  
+        /*   MIODRAG
         if (!nuovoLivello || isNaN(nuovoLivello) || nuovoLivello < 1 || nuovoLivello > 100) {
             mostraAvviso('Errore', 'Il livello deve essere un numero tra 1 e 100.');
             return false;
@@ -400,6 +468,7 @@
             btnCreaRuolo.classList.add('btn-success');
         }
     }
+    */
 
     // Aggiungi validazione in tempo reale
     document.getElementById('nuovo-ruolo').addEventListener('input', function(e) {
@@ -491,12 +560,72 @@
         // Assegna i permessi al dipendente selezionato
         window.dipendenteSelezionato.permessi = permessi;
 
+// Funzione per gestire l'assegnazione dei permessi
+document.getElementById('form-permessi').addEventListener('submit', function(e) {
+  e.preventDefault();
+  if (!window.dipendenteSelezionato) {
+      mostraAvviso('Errore', 'Seleziona un dipendente per assegnare i permessi.');
+      return;
+  }
+
+  // Ottieni lo stato dei permessi selezionati
+  const permessi = {
+      accessoAdmin: document.getElementById('accesso-admin').checked,
+      visualizzaReport: document.getElementById('visualizza-report').checked,
+      modificaDati: document.getElementById('modifica-dati').checked,
+      gestioneRuoli: document.getElementById('gestione-ruoli').checked,
+      accessoDashboard: document.getElementById('accesso-dashboard').checked,
+      creaUtenti: document.getElementById('crea-utenti').checked,
+  };
+
+  // Assegna i permessi al dipendente selezionato
+  window.dipendenteSelezionato.permessi = permessi;
+
+  // Mostra un avviso per confermare i permessi assegnati
+  mostraAvviso('Permessi Assegnati. ', `I permessi per ${window.dipendenteSelezionato.nome} sono stati aggiornati.`);
+});
+
+// Funzione per mostrare l'alert di successo o errore
+function mostraAvviso(titolo, messaggio) {
+  const avviso = document.getElementById('avviso');
+  avviso.querySelector('strong').textContent = titolo;
+  avviso.querySelector('span').textContent = messaggio;
+  avviso.classList.remove('alert-success', 'alert-danger');
+  avviso.classList.add(titolo === 'Errore' ? 'alert-danger' : 'alert-success');
+  avviso.style.display = 'block';
+
+  // Nascondi l'alert dopo 5 secondi
+  setTimeout(function() {
+      avviso.style.display = 'none';
+  }, 5000);
+}
+  // Funzione per mostrare l'alert di successo o errore
+  function mostraAvviso(titolo, messaggio) {
+      const avviso = document.getElementById('avviso');
+      avviso.querySelector('strong').textContent = titolo;
+      avviso.querySelector('strong').nextSibling.textContent = messaggio;
+      avviso.classList.remove('alert-success', 'alert-danger');
+      avviso.classList.add(titolo === 'Errore' ? 'alert-danger' : 'alert-success');
+      avviso.style.display = 'block';
+
+      // Nascondi l'alert dopo 5 secondi
+      setTimeout(function() {
+          avviso.style.display = 'none';
+      }, 5000);
+  }
+
+  // Chiamata per inizializzare la pagina con i dipendenti
+  aggiornaDipendentiPermessi();
+  /* MIODRAG */
         // Mostra un avviso per confermare i permessi assegnati
         mostraAvviso('Permessi Assegnati', `I permessi per ${window.dipendenteSelezionato.nome} sono stati aggiornati.`);
     });
 
     // Chiamata per inizializzare la pagina
     aggiornaDipendenti();
+   /* MIODRAG */
 </script>
 
 {% endblock %}
+
+

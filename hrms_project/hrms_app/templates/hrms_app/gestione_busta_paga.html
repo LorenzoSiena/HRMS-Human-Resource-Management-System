@@ -1,43 +1,11 @@
 {% extends 'hrms_app/base.html' %}
+{% load static %}
+{% block style %}
+    <link href="{% static '/css/gestione_busta_paga.css' %}" type="text/css" rel="stylesheet">
+{% endblock style %}         
 
 {% block title %}Gestione busta paga{% endblock%}
 
-{% block style %}
-
-    <style>       
-
-        .busta-paga-card {
-            margin-top: 20px;
-        }
-    
-        .busta-paga-list {
-            margin-top: 10px;
-            margin-bottom: 15px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-    
-        .btn-custom {
-            margin-right: 5px;
-        }
-    
-        /* Centra il contenuto della tabella */
-        .table th, .table td {
-            text-align: center;
-            vertical-align: middle; /* Centra verticalmente il contenuto */
-        }
-    
-        /* Rimuove lo spazio in eccesso nella tabella */
-        .table-responsive {
-            padding: 0; /* Rimuove il padding in eccesso */
-            margin-bottom: 0; /* Rimuove il margine in eccesso */
-        }
-    
-    </style>
-
-{% endblock%}
 
 {% block content %}
 
@@ -70,16 +38,17 @@
                 </tr>
             </thead>
             <tbody id="employeeList">
-                {% for dipendente in lista_dipendenti %}
-                    <tr>
+                {% for dipendente in lista_dipendenti %}                
+                    <tr>                        
                         <td> {{ forloop.counter }} </td>
                         <td> {{ dipendente.first_name }} </td>
                         <td> {{ dipendente.last_name }} </td>
                         <td> {{ dipendente.ruolo }} </td>
                         <td> {{ dipendente.email }} </td>                       
-                        <td>                            
+                        <td>
                             <a class="btn btn-info btn-sm btn-custom" href="{% url 'visualizza_busta_paga' dipendente.id %}">Visualizza Buste Paga</a>
                             <button class="btn btn-success btn-sm btn-custom" onclick="carica_busta_paga({{ dipendente.id }})">⬆️ Carica Busta Paga</button>                                   
+
                         </td>
                     </tr>
                 {% endfor %}                
@@ -87,6 +56,7 @@
         </table>
     </div>    
 
+    <p> {{ id }} {{ dipendente }} {{ mese }} {{ anno }} {{ importo }} {{ documento }} </p>
     <!-- Modal per visualizzare le buste paga -->
     <div class="modal" id="viewPayslipsModal" tabindex="-1" aria-labelledby="viewPayslipsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -131,9 +101,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+
                     <form id="uploadForm" action="{% url 'salva_busta_paga' %}" method="POST" enctype="multipart/form-data" autocomplete="off">
                         {% csrf_token %}
                         <input id="dipendente_id" type="hidden" name="dipendente_id">
+
                         <div class="mb-3">                            
                             {{ form_carica_busta.mese }}
                         </div>                        
@@ -174,27 +146,22 @@
 <script>
 
     // Funzione per caricare la busta paga
+
     function carica_busta_paga(ddipendente_i) {
         let modal = new bootstrap.Modal(document.getElementById('uploadPayslipModal'));
         modal.show();
         // Imposta l'ID del dipendente nel campo nascosto del form
         elemento_nascosto = document.getElementById('dipendente_id');
-        elemento_nascosto.value = dipendente_id;       
+        elemento_nascosto.value = dipendente_id;
     }
 
 
     // Funzione per visualizzare le buste paga di un dipendente
+
     function visualizza_busta_paga(dipendente_i) {
         let modal = new bootstrap.Modal(document.getElementById('viewPayslipsModal'));
         modal.show();
     }
-
-
-
-
-
-
-
 
     // Funzione per scaricare la busta paga
     function downloadPayslip(fileLink) {

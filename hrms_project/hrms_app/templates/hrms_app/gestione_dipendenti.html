@@ -1,164 +1,70 @@
 {% extends 'hrms_app/base.html' %}
+{% load static %}
+{% block style %}
+    <link href="{% static '/css/gestione_dipendenti.css' %}" type="text/css" rel="stylesheet">
+{% endblock style %}   
 {% block title %} Lista Dipendenti {% endblock title %}
 {% block content %}
 
-<style>
-/* Modifica della card per farla più lunga */
-.card-body {
-    max-height: none; 
-    overflow-y: auto;  
-}
 
-/* Allungare il contenitore per dare più spazio */
-.container.mt-2 {
-    width: 100%; 
-    padding: 15px;
-    box-sizing: border-box; 
-    display: flex;
-    justify-content: center; 
-    align-items: center;
-}
-
-/* Impostiamo un massimo per la larghezza della card */
-.card {
-    max-width: 800px;
-    width: 100%;
-    min-height: 600px;  
-}
-
-/* Gestione della barra di ricerca e dei bottoni */
-.search-container {
-    display: flex;
-    justify-content: flex-start; /* Allinea i bottoni a sinistra */
-    align-items: center;
-    margin-bottom: 20px;
-    gap: 10px; /* Spazio tra i bottoni */
-}
-
-.search-container input[type="text"] {
-    width: 70%; /* Riduci la larghezza della barra di ricerca */
-    padding: 10px;
-    margin-right: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.search-container button,
-.search-container a {
-    padding: 10px 15px;
-    margin: 0; /* Rimuove margini extra */
-}
-
-/* Gestione del formato per la lista dipendenti */
-.dipendente-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-.dipendente-list li {
-    border-bottom: 1px solid #ccc;
-    padding: 10px 0;
-}
-
-/* Allinea il titolo e il bottone nella stessa riga */
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.card-header h3 {
-    margin: 0; /* Rimuove margine predefinito */
-}
-
-.card-header .btn {
-    margin-left: 15px;
-}
-
-</style>
-
-
-{% if messages %}
-        {% for message in messages %}
-            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                {{ message }}
-            </div>
-        {% endfor %}
-{% endif %}
 
 <div class="container mt-2">
    <div class="card"> 
         <div class="card-header text-center">
             <h3>Lista Dipendenti</h3>
             <a href="{% url 'aggiungi_dipendente' %}" class="btn btn-primary" type="submit">Aggiungi Dipendente</a>
-            
         </div>
-
         
         <br>
 
-
         <div class="card">
-
-            <!-- <div class="card-header text-center">
-                <h3>Lista dipendenti</h3>
-            </div> -->
-            
-            
             <!-- Barra di ricerca e pulsante "Crea Dipendente" -->
-
-             <div class="card-body">
-                        <div class="container-fluid">
+                <div class="card-body">
+                    <div class="container-fluid">
                         <!-- Form di ricerca con larghezza dimezzata -->
-
-                        
-   
                         <form method="POST" action="{% url 'gestione_dipendenti' %}">
                             {% csrf_token %}
-                            <div class="d-flex">
-                                <label for="searchPerson" class="form-label">Cerca Dipendente</label>
-                                <input type="search" class="form-control me-2" id="searchPerson" name="dipendente" placeholder="Cerca per nome..." aria-label="Search">
+                            <div class="search-container">
+                                <input type="search" class="form-control" id="searchPerson" name="dipendente" placeholder="Cerca per nome..." aria-label="Search">
+                                <button type="submit" class="btn btn-primary">Cerca</button>
                             </div>
-                          
-                            <button type="submit" class="btn btn-primary">Cerca</button>
                         </form>
-                       
                     </div>
-                <!-- Lista delle persone in due colonne -->
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <ul class="list-group" id="personList1">
-                            {% for dipendente in dipendenti|slice:":10" %}
-                                <li class="dipendente-list"  > 
-                                    
-                                    <a href="{% url 'modifica_dipendente' dipendente.id %}" > <strong>{{dipendente.id }}{{dipendente.nome}} {{ dipendente.cognome }}</strong> {{ dipendente.ruolo }}</a>
-                                    
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>          
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert {% if message.tags %}
+                    {% if 'error' in message.tags %}
+                        alert-danger
+                    {% else %}
+                        alert-{{ message.tags }}
+                    {% endif %}
+                {% endif %}">
+                    {{ message }}
                 </div>
-                
-            <!-- Lista dei dipendenti -->
-            <ul class="dipendente-list" id="dipendenteList">
-                <!-- Questo sarà riempito dinamicamente con i dipendenti -->
-                <li>
-                    <strong>Mario Rossi</strong> - Sviluppatore
-                </li>
-                <li>
-                    <strong>Luca Bianchi</strong> - HR Manager
-                </li>
-                <li>
-                    <strong>Giulia Verdi</strong> - Designer
-                </li>
-                <!-- Aggiungi altri dipendenti qui -->
-            </ul>
+                {% endfor %}
+            {% endif %}
+                    
+                    <!-- Lista delle persone in colonna -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <ol class="dipendente-list" id="personList1">
+                                {% for dipendente in dipendenti|slice:":10" %}
+                                    <li class="list-group-item">
+                                        <a href="{% url 'modifica_dipendente' dipendente.id %}">
+                                            <strong>{{ dipendente.nome }} {{ dipendente.cognome }}</strong>
+                                        </a>
+                                        <div>
+                                            <small class="role">({{ dipendente.ruolo }})</small>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        </div>          
+                    </div>
+                </div>
         </div>
-
-
-
     </div>
 </div>
-
 
 {% endblock %}

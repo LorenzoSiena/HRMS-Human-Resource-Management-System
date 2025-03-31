@@ -84,8 +84,9 @@ class Dipendenti(AbstractUser):
         return self.nome
  """
 class Ruoli(models.Model):
-    ruolo = models.OneToOneField(Group, on_delete=models.CASCADE)  # Relazione 1 a 1 con Group
+    ruolo = models.OneToOneField(Group, on_delete=models.CASCADE, unique=True)  # Relazione 1 a 1 con Group
     """
+    class Group
     id	    AutoField	                    ID univoco
     name	CharField	                    Nome del gruppo
     permissions	ManyToManyField(Permission)	Permessi assegnati al gruppo 
@@ -182,10 +183,10 @@ class Permessi(models.Model):
     stato = models.CharField(max_length=20, choices=STATI_CHOICES, default=STATI_CHOICES[0][0]) # DA TESTARE 
     retribuito=models.BooleanField()
     motivo=models.TextField()
-    ore_totali_permesso_previste_float=models.FloatField() # in ore e giorni
+    ore_totali_permesso_previste_float=models.FloatField(null=True, blank=True) # in ore e giorni
     
     def save(self, *args, **kwargs):
-        self.ore_totali_permesso_previste_float = ore_lavorative_tra_date(self.data_ora_inizio, self.data_ora_fine)
+        self.ore_totali_permesso_previste_float = ore_lavorative_tra_date(self.data_ora_inizio, self.data_ora_fine) # bug 
         super().save(*args, **kwargs)
 
 
@@ -201,7 +202,8 @@ class Permessi(models.Model):
         return formatta_ore(self.ore_totali_permesso_approvate_float or 0)
 
     def __str__(self):
-        return  f" ({self.stato}) - ({self.data_ora_inizio} - {self.data_ora_fine} - sono previste {formatta_ore(self.ore_totali_permesso_previste_float)} ore)"
+        #return  f" ({self.stato}) - ({self.data_ora_inizio} - {self.data_ora_fine} - sono previste {formatta_ore(self.ore_totali_permesso_previste_float)} ore)"
+        return  f" ({self.stato}) - ({self.data_ora_inizio} - {self.data_ora_fine} - ??? ore)"
 
 
 #BUG! Funziona solo se non sforo il mese @.@

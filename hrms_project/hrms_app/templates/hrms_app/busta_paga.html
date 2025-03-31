@@ -1,8 +1,13 @@
 {% extends 'hrms_app/base.html' %}
+{% load static %}
+{% block style %}
+   <link href="{% static '/css/busta_paga.css' %}" type="text/css" rel="stylesheet">
+{% endblock style %} 
 {% block title %}
 Visualizza Buste Paga
 {% endblock %}
 {% block content %}
+
 
 <style>
   .container {
@@ -17,7 +22,7 @@ Visualizza Buste Paga
       border-radius: 5px;
       background-color: #f9f9f9;
       max-width: 600px;
-      width: 100%; /* Original size */
+      width: 100%;
   }
 
   .btn-custom {
@@ -30,33 +35,8 @@ Visualizza Buste Paga
       vertical-align: middle;
   }
 
-  .table-responsive {
-      padding: 0;
-      margin-bottom: 0;
-  }
 
-  #payslipsList {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      justify-content: center;
-      align-items: center;
-  }
 
-  .centered-content {
-      text-align: center;
-  }
-
-  .centered-form {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-      max-width: 300px;
-      margin: 0 auto;
-  }
 
   .form-control {
       width: 100%;
@@ -65,6 +45,12 @@ Visualizza Buste Paga
 
   .form-label {
       font-size: 0.9rem;
+  }
+
+  /* Placeholder più evidente per il campo di selezione del mese */
+  #monthYearFilter::placeholder {
+      color: #aaa;
+      font-style: italic;
   }
 
   /* Mobile responsiveness */
@@ -95,7 +81,7 @@ Visualizza Buste Paga
       }
 
       .busta-paga-list {
-          max-width: 600px; /* Dimensione originale ripristinata */
+          max-width: 600px;
       }
   }
 
@@ -104,20 +90,30 @@ Visualizza Buste Paga
       white-space: nowrap;
   }
 </style>
-</head>
-<body>
 
+
+<body>
 <div class="container">
   <div class="centered-content mb-4">
       <h2>Buste Paga del Dipendente</h2>
   </div>
 
+  <!-- Campo per selezionare il mese e l'anno -->
   <div class="centered-form mb-3">
-      <small id="monthYearFilterHelp" class="form-text text-muted no-wrap">Seleziona un mese e un anno per filtrare le buste paga.</small>
       <input type="month" id="monthYearFilter" class="form-control" onchange="filterPayslips()" aria-describedby="monthYearFilterHelp">
   </div>
 
+  <div id="pdfContainer" class="centered-content" style="display: none; margin-top: 20px;">
+    <h4>Anteprima Busta Paga</h4>
+    <iframe id="pdfViewer" style="width: 100%; max-width: 800px; height: 600px; border: 1px solid #ddd;"></iframe>
+    <br>
+    <button class="btn btn-danger btn-sm btn-custom" onclick="closePayslipViewer()">Chiudi</button>
+</div>
+
+
+
   <div id="payslipsList">
+      <!-- Busta paga di Gennaio -->
       <div class="busta-paga-list" data-period="2025-01">
           <dl>
               <dt>Nome File:</dt>
@@ -129,10 +125,11 @@ Visualizza Buste Paga
               <dt>Importo dello Stipendio:</dt>
               <dd>€1500.50</dd>
           </dl>
-          <button class="btn btn-info btn-sm btn-custom" onclick="viewPayslipDetails('path/to/payslip1.pdf')" aria-label="Visualizza Busta Paga Gennaio 2025">Visualizza</button>
-          <button class="btn btn-primary btn-sm btn-custom" onclick="downloadPayslip('path/to/payslip1.pdf')" aria-label="Scarica Busta Paga Gennaio 2025">Scarica</button>
+          <button class="btn btn-primary btn-sm btn-custom" onclick="viewPayslipDetails('path/to/payslip1.pdf')" role="button">Visualizza</button>
+          <button class="btn btn-success btn-sm btn-custom" onclick="downloadPayslip('path/to/payslip1.pdf')" role="button">Scarica</button>
       </div>
 
+      <!-- Busta paga di Febbraio -->
       <div class="busta-paga-list" data-period="2025-02">
           <dl>
               <dt>Nome File:</dt>
@@ -144,10 +141,11 @@ Visualizza Buste Paga
               <dt>Importo dello Stipendio:</dt>
               <dd>€1600.75</dd>
           </dl>
-          <button class="btn btn-info btn-sm btn-custom" onclick="viewPayslipDetails('path/to/payslip2.pdf')" aria-label="Visualizza Busta Paga Febbraio 2025">Visualizza</button>
-          <button class="btn btn-primary btn-sm btn-custom" onclick="downloadPayslip('path/to/payslip2.pdf')" aria-label="Scarica Busta Paga Febbraio 2025">Scarica</button>
+          <button class="btn btn-primary btn-sm btn-custom" onclick="viewPayslipDetails('path/to/payslip2.pdf')" role="button">Visualizza</button>
+          <button class="btn btn-success btn-sm btn-custom" onclick="downloadPayslip('path/to/payslip2.pdf')" role="button">Scarica</button>
       </div>
 
+      <!-- Busta paga di Marzo -->
       <div class="busta-paga-list" data-period="2025-03">
           <dl>
               <dt>Nome File:</dt>
@@ -159,30 +157,67 @@ Visualizza Buste Paga
               <dt>Importo dello Stipendio:</dt>
               <dd>€1550.30</dd>
           </dl>
-          <button class="btn btn-info btn-sm btn-custom" onclick="viewPayslipDetails('path/to/payslip3.pdf')" aria-label="Visualizza Busta Paga Marzo 2025">Visualizza</button>
-          <button class="btn btn-primary btn-sm btn-custom" onclick="downloadPayslip('path/to/payslip3.pdf')" aria-label="Scarica Busta Paga Marzo 2025">Scarica</button>
+          <button class="btn btn-primary btn-sm btn-custom" onclick="viewPayslipDetails('path/to/payslip3.pdf')" role="button">Visualizza</button>
+          <button class="btn btn-success btn-sm btn-custom" onclick="downloadPayslip('path/to/payslip3.pdf')" role="button">Scarica</button>
       </div>
   </div>
 
 </div>
 
-
 <script>
+
+ // Funzione per scaricare la busta paga
   function downloadPayslip(fileLink) {
-      window.open(fileLink, '_blank');
+      let a = document.createElement('a');
+      a.href = fileLink;
+      a.download = fileLink.split('/').pop(); 
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
   }
-
+    // Funzione per visualizzare i dettagli della busta paga
   function viewPayslipDetails(fileLink) {
-      window.open(fileLink, '_blank');
-  }
+    let pdfContainer = document.getElementById('pdfContainer');
+    let pdfViewer = document.getElementById('pdfViewer');
 
-  /**
-   * Filtrare le buste paga in base al mese e all'anno selezionati.
-   * Nascondere le buste paga che non corrispondono al mese e all'anno selezionati.
-   */
-  function filterPayslips() {
+    pdfViewer.src = fileLink;
+    pdfContainer.style.display = 'block'; // Mostra il visualizzatore
+}
+    // Funzione per chiudere il visualizzatore PDF
+    function closePayslipViewer() {
+        document.getElementById('pdfContainer').style.display = 'none';
+        document.getElementById('pdfViewer').src = ''; // Svuota l'iframe per evitare il caricamento del PDF
+    }
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+    let input = document.getElementById("monthYearFilter");
+
+    let today = new Date();
+    let currentMonthYear = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0");
+
+    input.value = currentMonthYear;
+    input.style.color = "#000";
+
+    filterPayslips();
+
+    input.addEventListener("focus", function () {
+        input.style.color = "#000";
+    });
+
+    input.addEventListener("blur", function () {
+        if (!input.value) {
+            input.style.color = "#999";
+            input.value = "";
+        }
+    });
+  });
+  
+    // Funzione per filtrare le buste paga in base al mese e all'anno selezionati
+    function filterPayslips() {
       let selectedMonthYear = document.getElementById('monthYearFilter').value;
       let payslips = document.querySelectorAll('.busta-paga-list');
+      let visiblePayslips = 0;
 
       payslips.forEach(payslip => {
           let payslipPeriod = payslip.getAttribute('data-period');
@@ -190,8 +225,20 @@ Visualizza Buste Paga
               payslip.style.display = 'none';
           } else {
               payslip.style.display = '';
+              visiblePayslips++;
           }
       });
+
+      let noPayslipsMessage = document.getElementById('noPayslipsMessage');
+      if (!noPayslipsMessage) {
+          noPayslipsMessage = document.createElement('p');
+          noPayslipsMessage.id = 'noPayslipsMessage';
+          noPayslipsMessage.className = 'centered-content';
+          noPayslipsMessage.textContent = 'Nessuna busta paga disponibile per il periodo selezionato.';
+          document.getElementById('payslipsList').appendChild(noPayslipsMessage);
+      }
+
+      noPayslipsMessage.style.display = visiblePayslips === 0 ? 'block' : 'none';
   }
 </script>
 

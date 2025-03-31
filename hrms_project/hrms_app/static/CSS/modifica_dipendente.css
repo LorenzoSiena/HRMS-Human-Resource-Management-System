@@ -1,0 +1,9 @@
+
+    /* Impostiamo un'altezza massima per la card e abilitiamo lo scroll */
+    .card-body {
+        overflow-y: auto;  /* Abilita lo scroll verticale */
+    }
+    /* Garantiamo che il footer stia sempre in fondo */
+    footer {
+        margin-top: 5px; /* Separazione dal contenuto */
+    }
