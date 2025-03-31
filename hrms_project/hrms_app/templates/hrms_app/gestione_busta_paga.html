@@ -6,7 +6,6 @@
 
 {% block title %}Gestione busta paga{% endblock%}
 
-
 {% block content %}
 
 <div class="container mt-5">
@@ -46,9 +45,8 @@
                         <td> {{ dipendente.ruolo }} </td>
                         <td> {{ dipendente.email }} </td>                       
                         <td>
-                            <a class="btn btn-info btn-sm btn-custom" href="{% url 'visualizza_busta_paga' dipendente.id %}">Visualizza Buste Paga</a>
+                            <a class="btn btn-info btn-sm btn-custom" href="#" onclick="visualizza_busta_paga(event, {{ dipendente.id }})">Visualizza Buste Paga</a>
                             <button class="btn btn-success btn-sm btn-custom" onclick="carica_busta_paga({{ dipendente.id }})">⬆️ Carica Busta Paga</button>                                   
-
                         </td>
                     </tr>
                 {% endfor %}                
@@ -57,6 +55,24 @@
     </div>    
 
     <p> {{ id }} {{ dipendente }} {{ mese }} {{ anno }} {{ importo }} {{ documento }} </p>
+
+    <!-- Modal per "Work in Progress" -->
+    <div class="modal" id="workInProgressModal" tabindex="-1" aria-labelledby="workInProgressModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="workInProgressModalLabel">Work in progress</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Ci scusiamo per il disagio, questa funzionalità non è ancora disponibile</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="window.location.reload();">Chiudi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal per visualizzare le buste paga -->
     <div class="modal" id="viewPayslipsModal" tabindex="-1" aria-labelledby="viewPayslipsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -146,55 +162,36 @@
 <script>
 
     // Funzione per caricare la busta paga
-
-    function carica_busta_paga(ddipendente_i) {
+    function carica_busta_paga(dipendente_id) {
         let modal = new bootstrap.Modal(document.getElementById('uploadPayslipModal'));
         modal.show();
         // Imposta l'ID del dipendente nel campo nascosto del form
-        elemento_nascosto = document.getElementById('dipendente_id');
+        let elemento_nascosto = document.getElementById('dipendente_id');
         elemento_nascosto.value = dipendente_id;
     }
 
-
     // Funzione per visualizzare le buste paga di un dipendente
-
-    function visualizza_busta_paga(dipendente_i) {
-        let modal = new bootstrap.Modal(document.getElementById('viewPayslipsModal'));
-        modal.show();
-    }
-
-    // Funzione per scaricare la busta paga
-    function downloadPayslip(fileLink) {
-        window.open(fileLink, '_blank');
-    }
-
-    // Funzione per condividere la busta paga via email
-    function sharePayslip(fileLink) {
-        let emailBody = `Ciao, ti invio la busta paga. Puoi scaricarla dal seguente link: ${fileLink}`;
-        window.location.href = `mailto:?subject=Busta Paga&body=${encodeURIComponent(emailBody)}`;
-    }
-
-    // Funzione per visualizzare la busta paga
-    function viewPayslipDetails(fileLink) {
-        window.open(fileLink, '_blank');
+    function visualizza_busta_paga(event, dipendente_id) {
+        event.preventDefault(); // Impedisce il comportamento di default del link
+        
+        // Mostra il pop-up "Work in Progress"
+        let workInProgressModal = new bootstrap.Modal(document.getElementById('workInProgressModal'));
+        workInProgressModal.show();
     }
 
     // Funzione per eliminare la busta paga
-function deletePayslip(fileLink) {
-  if (confirm('Sei sicuro di voler eliminare questa busta paga?')) {
-      showDeleteToast();
-
-      // Trova il bottone cliccato e risali fino al contenitore della busta paga
-      let payslipElement = event.target.closest('.busta-paga-list');
-      
-      if (payslipElement) {
-          payslipElement.remove();
-      } else {
-          alert('Errore: impossibile trovare la busta paga da eliminare.');
-      }
-  }
-}
-
+    function deletePayslip(fileLink) {
+        if (confirm('Sei sicuro di voler eliminare questa busta paga?')) {
+            showDeleteToast();
+            // Trova il bottone cliccato e risali fino al contenitore della busta paga
+            let payslipElement = event.target.closest('.busta-paga-list');
+            if (payslipElement) {
+                payslipElement.remove();
+            } else {
+                alert('Errore: impossibile trovare la busta paga da eliminare.');
+            }
+        }
+    }
 
     // Funzione per mostrare il toast di eliminazione
     function showDeleteToast() {
@@ -202,40 +199,6 @@ function deletePayslip(fileLink) {
         toast.show();
     }
 
-    
-
-    // Funzione di ricerca dipendente (simulata)
-    function searchEmployee() {
-        let searchValue = document.getElementById('searchEmployee').value.toLowerCase();
-        let rows = document.getElementById('employeeList').getElementsByTagName('tr');
-        
-        Array.from(rows).forEach(row => {
-            let name = row.cells[1].textContent.toLowerCase();
-            let surname = row.cells[2].textContent.toLowerCase();
-            let role = row.cells[3].textContent.toLowerCase();
-            if (name.includes(searchValue) || surname.includes(searchValue) || role.includes(searchValue)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    }
-
-    // Funzione per filtrare le buste paga in base al mese e anno
-    function filterPayslips() {
-        let selectedMonthYear = document.getElementById('monthYearFilter').value;
-        let payslips = document.querySelectorAll('.busta-paga-list');
-
-        payslips.forEach(payslip => {
-            let payslipPeriod = payslip.getAttribute('data-period');
-            if (selectedMonthYear && !payslipPeriod.startsWith(selectedMonthYear)) {
-                payslip.style.display = 'none';
-            } else {
-                payslip.style.display = '';
-            }
-        });
-    }
 </script>
-
 
 {% endblock %}
