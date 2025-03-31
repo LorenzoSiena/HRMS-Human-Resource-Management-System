@@ -1,4 +1,5 @@
 from datetime import datetime, time, timedelta
+from django.utils.timezone import is_naive, make_aware, get_current_timezone
 
 # Orario lavorativo
 ORARIO_INIZIO_LAVORO = time(9, 0)   # 09:00
@@ -76,9 +77,22 @@ def ore_lavorative_tra_date(start, end):
     e considerando solo l'orario lavorativo 09:00-13:00 e 14:00-18:00.
     """
 
-    # Ensure both start and end are naive (remove timezone info)
-    start = start.replace(tzinfo=None)
-    end = end.replace(tzinfo=None)
+    # Converte le stringhe in oggetti datetime, se necessario
+    if isinstance(start, str):
+        start = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+    if isinstance(end, str):
+        end = datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
+
+    # Assicura che start e end siano timezone-aware
+    if is_naive(start):
+        start = make_aware(start, get_current_timezone())
+    if is_naive(end):
+        end = make_aware(end, get_current_timezone())
+
+    # Converte entrambi in un unico timezone (opzionale, ma consigliato)
+    tz = get_current_timezone()
+    start = start.astimezone(tz)
+    end = end.astimezone(tz)
 
     total_work_seconds = 0  # Conteggio totale dei secondi lavorativi
     current = start
@@ -87,14 +101,14 @@ def ore_lavorative_tra_date(start, end):
         # Se è sabato o domenica, passiamo al giorno successivo
         if current.weekday() in [5, 6]:  # 5=Sabato, 6=Domenica
             current += timedelta(days=1)
-            current = datetime.combine(current.date(), ORARIO_INIZIO_LAVORO)
+            current = datetime.combine(current.date(), ORARIO_INIZIO_LAVORO, tzinfo=current.tzinfo)
             continue
 
         # Convertiamo l'orario di lavoro in datetime per il giorno corrente
-        work_morning_start = datetime.combine(current.date(), ORARIO_INIZIO_LAVORO)
-        work_morning_end = datetime.combine(current.date(), PAUSA_PRANZO_INIZIO)
-        work_afternoon_start = datetime.combine(current.date(), PAUSA_PRANZO_FINE)
-        work_afternoon_end = datetime.combine(current.date(), ORARIO_FINE_LAVORO)
+        work_morning_start = datetime.combine(current.date(), ORARIO_INIZIO_LAVORO, tzinfo=current.tzinfo)
+        work_morning_end = datetime.combine(current.date(), PAUSA_PRANZO_INIZIO, tzinfo=current.tzinfo)
+        work_afternoon_start = datetime.combine(current.date(), PAUSA_PRANZO_FINE, tzinfo=current.tzinfo)
+        work_afternoon_end = datetime.combine(current.date(), ORARIO_FINE_LAVORO, tzinfo=current.tzinfo)
 
         # Se `current` è prima dell'orario lavorativo, lo spostiamo all'inizio del lavoro
         if current < work_morning_start:
@@ -122,7 +136,7 @@ def ore_lavorative_tra_date(start, end):
 
         # Passiamo al giorno successivo, reimpostando l'orario all'inizio della fascia lavorativa
         current += timedelta(days=1)
-        current = datetime.combine(current.date(), ORARIO_INIZIO_LAVORO)
+        current = datetime.combine(current.date(), ORARIO_INIZIO_LAVORO, tzinfo=current.tzinfo)
 
     # Convertiamo i secondi in ore
     total_work_hours = total_work_seconds / 3600
@@ -160,6 +174,12 @@ def calcola_ore_lavorate(ora_ingresso, ora_uscita):
     """Calcola il tempo lavorato escludendo pause e orari non lavorativi."""
     if not ora_ingresso or not ora_uscita:
         return 0
+
+    # Converte le stringhe in oggetti time, se necessario
+    if isinstance(ora_ingresso, str):
+        ora_ingresso = datetime.strptime(ora_ingresso, "%H:%M:%S").time()
+    if isinstance(ora_uscita, str):
+        ora_uscita = datetime.strptime(ora_uscita, "%H:%M:%S").time()
 
     dt_ingresso = datetime.combine(datetime.today(), ora_ingresso)
     dt_uscita = datetime.combine(datetime.today(), ora_uscita)
