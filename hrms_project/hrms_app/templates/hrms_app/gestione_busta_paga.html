@@ -1,44 +1,11 @@
 {% extends 'hrms_app/base.html' %}
+{% load static %}
+{% block style %}
+    <link href="{% static '/css/gestione_busta_paga.css' %}" type="text/css" rel="stylesheet">
+{% endblock style %}         
 
 {% block title %}Gestione busta paga{% endblock%}
 
-{% block style %}
-
-    <style>       
-
-        .busta-paga-card {
-            margin-top: 20px;
-        }
-    
-        .busta-paga-list {
-            margin-top: 10px;
-            margin-bottom: 15px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-    
-        .btn-custom {
-            margin-right: 5px;
-        }
-    
-        /* Centra il contenuto della tabella */
-        .table th, .table td {
-            text-align: center;
-            vertical-align: middle; /* Centra verticalmente il contenuto */
-        }
-    
-        /* Rimuove lo spazio in eccesso nella tabella */
-        .table-responsive {
-            padding: 0; /* Rimuove il padding in eccesso */
-            margin-bottom: 0; /* Rimuove il margine in eccesso */
-        }
-    
-
-    </style>
-
-{% endblock%}
 
 {% block content %}
 
