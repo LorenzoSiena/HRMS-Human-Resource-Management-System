@@ -407,23 +407,17 @@ def visualizza_busta_paga(request: HttpRequest, id):
 
 def modifica_busta_paga(request: HttpRequest):
     if request.method == "POST":
-        form = ModificaBustaPaga(request.POST, request.FILES) # Carica il form con i dati POST
-        if form.is_valid(): # Controlla se il form é valido
-            busta_paga = form.save(commit=False) # Salva la busta paga senza committare al database
-            busta_paga.dipendente = Dipendenti.objects.get(id = request.POST.get("dipendente_id")) # Recupera l'utente selezionato
-            busta_paga.save() # Salva la busta paga nel database
-            messages.success(request, "Busta paga modificata con successo")
+        #busta_paga = BustePaga.objects.get(id = id)
+        #if not busta_paga:
+        #    messages.error(request, "Busta paga non trovata.")
+        #    return redirect('gestione_busta_paga')
+        form_carica_busta = CaricaBustaPaga(request.POST, request.FILES)
+        if form_carica_busta.is_valid(): # Controlla se il form è valido
+            form_carica_busta.save() # Salva la busta paga
+            messages.success(request, "Busta paga modificata con successo")            
         else:
             messages.error(request, "Errore nella modifica della busta paga")
-    else:
-        messages.error(request, "Errore nella modifica della busta paga")
-    return render(request, 'hrms_app/visualizza_busta_paga.html') # Reindirizza alla pagina di modifica busta paga con l'id della busta paga da modificare  
-
-def crea_busta_paga():
-    pass
-
-def busta_paga(request:HttpRequest):
-    return render(request,'hrms_app/busta_paga.html')
+    return render(request, 'hrms_app/modifica_busta_paga.html') # Reindirizza alla pagina di modifica busta paga con l'id della busta paga da modificare
 
 def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')

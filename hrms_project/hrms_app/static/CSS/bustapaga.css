@@ -1,0 +1,39 @@
+.table-container {
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+    opacity: 0.9;
+}
+
+.table-row {
+    display: flex;
+    flex-wrap: nowrap;
+    border-bottom: 1px solid #ddd;
+    padding: 8px 0;
+}
+
+.table-header {
+    font-weight: bold;
+    background-color: #f8f9fa;
+}
+
+.table-cell {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+}
+
+.table-cell input {
+    width: 100%;
+    padding: 4px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .table-row {
+        flex-direction: column;
+    }
+    .table-cell {
+        text-align: left;
+    }
+}
