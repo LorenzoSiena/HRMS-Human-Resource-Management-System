@@ -39,24 +39,38 @@
 /* Gestione della barra di ricerca e dei bottoni */
 .search-container {
     display: flex;
-    justify-content: flex-start; /* Allinea i bottoni a sinistra */
+    justify-content: space-between; /* Allinea input e bottone sulla stessa riga */
     align-items: center;
     margin-bottom: 20px;
-    gap: 10px; /* Spazio tra i bottoni */
+    gap: 10px; /* Spazio tra input e bottone */
+    width: 100%;
 }
 
+/* Impostiamo un massimo per la larghezza dell'input */
 .search-container input[type="text"] {
-    width: 70%; /* Riduci la larghezza della barra di ricerca */
+    width: 80%; /* Larghezza maggiore per l'input */
     padding: 10px;
     margin-right: 15px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 5px;
+    font-size: 16px;
 }
 
-.search-container button,
-.search-container a {
-    padding: 10px 15px;
-    margin: 0; /* Rimuove margini extra */
+/* Stile per il bottone */
+.search-container button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: auto; /* La larghezza è determinata dal contenuto */
+}
+
+/* Hover del bottone */
+.search-container button:hover {
+    background-color: #0056b3;
 }
 
 /* Gestione del formato per la lista dipendenti */
@@ -108,7 +122,6 @@
 .dipendente-list a:hover {
     text-decoration: underline;
 }
-
 </style>
 
 <div class="container mt-2">
@@ -117,9 +130,25 @@
             <h3>Lista Dipendenti</h3>
             <a href="{% url 'aggiungi_dipendente' %}" class="btn btn-primary" type="submit">Aggiungi Dipendente</a>
         </div>
+        
+        <br>
 
-        {% if messages %}
-            {% for message in messages %}
+        <div class="card">
+            <!-- Barra di ricerca e pulsante "Crea Dipendente" -->
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <!-- Form di ricerca con larghezza dimezzata -->
+                        <form method="POST" action="{% url 'gestione_dipendenti' %}">
+                            {% csrf_token %}
+                            <div class="search-container">
+                                <input type="search" class="form-control" id="searchPerson" name="dipendente" placeholder="Cerca per nome..." aria-label="Search">
+                                <button type="submit" class="btn btn-primary">Cerca</button>
+                            </div>
+                        </form>
+                    </div>
+
+            {% if messages %}
+                {% for message in messages %}
                 <div class="alert {% if message.tags %}
                     {% if 'error' in message.tags %}
                         alert-danger
@@ -129,51 +158,27 @@
                 {% endif %}">
                     {{ message }}
                 </div>
-            {% endfor %}
-        {% endif %}
-        
-        <br>
-
-        <div class="card">
-            <!-- Barra di ricerca e pulsante "Crea Dipendente" -->
-
-
-                <div class="card-body">
-                        <div class="container-fluid">
-                        <!-- Form di ricerca con larghezza dimezzata -->
-
-                        
-   
-                        <form method="POST" action="{% url 'gestione_dipendenti' %}">
-                            {% csrf_token %}
-                            <div class="d-flex">
-                                <label for="searchPerson" class="form-label">Cerca Dipendente</label>
-                                <input type="search" class="form-control me-2" id="searchPerson" name="dipendente" placeholder="Cerca per nome..." aria-label="Search">
-                            </div>
-                          
-                            <button type="submit" class="btn btn-primary">Cerca</button>
-                        </form>
-                       
-                        </div>
-                <!-- Lista delle persone in due colonne -->
-
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <ol class="dipendente-list" id="personList1">
-                            {% for dipendente in dipendenti|slice:":10" %}
-                                <li class="list-group-item">
-                                    <a href="{% url 'modifica_dipendente' dipendente.id %}">
-                                        <strong>{{ dipendente.nome }} {{ dipendente.cognome }}</strong>
-                                    </a>
-                                    <div>
-                                        <small class="role">({{ dipendente.ruolo }})</small>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ol>
-                    </div>          
+                {% endfor %}
+            {% endif %}
+                    
+                    <!-- Lista delle persone in colonna -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <ol class="dipendente-list" id="personList1">
+                                {% for dipendente in dipendenti|slice:":10" %}
+                                    <li class="list-group-item">
+                                        <a href="{% url 'modifica_dipendente' dipendente.id %}">
+                                            <strong>{{ dipendente.nome }} {{ dipendente.cognome }}</strong>
+                                        </a>
+                                        <div>
+                                            <small class="role">({{ dipendente.ruolo }})</small>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        </div>          
+                    </div>
                 </div>
-            </div>
         </div>
     </div>
 </div>
