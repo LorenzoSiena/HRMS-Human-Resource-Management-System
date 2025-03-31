@@ -400,23 +400,18 @@ def salva_busta_paga(request: HttpRequest):
 def visualizza_busta_paga(request: HttpRequest, id):
     dipendente = Dipendenti.objects.get(id = id) # Recupera l'utente loggato
     buste_paga_form_set = modelformset_factory(BustePaga, form=ModificaBustaPaga, extra=0) # Crea un formset per la modifica delle buste paga
-    elenco_buste_paga = buste_paga_form_set(queryset = BustePaga.objects.filter(dipendente=dipendente).order_by('-data_emissione', 'anno', 'mese')) # Recupera tutte le buste paga del dipendente
-   
+    elenco_buste_paga = buste_paga_form_set(queryset = BustePaga.objects.filter(dipendente=dipendente).order_by('-data_emissione', 'anno', 'mese')) # Recupera tutte le buste paga del dipendente   
     return render(request, 'hrms_app/modifica_busta_paga.html', {'dipendente': dipendente, 'elenco_buste_paga': elenco_buste_paga}) # Reindirizza alla pagina di gestione busta paga con l'elenco delle buste paga('gestione_busta_paga')    
 
 def modifica_busta_paga(request: HttpRequest):
-    if request.method == "POST":
-        #busta_paga = BustePaga.objects.get(id = id)
-        #if not busta_paga:
-        #    messages.error(request, "Busta paga non trovata.")
-        #    return redirect('gestione_busta_paga')
+    if request.method == "POST":        
         form_carica_busta = CaricaBustaPaga(request.POST, request.FILES)
         if form_carica_busta.is_valid(): # Controlla se il form è valido
             form_carica_busta.save() # Salva la busta paga
             messages.success(request, "Busta paga modificata con successo")            
         else:
             messages.error(request, "Errore nella modifica della busta paga")
-    return render(request, 'hrms_app/modifica_busta_paga.html') # Reindirizza alla pagina di modifica busta paga con l'id della busta paga da modificare
+    return render(request, 'hrms_app/modifica_busta_paga.html 1') # Reindirizza alla pagina di modifica busta paga con l'id della busta paga da modificare
 
 def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')

@@ -7,42 +7,44 @@
     
 {% block content %}
 
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
-    
-{% if form.errors %}
-    <div class="alert alert-danger">
-        <strong>Errore!</strong>
-        <ul>
-            {% for field in form %}
-                {% if field.errors %}
-                    <li><strong>{{ field.label }}:</strong>
-                        <ul>
-                            {% for error in field.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </div>
-{% endif %}
+
 
 <div class="container mt-4">
     <div class="table-container">
         <div class="d-flex justify-content-between align-items-center card-header p-2">
             <span><strong>Elenco Buste Paga del dipendente: {{ dipendente }}</strong></span>
-            <button type="submit" href="{% url 'gestione_busta_paga' %}" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <a href="{% url 'gestione_busta_paga' %}" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></a>
         </div>
         <div class="d-flex justify-content-between align-items-center card-header p-2">
             <span><strong>Filtra per Anno: </strong></span>
             
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+                
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <strong>Errore!</strong>
+                    <ul>
+                        {% for field in form %}
+                            {% if field.errors %}
+                                <li><strong>{{ field.label }}:</strong>
+                                    <ul>
+                                        {% for error in field.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
         </div>
         <div class="table-row table-header">           
             <div class="table-cell">Mese</div>
@@ -70,29 +72,7 @@
                 </div>                   
             </div>
         </form>
-        {% endfor %}
-                    <!-- <tr>
-                        <form method="post" action="{% url 'modifica_busta_paga' %}"> 
-                            {% csrf_token %}
-                            <td class="hidden"> {{ busta_paga.id }} </td>
-                            <td class="Riga hidden"> {{ forloop.counter }} </td>                            
-                            <td> {{ busta_paga.mese }} </td>
-                            <td> {{ busta_paga.anno }} </td>
-                            <td> {{ busta_paga.importo }} </td>                             
-                            <td>
-                                {{ busta_paga.documento|cut:"documenti_bustepaga/"|cut:".pdf" }}-->
-                            <!-- <a href="{{ busta_paga.documento.url }}" target="_blank" class="btn btn-primary btn-sm btn-custom">Visualizza</a> --> 
-                            <!-- <td>
-                                <a id="btn-modifica" class="btn btn-outline-primary btn-sm btn-custom" title="Modifica">📝</a>                                
-                                <a id="btn-scarica" class="btn btn-outline-primary btn-sm btn-custom"  title="Scarica">📥</a>
-                                <a id="btn-condividi" class="btn btn-outline-primary btn-sm btn-custom"  title="Condividi">🔁</a>                                
-                                <a id="btn-elimina" class="btn btn-outline-danger btn-sm btn-custom"  title="Elimina">🗑️</a>
-                                <button type="submit" id="btn-aggiorna" class="btn btn-outline-success btn-sm btn-custom hidden" type="submit" title="Aggiorna">✅</button>
-                                <a id="btn-annulla" class="btn btn-outline-secondary btn-sm btn-custom hidden" href="{% url 'visualizza_busta_paga' dipendente.id %}" title="Chiudi">❌</a>        
-                            </td>
-                        </form>
-                    </tr>-->
-                        
+        {% endfor %}                   
         </div>
     </div>
 </div>
