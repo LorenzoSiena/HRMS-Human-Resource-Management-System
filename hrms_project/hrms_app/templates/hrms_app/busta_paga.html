@@ -1,8 +1,13 @@
 {% extends 'hrms_app/base.html' %}
+{% load static %}
+{% block style %}
+<link href="{% static '/css/busta_paga.css' %}" type="text/css" rel="stylesheet">
+{% endblock style %} 
 {% block title %}
 Visualizza Buste Paga
 {% endblock %}
 {% block content %}
+
 
 <style>
   .container {
@@ -30,33 +35,8 @@ Visualizza Buste Paga
       vertical-align: middle;
   }
 
-  .table-responsive {
-      padding: 0;
-      margin-bottom: 0;
-  }
 
-  #payslipsList {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      justify-content: center;
-      align-items: center;
-  }
 
-  .centered-content {
-      text-align: center;
-  }
-
-  .centered-form {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-      max-width: 300px;
-      margin: 0 auto;
-  }
 
   .form-control {
       width: 100%;
@@ -110,6 +90,7 @@ Visualizza Buste Paga
       white-space: nowrap;
   }
 </style>
+
 
 <body>
 <div class="container">

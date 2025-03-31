@@ -3,10 +3,11 @@ from django.contrib.auth import get_user_model
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Dipendenti, Ruoli, Ferie, Permessi
 from random import randint
 from datetime import date, timedelta
+from django.core.validators import MinValueValidator,MaxValueValidator
 
+from .models import Dipendenti, Ruoli, Ferie, BustePaga
 class RegisterForm(UserCreationForm):   
     nome = forms.CharField(  
         max_length=100,
@@ -122,7 +123,7 @@ class RegisterForm(UserCreationForm):
 
 
 # Form per la richiesta di ferie o permessi
-class Richiedi_assenza(forms.ModelForm):    
+class RichiediAssenza(forms.ModelForm):    
 
     data_inizio = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control','type': 'date', 'min': date.today}))  
     ora_inizio = forms.TimeField(widget=forms.TimeInput(attrs={'class': 'form-control hidden','type': 'time', 'min': '09:00', 'max': '18:00'}), required = False)
@@ -224,4 +225,69 @@ class EditUserForm(forms.ModelForm):
             elif isinstance(field.widget, forms.FileInput):
                 field.widget.attrs.update({'class': 'form-control'})
 
+class CaricaBustaPaga(forms.ModelForm):
 
+    mese = forms.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(12)],
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 12, 'placeholder': 'Mese (1-12)'})
+    )
+    anno = forms.IntegerField(
+        validators=[MinValueValidator(2000)],
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 2000, 'placeholder': 'Anno (2000+)'})
+    )
+    importo = forms.DecimalField(
+        label="Importo",
+        max_digits=10, 
+        decimal_places=2,
+        min_value=0,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Importo', 'min': 0})
+    )    
+        
+    documento = forms.FileField(
+        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.doc,.docx'})
+    )
+
+    class Meta:
+        model = BustePaga
+        fields = ['mese', 'anno', 'importo', 'documento']
+
+class ModificaBustaPaga(forms.ModelForm):
+
+    id = forms.IntegerField(widget=forms.HiddenInput())    
+    
+    mese = forms.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(12)],
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 12, 'placeholder': 'Mese (1-12)'})
+    )
+    anno = forms.IntegerField(
+        validators=[MinValueValidator(2000)],
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 2000, 'placeholder': 'Anno (2000+)'})
+    )
+    importo = forms.DecimalField(
+        label="Importo",
+        max_digits=10, 
+        decimal_places=2,
+        min_value=0,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Importo', 'min': 0})
+    )    
+        
+    documento = forms.FileField(widget=forms.TextInput(attrs={'class': 'form-control', 'accept': '.pdf,.doc,.docx'}))
+
+    def __init__(self, *args, **kwargs):
+        super(ModificaBustaPaga, self).__init__(*args, **kwargs)
+        #self.field['data_emissione'].widget.attrs['readonly'] = True
+        
+        for field_name, field in self.fields.items():
+            
+            field.widget.attrs['disabled'] = 'disabled'#
+            if isinstance(field.widget, forms.TextInput) or isinstance(field.widget, forms.EmailInput):
+                field.widget.attrs.update({'class': 'form-control'})
+            elif isinstance(field.widget, forms.Select):
+                field.widget.attrs.update({'class': 'form-select'})            
+            #elif isinstance(field.widget, forms.FileInput):
+                #field.widget.attrs.update({'class': 'form-control'})
+
+    class Meta:
+        model = BustePaga
+        fields =['id', 'mese', 'anno', 'importo', 'documento']
+        

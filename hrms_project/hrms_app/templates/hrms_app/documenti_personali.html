@@ -1,8 +1,190 @@
 {% extends 'hrms_app/base.html' %}
-
+{% load static %}
+{% block style %}
+    <link href="{% static '/css/documenti_personali.css' %}" type="text/css" rel="stylesheet">
+{% endblock style %}         
 {% block title %}
-Documenti Personali
-{% endblock%}
+Consulta_documenti
+{% endblock %}
 
 {% block content %}
+
+
+
+<div class="container">
+    <h1>Consulta Documenti</h1>
+
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <!-- Selezione del mese e dell'anno per la ricerca -->
+            <div class="search-container">
+
+                <select id="monthSelect" class="form-select">
+                    <option value="">Seleziona Mese</option>
+                    <option value="1">Gennaio</option>
+                    <option value="2">Febbraio</option>
+                    <option value="3">Marzo</option>
+                    <option value="4">Aprile</option>
+                    <option value="5">Maggio</option>
+                    <option value="6">Giugno</option>
+                    <option value="7">Luglio</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Settembre</option>
+                    <option value="10">Ottobre</option>
+                    <option value="11">Novembre</option>
+                    <option value="12">Dicembre</option>
+                </select>
+
+
+                <select id="yearSelect" class="form-select">
+                    <option value="">Seleziona Anno</option>
+                    <option value="2023">2023</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                </select>
+
+                <button id="applyFilter" class="btn btn-primary">Filtra</button>
+            </div>
+
+            <!-- Sezione per visualizzare i documenti caricati -->
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <!-- Card 1: Contratto -->
+                <div class="col">
+                    <div class="card text-center p-3">
+                        <h5 class="card-title">Contratti</h5>
+                        <!-- Lista dei documenti caricati -->
+                        <div id="file-list-contratto" class="file-list"></div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Certificati -->
+                <div class="col">
+                    <div class="card text-center p-3">
+                        <h5 class="card-title">Certificati</h5>
+                        <div id="file-list-certificati" class="file-list"></div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Documenti Legali -->
+                <div class="col">
+                    <div class="card text-center p-3">
+                        <h5 class="card-title">Documenti Legali</h5>
+                        <div id="file-list-documenti-legali" class="file-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pannello di visualizzazione documento -->
+<div id="view-panel">
+    <button id="close-view-panel-btn" onclick="closeViewPanel()">Chiudi</button>
+    <button id="download-btn" onclick="downloadFile()">Scarica</button>
+    <iframe id="view-frame" src="" frameborder="0"></iframe>
+</div>
+
+<script>
+    // Dati di esempio per i documenti caricati (questi verranno caricati dinamicamente da un altro sistema/backend)
+    const documentiCaricati = {
+        contratto: [
+            { name: 'Contratto 1.pdf', month: '1', year: '2024', file: 'path/to/contratto1.pdf' },
+            { name: 'Contratto 2.pdf', month: '2', year: '2024', file: 'path/to/contratto2.pdf' },
+            { name: 'Contratto 3.pdf', month: '5', year: '2024', file: 'path/to/contratto3.pdf' }
+        ],
+        certificati: [
+            { name: 'Certificato 1.pdf', month: '3', year: '2024', file: 'path/to/certificato1.pdf' },
+            { name: 'Certificato 2.pdf', month: '4', year: '2024', file: 'path/to/certificato2.pdf' },
+            { name: 'Certificato 3.pdf', month: '6', year: '2024', file: 'path/to/certificato3.pdf' }
+        ],
+        documenti_legali: [
+            { name: 'Documento Legale 1.pdf', month: '1', year: '2025', file: 'path/to/documento1.pdf' },
+            { name: 'Documento Legale 2.jpg', month: '6', year: '2024', file: 'path/to/documento2.jpg' },
+            { name: 'Documento Legale 3.png', month: '12', year: '2024', file: 'path/to/documento3.png' }
+        ]
+    };
+
+    // Funzione per aggiornare la lista dei documenti visualizzati
+    function updateFileList(documentType) {
+        const fileListElement = document.getElementById(`file-list-${documentType}`);
+        const month = document.getElementById('monthSelect').value;
+        const year = document.getElementById('yearSelect').value;
+
+        // Filtro dei documenti in base al mese e anno selezionato
+        const filteredDocuments = documentiCaricati[documentType].filter(file => 
+            (file.month == month || month == "") && (file.year == year || year == "")
+        );
+
+        fileListElement.innerHTML = filteredDocuments.map(file => {
+            return `<div class="file-item">
+                        <span class="file-name" onclick="openViewPanel('${file.file}')">${file.name}</span>
+                    </div>`;
+        }).join('');
+    }
+
+    // Funzione per applicare il filtro (mese e anno)
+    document.getElementById('applyFilter').addEventListener('click', function() {
+        const month = document.getElementById('monthSelect').value;
+        const year = document.getElementById('yearSelect').value;
+
+        // Verifica che siano stati selezionati mese e anno
+        if (!month || !year) {
+            alert("Seleziona sia il mese che l'anno!");
+            return;
+        }
+
+        // Aggiorna le liste di file per ogni tipo di documento con il filtro applicato
+        updateFileList('contratto');
+        updateFileList('certificati');
+        updateFileList('documenti_legali');
+    });
+
+    // Funzione per aprire il pannello di visualizzazione del documento
+    let currentFilePath = ""; // Variabile per memorizzare il file corrente
+    function openViewPanel(filePath) {
+        const panel = document.getElementById('view-panel');
+        const iframe = document.getElementById('view-frame');
+
+        // Memorizza il percorso del file corrente
+        currentFilePath = filePath;
+
+        // Verifica il tipo di file e carica il contenuto appropriato
+        const fileExtension = filePath.split('.').pop().toLowerCase();
+
+        if (fileExtension === 'pdf') {
+            iframe.src = filePath; // Carica il PDF
+        } else if (fileExtension === 'jpg' || fileExtension === 'png') {
+            iframe.src = filePath; // Carica l'immagine
+        } else {
+            alert('Formato non supportato');
+            return;
+        }
+
+        panel.style.display = 'block';
+    }
+
+    // Funzione per scaricare il file
+    function downloadFile() {
+        if (currentFilePath) {
+            const link = document.createElement('a');
+            link.href = currentFilePath;
+            link.download = currentFilePath.split('/').pop(); // Usa il nome del file per il download
+            link.click();
+        }
+    }
+
+    // Funzione per chiudere il pannello di visualizzazione
+    function closeViewPanel() {
+        const panel = document.getElementById('view-panel');
+        const iframe = document.getElementById('view-frame');
+        iframe.src = ""; // Pulisce il contenuto dell'iframe
+        panel.style.display = 'none';
+    }
+
+    // Inizializza la visualizzazione dei documenti
+    updateFileList('contratto');
+    updateFileList('certificati');
+    updateFileList('documenti_legali');
+</script>
+
 {% endblock %}

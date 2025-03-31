@@ -5,8 +5,7 @@ admin.site.register(Dipendenti) """
 #Test e debug!
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-
-from .models import Dipendenti,Ruoli
+from .models import *
 
 
 
@@ -39,4 +38,14 @@ class DipendentiAdmin(UserAdmin):
 
 admin.site.register(Dipendenti, DipendentiAdmin)
 admin.site.register(Ruoli)
+admin.site.register(Permessi)
+admin.site.register(Presenze)
+admin.site.register(Ferie)
+admin.site.register(ReportFerie)
+admin.site.register(ReportPresenze)
+admin.site.register(ReportPermessi)
+admin.site.register(Bacheca)
+admin.site.register(BustePaga)
+admin.site.register(Certificati)
+admin.site.register(Notifiche)
 

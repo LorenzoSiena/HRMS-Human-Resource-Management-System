@@ -1,4 +1,5 @@
 #Standard imports
+from django.forms import modelformset_factory
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpRequest
 from django.contrib import messages
@@ -7,6 +8,9 @@ from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 
+from django.contrib.auth.models import Permission
+from hrms_app.constant import PERMESSI_APP
+
 
 
 from django.contrib.auth.models import User,Group
@@ -14,7 +18,7 @@ from .models import *
 
 #Form
 
-from .forms import RegisterForm, Richiedi_assenza, EditUserForm
+from .forms import *
 
 from django.contrib.auth import authenticate, login, logout
 
@@ -43,7 +47,7 @@ def hrms_app(request: HttpRequest):
     # Lista delle timbrature da visualizzare - Solo quelle della data odierna
     lista_presenze = Presenze.objects.filter(dipendente = dipendente, data = date.today()) # Lista timbrature odierna
     # Carico il form per la richiesta di permessi o ferie
-    form = Richiedi_assenza()
+    form = RichiediAssenza()
     lista_ferie = Ferie.objects.filter(dipendente = dipendente, stato = "In attesa")
     lista_permessi = Permessi.objects.filter(dipendente = dipendente, stato = "In attesa")
     return render(request,'hrms_app/home.html', {'messaggi_bacheca': messaggi_bacheca, 'button_timbra': button_timbra, 'lista_ferie': lista_ferie, 'lista_permessi': lista_permessi, 'form': form, 'lista_presenze': lista_presenze})
@@ -83,6 +87,7 @@ def crea_dipendente(request: HttpRequest):
         livello_accesso = request.POST.get('livello_accesso', '').strip()
 
         if nome and cognome and email and ruolo and data_assunzione and livello_accesso:
+
             Dipendenti.objects.create(
                 nome=nome,
                 cognome=cognome,
@@ -91,27 +96,18 @@ def crea_dipendente(request: HttpRequest):
                 data_assunzione=data_assunzione,
                 livello_accesso=livello_accesso
             )
+            
             messages.success(request, f"✅ Dipendente '{nome} {cognome}' aggiunto con successo!")
         else:
             messages.error(request, "⚠️ Tutti i campi sono obbligatori!")
 
     return redirect('dipendenti')
 
-
-
-
-
-
 def report(request:HttpRequest):
     return render(request,'hrms_app/report.html')
 
-
 def stipendi(request:HttpRequest):
     return render(request,'hrms_app/stipendi.html')
-    
-
-
-
 
 def richiedi_ferie():
     pass
@@ -158,8 +154,6 @@ def modifica_messaggio_bacheca(request:HttpRequest,id):
 
     return render(request, 'hrms_app/bacheca.html', {'messaggio': messaggio})
 
-
-
 def aggiungi_messaggio_bacheca(request:HttpRequest):
     if request.method == "POST":
         titolo=request.POST.get('titolo').strip()
@@ -172,7 +166,6 @@ def aggiungi_messaggio_bacheca(request:HttpRequest):
             return render(request,'hrms_app/bacheca.html')        
     return redirect('bacheca')
 
-
 def cancella_messaggio_bacheca(request: HttpRequest,id):
     messaggio = Bacheca.objects.get(id=id)
     messaggio.delete()
@@ -184,11 +177,6 @@ def crea_busta_paga():
 
 def visualizza_busta_paga():
     pass
-
-
-
-
-
 def visualizza_report_presenze(request:HttpRequest):
     pass
 
@@ -197,8 +185,6 @@ def visualizza_report_ferie(request:HttpRequest):
 
 def visualizza_report_permessi(request:HttpRequest):
     pass
-
-
 
 def visualizza_report_mensile(request:HttpRequest):
     pass
@@ -215,8 +201,7 @@ def aggiungi_dipendente(request:HttpRequest):
     else:
         form = RegisterForm()  # Creazione di un form vuoto se è una GET
 
-    return render(request, "hrms_app/aggiungi_dipendente.html", {"form": form})
-    
+    return render(request, "hrms_app/aggiungi_dipendente.html", {"form": form})    
 
 def modifica_dipendente(request: HttpRequest, id):
     dipendente = Dipendenti.objects.get(id=id)  # Recupera l'utente esistente
@@ -234,20 +219,11 @@ def modifica_dipendente(request: HttpRequest, id):
         form = EditUserForm(instance=dipendente)  # Precompila il form
     return render(request, 'hrms_app/modifica_dipendente.html', {'form': form, 'dipendente': dipendente})
 
-
-
-
-
-
 def elimina_dipendente(request: HttpRequest, id):
     dipendente = get_object_or_404(Dipendenti, id=id)
     dipendente.delete()
     messages.success(request, f"🗑️ Dipendente '{dipendente.nome} {dipendente.cognome}' eliminato con successo!")
     return redirect('gestione_dipendenti')
-
-
-
-
 
 def registrati(request: HttpRequest):
     if request.method == "POST":
@@ -264,24 +240,11 @@ def registrati(request: HttpRequest):
 
     return render(request, "hrms_app/register_forms.html", {"form": form})
 
-@login_required
-def mostra_permessi(request):
-    permessi_individuali = request.user.get_all_permissions()  # Restituisce un set di permessi (app_label.codename)
-
-    permessi_ruolo = set()
-    ruolo=request.user.ruolo
-    if ruolo:  # Se l'utente ha un ruolo assegnato
-        permessi_ruolo = set(request.user.ruolo.ruolo.permissions.values_list('codename', flat=True))
-    
-    
-    return render(request, 'hrms_app/debug_permessi.html', {'permessi_individuali': permessi_individuali, 'permessi_ruolo':permessi_ruolo,'ruolo': ruolo})
 
 from django.urls import reverse
 
 def vai_all_admin(request):
     return redirect(reverse('admin:index'))  # Ricava l'URL dinamicamente
-
-
 
 # Login
 def user_login(request: HttpRequest):
@@ -307,7 +270,7 @@ def user_logout(request: HttpRequest):
 def richiesta_permessi_ferie(request: HttpRequest):
     if request.method == "POST":
         tipo_permesso = request.POST.get("tipo_permesso", "Nessuna selezione") # Prende il valore dal radio button selezionato nel form
-        form = Richiedi_assenza(request.POST)
+        form = RichiediAssenza(request.POST)
         if form.is_valid():
             data_inizio = form.cleaned_data['data_inizio']
             ora_inizio = form.cleaned_data['ora_inizio']
@@ -316,24 +279,24 @@ def richiesta_permessi_ferie(request: HttpRequest):
             motivo = form.cleaned_data['motivo']
             dipendente = Dipendenti.objects.get(id = request.user.id)
             # Controllo che la data fine sia maggiore o uguale alla data inizio
-            if data_inizio < data_fine:
+            if not(data_inizio < data_fine):
                 messages.error(request, 'Errore nella richiesta: La data fine deve essere maggiore o uguale alla data inizio.')
-                return redirect('home')
-            # Controllo che le ore di ingresso e uscita siano tra le 9.00 e le 18.00
-            if ora_inizio < datetime.strptime('09:00', '%H:%M').time() or ora_inizio > datetime.strptime('18:00', '%H:%M').time():
-                messages.error(request, 'Errore nella richiesta: Le ore di ingresso devono essere tra le 9.00 e le 18.00.')
-                return redirect('home')
-            if ora_fine < datetime.strptime('09:00', '%H:%M').time() or ora_fine > datetime.strptime('18:00', '%H:%M').time():
-                messages.error(request, 'Errore nella richiesta: Le ore di uscita devono essere tra le 9.00 e le 18.00.')
-                return redirect('home')
-            # Controllo che l'ora di uscita sia maggiore dell'ora di ingresso nei permessi dello stesso giorno
-            if data_inizio == data_fine and ora_inizio > ora_fine:
-                messages.error(request, "Errore nella richiesta: Le ore di uscita deve essere maggiore dell'ora di entrata")
                 return redirect('home')
             if tipo_permesso == "ferie":
                 Ferie.objects.create(dipendente = dipendente, data_inizio = data_inizio, data_fine = data_fine, stato = "In attesa") 
-                messages.success(request, 'Permesso richiesto con successo!')               
+                messages.success(request, 'Assenza per Ferie richiesta con successo!')               
             elif tipo_permesso == "permesso" or tipo_permesso == "permesso_nr":
+                # Controllo che le ore di ingresso e uscita siano tra le 9.00 e le 18.00
+                if ora_inizio < datetime.strptime('09:00', '%H:%M').time() or ora_inizio > datetime.strptime('18:00', '%H:%M').time():
+                    messages.error(request, 'Errore nella richiesta: Le ore di ingresso devono essere tra le 9.00 e le 18.00.')
+                    return redirect('home')
+                if ora_fine < datetime.strptime('09:00', '%H:%M').time() or ora_fine > datetime.strptime('18:00', '%H:%M').time():
+                    messages.error(request, 'Errore nella richiesta: Le ore di uscita devono essere tra le 9.00 e le 18.00.')
+                    return redirect('home')
+                # Controllo che l'ora di uscita sia maggiore dell'ora di ingresso nei permessi dello stesso giorno
+                if data_inizio == data_fine and ora_inizio > ora_fine:
+                    messages.error(request, "Errore nella richiesta: Le ore di uscita deve essere maggiore dell'ora di entrata")
+                    return redirect('home')
                 retribuito = (tipo_permesso == "permesso")
                 Permessi.objects.create(dipendente = dipendente, data_ora_inizio = datetime.combine(data_inizio, ora_inizio), data_ora_fine = datetime.combine(data_fine, ora_fine), stato = "In attesa", retribuito = retribuito, motivo = motivo)
                 messages.success(request, 'Permesso richiesto con successo!')
@@ -364,45 +327,311 @@ class CustomPasswordResetCompleteView(PasswordResetCompleteView):
 def documenti_personali(request:HttpRequest):
     return render(request,'hrms_app/documenti_personali.html')
 
-def assenze_personali(request:HttpRequest):
-    return render(request,'hrms_app/assenze_personali.html')
-
-def busta_paga(request:HttpRequest):
-    return render(request,'hrms_app/busta_paga.html')
-
 def gestione_dipendenti(request:HttpRequest):
-
     if request.method == "POST":
         dipendente = request.POST.get("dipendente")
-        
+        origine_form = request.POST.get("origine_form")
         #ricerca incrociata su nome e cognome dove %dipendente%
         #lista_dipendenti = Dipendenti.objects.filter(nome=dipendente,cognome=dipendente)
-
         lista_dipendenti = Dipendenti.objects.filter(Q(first_name__icontains=dipendente) | Q(last_name__icontains=dipendente))
         if lista_dipendenti:
             messages.success(request, "Utenti trovati")
-                    
         else:
             messages.error(request, "Nessun dipendente trovato")
-    
-
-        return render(request, "hrms_app/gestione_dipendenti.html", {"dipendenti": lista_dipendenti})
+        if origine_form == "ruoli":
+            ruoli = Ruoli.objects.all()
+            return render(request, "hrms_app/gestione_ruoli.html", {"dipendenti": lista_dipendenti, "ruoli": ruoli})
+        elif origine_form == "report":
+            return render(request, "hrms_app/report.html", {"dipendenti": lista_dipendenti})
+        else:
+            return render(request, "hrms_app/gestione_dipendenti.html", {"dipendenti": lista_dipendenti})
     return render(request, "hrms_app/gestione_dipendenti.html")
-
-
 
 def gestione_assenze(request:HttpRequest):
     return render(request,'hrms_app/gestione_assenze.html')
 
-def gestione_busta_paga(request:HttpRequest):
-    return render(request,'hrms_app/gestione_busta_paga.html')
+def assegna_ruolo(request:HttpRequest):
+    if request.method == "POST":
+        id_dipendente = request.POST.get("dipendente")
+        id_ruolo = request.POST.get("ruolo")
+        dipendente = Dipendenti.objects.get(id=id_dipendente)
+        dipendente.ruolo = Ruoli.objects.get(id=id_ruolo)
+        dipendente.save()
+        messages.success(request, f"Ruolo assegnato con successo {dipendente.nome} {dipendente.cognome} -> {dipendente.ruolo}")
+    return redirect("gestione_ruoli")
+    
+def gestione_assenze(request:HttpRequest):
+    return render(request,'hrms_app/gestione_assenze.html')
+
+def gestione_busta_paga(request: HttpRequest):
+    if request.method == "POST":
+        dipendente = request.POST.get("dipendente")        
+        #Ricerca incrociata su nome e cognome dove %dipendente%    
+        lista_dipendenti = Dipendenti.objects.filter(Q(first_name__icontains=dipendente) | Q(last_name__icontains=dipendente))
+        lista_dipendenti_id = [ dipendente.id for dipendente in lista_dipendenti] # Salvo il dipendente nella sessione per il redirect
+        request.session['lista_dipendenti_id'] = lista_dipendenti_id # Salvo il dipendente nella sessione per il redirect
+        if lista_dipendenti:
+            messages.success(request, "Utenti trovati")
+        else:
+            messages.error(request, "Nessun dipendente trovato")
+    else:
+        if 'lista_dipendenti_id' in request.session:
+            lista_dipendenti = Dipendenti.objects.filter(id__in=request.session['lista_dipendenti_id'])
+        else:
+            lista_dipendenti = None
+    form_carica_busta = CaricaBustaPaga()    
+    return render(request, 'hrms_app/gestione_busta_paga.html', {"lista_dipendenti": lista_dipendenti, "form_carica_busta": form_carica_busta}) 
+
+def salva_busta_paga(request: HttpRequest):  
+    if request.method == "POST":        
+        dipendente = Dipendenti.objects.get(id = request.POST.get("dipendente_id")) # Recupera l'utente selezionato
+        if not dipendente:
+            messages.error(request, "Dipendente non trovato.")
+            return redirect('gestione_busta_paga')
+        form_carica_busta = CaricaBustaPaga(request.POST, request.FILES) # Carica il form con i dati POST
+        if form_carica_busta.is_valid(): # Controlla se il form è valido           
+            busta_paga = form_carica_busta.save(commit=False)
+            busta_paga.dipendente = dipendente
+            busta_paga.save()
+            messages.success(request, "Busta paga caricata con successo")            
+        else:
+            messages.error(request, "Errore nel caricamento della busta paga")
+    return redirect('gestione_busta_paga', ) # Reindirizza alla pagina di gestione busta paga con l'elenco delle buste paga
+
+def visualizza_busta_paga(request: HttpRequest, id):
+    dipendente = Dipendenti.objects.get(id = id) # Recupera l'utente loggato
+    buste_paga_form_set = modelformset_factory(BustePaga, form=ModificaBustaPaga, extra=0) # Crea un formset per la modifica delle buste paga
+    elenco_buste_paga = buste_paga_form_set(queryset = BustePaga.objects.filter(dipendente=dipendente).order_by('-data_emissione', 'anno', 'mese')) # Recupera tutte le buste paga del dipendente
+   
+    return render(request, 'hrms_app/modifica_busta_paga.html', {'dipendente': dipendente, 'elenco_buste_paga': elenco_buste_paga}) # Reindirizza alla pagina di gestione busta paga con l'elenco delle buste paga('gestione_busta_paga')    
+
+def modifica_busta_paga(request: HttpRequest):
+    if request.method == "POST":
+        form = ModificaBustaPaga(request.POST, request.FILES) # Carica il form con i dati POST
+        if form.is_valid(): # Controlla se il form é valido
+            busta_paga = form.save(commit=False) # Salva la busta paga senza committare al database
+            busta_paga.dipendente = Dipendenti.objects.get(id = request.POST.get("dipendente_id")) # Recupera l'utente selezionato
+            busta_paga.save() # Salva la busta paga nel database
+            messages.success(request, "Busta paga modificata con successo")
+        else:
+            messages.error(request, "Errore nella modifica della busta paga")
+    else:
+        messages.error(request, "Errore nella modifica della busta paga")
+    return render(request, 'hrms_app/visualizza_busta_paga.html') # Reindirizza alla pagina di modifica busta paga con l'id della busta paga da modificare  
+
+def crea_busta_paga():
+    pass
+
+def busta_paga(request:HttpRequest):
+    return render(request,'hrms_app/busta_paga.html')
 
 def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')
-def sviluppo(request:HttpRequest):
-    return render(request,'hrms_app/modifica_dipendente.html')
-# def aggiungi_dipendente(request:HttpRequest):
-#     return render(request,'hrms_app/aggiungi_dipendente.html')
+
+def report_mensile(request:HttpRequest):
+    
+    report_mensile = []
+
+    # Recupera il mese e l'anno scelti dall'utente
+    if request.method == "POST":
+        id = request.POST.get("dipendente")
+        mese = request.POST.get("month")
+        anno = request.POST.get("year")
+
+        dipendente = Dipendenti.objects.get(id=id)
+
+        if dipendente is None:
+            messages.error(request, "Nessun dipendente trovato")
+            return redirect('report')
+        
+
+        presenze = ReportPresenze.objects.get(dipendente=dipendente, anno=anno, mese=mese)
+        ferie = ReportFerie.objects.get(dipendente=dipendente, anno=anno, mese=mese)
+        permessi = ReportPermessi.objects.get(dipendente=dipendente, anno=anno, mese=mese)
+        
+        #generare robe in shell QUI
+        
+        report_mensile = [presenze, ferie, permessi]
+    return render(request, "hrms_app/report.html", {"report_mensile": report_mensile, "dipendente" :dipendente })
+
+
+def crea_report_finti(request:HttpRequest):
+    if request.method == "POST":
+        some_dipendente = Dipendenti.objects.get(id=1)
+
+        # Inserire Ferie
+        ferie_data = [
+            {'dipendente': some_dipendente, 'data_inizio': '2025-03-05', 'data_fine': '2025-03-10', 'stato': 'Approvata'},
+            {'dipendente': some_dipendente, 'data_inizio': '2025-03-15', 'data_fine': '2025-03-19', 'stato': 'Approvata'},
+            {'dipendente': some_dipendente, 'data_inizio': '2025-04-07', 'data_fine': '2025-04-13', 'stato': 'Approvata'},
+            {'dipendente': some_dipendente, 'data_inizio': '2025-05-08', 'data_fine': '2025-05-14', 'stato': 'Approvata'},
+            {'dipendente': some_dipendente, 'data_inizio': '2025-05-25', 'data_fine': '2025-05-29', 'stato': 'Approvata'},
+        ]
+        for ferie in ferie_data:
+            Ferie(**ferie).save()  # Invoca il metodo save del modello
+
+        # Inserire Permessi
+        permessi_data = [
+            {'dipendente': some_dipendente, 'data_ora_inizio': '2025-03-03 10:00:00', 'data_ora_fine': '2025-03-03 12:00:00', 'stato': 'Approvata', 'retribuito': True, 'motivo': 'a'},
+            {'dipendente': some_dipendente, 'data_ora_inizio': '2025-03-04 14:00:00', 'data_ora_fine': '2025-03-04 16:30:00', 'stato': 'Approvata', 'retribuito': True, 'motivo': 'b'},
+            {'dipendente': some_dipendente, 'data_ora_inizio': '2025-03-06 09:00:00', 'data_ora_fine': '2025-03-06 11:00:00', 'stato': 'Approvata', 'retribuito': True, 'motivo': 'e'},
+            {'dipendente': some_dipendente, 'data_ora_inizio': '2025-03-07 13:30:00', 'data_ora_fine': '2025-03-07 15:00:00', 'stato': 'Approvata', 'retribuito': True, 'motivo': 'f'},
+            {'dipendente': some_dipendente, 'data_ora_inizio': '2025-03-17 10:00:00', 'data_ora_fine': '2025-03-03 12:00:00', 'stato': 'Approvata', 'retribuito': True, 'motivo': 'c'},
+            {'dipendente': some_dipendente, 'data_ora_inizio': '2025-03-22 14:00:00', 'data_ora_fine': '2025-03-22 16:30:00', 'stato': 'Approvata', 'retribuito': True, 'motivo': 'd'},
+        ]
+        for permesso in permessi_data:
+            Permessi(**permesso).save()  # Invoca il metodo save del modello
+
+        # Inserire Presenze
+        presenze_data = [
+            {'dipendente': some_dipendente, 'data': '2025-03-03', 'ora_ingresso': '08:30:00', 'ora_uscita': '16:30:00'},
+            {'dipendente': some_dipendente, 'data': '2025-03-04', 'ora_ingresso': '09:15:00', 'ora_uscita': '17:15:00'},
+            {'dipendente': some_dipendente, 'data': '2025-03-05', 'ora_ingresso': '08:30:00', 'ora_uscita': '16:30:00'},
+            {'dipendente': some_dipendente, 'data': '2025-03-06', 'ora_ingresso': '09:15:00', 'ora_uscita': '17:15:00'},
+            {'dipendente': some_dipendente, 'data': '2025-03-19', 'ora_ingresso': '08:45:00', 'ora_uscita': '16:45:00'},
+            {'dipendente': some_dipendente, 'data': '2025-03-20', 'ora_ingresso': '09:00:00', 'ora_uscita': '17:00:00'},
+            {'dipendente': some_dipendente, 'data': '2025-03-21', 'ora_ingresso': '09:30:00', 'ora_uscita': '17:30:00'},
+        ]
+        for presenza in presenze_data:
+            Presenze(**presenza).save()  # Invoca il metodo save del modello
+
+        return render(request, 'hrms_app/report.html')
+
+    return render(request, 'hrms_app/report.html')
+
+
+
 
 def gestione_ruoli(request:HttpRequest):
+    ruoli = Ruoli.objects.all()
+    return render(request,'hrms_app/gestione_ruoli.html',{'ruoli':ruoli})
+
+#controllare validation!
+
+def crea_ruolo(request: HttpRequest):
+
+    if request.method == "POST":
+        ruolo = request.POST.get("name") # testo
+        livello_accesso = request.POST.get("livello_accesso") #numero
+
+        if not ruolo or not livello_accesso:
+
+            messages.error(request, f"Errore nella creazione del ruolo. {ruolo} livello {livello_accesso} Controlla i dati inseriti.")
+            return redirect("gestione_ruoli")
+
+        # Controlla se esiste già un Group con quel nome
+        gruppo_esistente = Group.objects.filter(name=ruolo).first()
+
+        if gruppo_esistente and Ruoli.objects.filter(ruolo=gruppo_esistente).exists():
+            messages.error(request, "Ruolo già esistente.")
+            return redirect("gestione_ruoli")
+
+        # Crea il gruppo se non esiste
+        if not gruppo_esistente:
+            gruppo_esistente = Group.objects.create(name=ruolo)
+
+        # Crea il ruolo associato
+        Ruoli.objects.create(ruolo=gruppo_esistente, livello_accesso=int(livello_accesso))
+        messages.success(request, f"Creazione ruolo {ruolo} avvenuta con successo!")
+        #return render(request,'hrms_app/gestione_ruoli.html') 
+        return redirect("gestione_ruoli") 
+
     return render(request,'hrms_app/gestione_ruoli.html')
+
+""" 
+SELECT *
+FROM ruoli JOIN Group 
+ON ruoli.ruolo_id = Group.id
+WHERE Group.name = 'Contabile';
+"""          
+
+
+
+""" 
+Gestione dipendenti (crea,modifica,visualizza,elimina)
+Gestire Ruoli(crea,modifica,visualizza,elimina)
+Gestire Autorizzazioni(assegna a ruolo,rimuovi da ruolo,visualizza autorizzazioni per ruolo)
+Gestire Ferie/Permessi(accetta,rifiuta,visualizza)
+Visualizza Report(ferie,permessi,presenze)
+Gestire messaggi bacheca (Crea,modifica,elimina)
+Gestire Buste paga (Crea,carica file,elimina,visualizza)
+Gestire documenti [contratti e certificati] (visualizza,modifica,elimina)
+ """
+
+
+def cerca_ruolo_id(request:HttpRequest):
+    ruoli = Ruoli.objects.all()
+    if request.method == "GET":    
+        id = request.GET.get("id")
+        if id:
+            ruolo = Ruoli.objects.get(id=id)
+            if not ruolo:
+                messages.error(request, f"Ruolo non trovato.")
+                return redirect("gestione_ruoli")
+
+            permessi_disponibili = {}
+            permessi_ruolo = set(ruolo.ruolo.permissions.values_list('codename', flat=True))
+
+            for nome_permesso, permessi_richiesti in PERMESSI_APP.items():
+                permessi_disponibili[nome_permesso] = all(p in permessi_ruolo for p in permessi_richiesti)
+            
+            return render(request,'hrms_app/gestione_ruoli.html',{"ruolo":ruolo,'permessi_disponibili': permessi_disponibili,'ruoli':ruoli}) 
+
+    return redirect('gestione_ruoli')
+
+def cerca_ruolo(request:HttpRequest):
+
+    if request.method == "GET":    
+        name = request.GET.get("name")
+        if name:
+            ruolo = Ruoli.objects.filter(ruolo__name__icontains=name).first()
+            if not ruolo:
+                messages.error(request, f"Ruolo non trovato.")
+                return redirect("gestione_ruoli")
+
+            permessi_disponibili = {}
+            permessi_ruolo = set(ruolo.ruolo.permissions.values_list('codename', flat=True))
+
+            for nome_permesso, permessi_richiesti in PERMESSI_APP.items():
+                permessi_disponibili[nome_permesso] = all(p in permessi_ruolo for p in permessi_richiesti)
+            
+            return render(request,'hrms_app/gestione_ruoli.html',{"ruolo":ruolo,'permessi_disponibili': permessi_disponibili}) 
+
+    return redirect('gestione_ruoli')
+
+def modifica_autorizzazioni(request: HttpRequest, id):
+    ruoli = Group.objects.all()
+    if request.method == "POST":
+
+        permessi_selezionati = request.POST.getlist("permessi")  # Ottieni solo quelli selezionati
+        permessi_nuovi = []
+
+        for gruppo, permessi_richiesti in PERMESSI_APP.items():
+            if gruppo in permessi_selezionati:
+                # Aggiungi i permessi richiesti per il gruppo selezionato
+                permessi_nuovi.extend(Permission.objects.filter(codename__in=permessi_richiesti))
+
+        ruolo = Group.objects.get(id=id) 
+        ruolo.permissions.set(permessi_nuovi)
+        messages.success(request, f"✅ Ruolo aggiornato con successo!")
+        return render(request,'hrms_app/gestione_ruoli.html',{'ruoli':ruoli})
+
+    return render(request, 'hrms_app/gestione_ruoli.html', {
+        'ruolo': ruolo,'ruoli':ruoli
+    })
+
+@login_required
+def mostra_permessi(request):
+    permessi_individuali = request.user.get_all_permissions()  # Restituisce un set di permessi (app_label.codename)
+
+    permessi_ruolo = set()
+    ruolo=request.user.ruolo
+    if ruolo:  # Se l'utente ha un ruolo assegnato
+        permessi_ruolo = set(request.user.ruolo.ruolo.permissions.values_list('codename', flat=True))
+    
+    
+    return render(request, 'hrms_app/debug_permessi.html', {'permessi_individuali': permessi_individuali, 'permessi_ruolo':permessi_ruolo,'ruolo': ruolo})
+
+def notifiche(request:HttpRequest):
+    return render(request,'hrms_app/notifiche.html')
+
