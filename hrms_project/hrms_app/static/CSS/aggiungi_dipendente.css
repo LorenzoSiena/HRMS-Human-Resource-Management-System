@@ -1,0 +1,23 @@
+
+    .card {
+        max-height: 1200px; 
+        overflow-y: auto; 
+        max-width: 600px;
+        border-radius: 10px;
+    }
+    .card h2 {
+        font-size: 24px; 
+    }
+    .text-center a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    .text-center a:hover {
+        text-decoration: underline;
+    }
+    .alert-danger {
+        margin-top: 10px;
+    }
+    footer {
+        margin-top: 5px; 
+    }

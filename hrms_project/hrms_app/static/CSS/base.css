@@ -1,0 +1,14 @@
+
+        /* Rimuovi la classe btn dai dropdown e rendi il comportamento hover più scuro */
+        .navbar-nav .dropdown-menu {
+            background-color: white; /* Colore di sfondo del menu */
+        }
+
+        .navbar-nav .dropdown-item:hover {
+            background-color: #f1f1f1; /* Colore di sfondo al passaggio del mouse */
+        }
+
+        .hidden {
+            display: none;
+        }
+        

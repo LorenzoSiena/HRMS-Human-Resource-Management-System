@@ -1,25 +1,12 @@
 {% extends 'hrms_app/base.html' %}
+{% load static %}
+{% block style %}
+    <link href="{% static '/css/report.css' %}" type="text/css" rel="stylesheet">
+{% endblock style %}  
 {% block title %} Report Dipendenti {% endblock title %}
 {% block content %}
 
-  <style>
-    .card {
-      max-width: 100%;
-      margin: 0 auto;
-    }
-    .form-container {
-      margin-bottom: 20px;
-    }
-    .form-container input, .form-container select, .form-container button {
-      margin: 5px;
-      padding: 10px;
-      font-size: 14px;
-    }
-    /* Tabella responsive */
-    .table-responsive {
-      overflow-x: auto;
-    }
-  </style>
+
 
   <div class="container">
     <!-- Card per il form di ricerca -->

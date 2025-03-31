@@ -1,4 +1,5 @@
 #Standard imports
+from django.forms import modelformset_factory
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpRequest
 from django.contrib import messages
@@ -17,7 +18,7 @@ from .models import *
 
 #Form
 
-from .forms import RegisterForm, RichiediAssenza, EditUserForm, CaricaBustaPaga
+from .forms import *
 
 from django.contrib.auth import authenticate, login, logout
 
@@ -102,21 +103,11 @@ def crea_dipendente(request: HttpRequest):
 
     return redirect('dipendenti')
 
-
-
-
-
-
 def report(request:HttpRequest):
     return render(request,'hrms_app/report.html')
 
-
 def stipendi(request:HttpRequest):
     return render(request,'hrms_app/stipendi.html')
-    
-
-
-
 
 def richiedi_ferie():
     pass
@@ -163,8 +154,6 @@ def modifica_messaggio_bacheca(request:HttpRequest,id):
 
     return render(request, 'hrms_app/bacheca.html', {'messaggio': messaggio})
 
-
-
 def aggiungi_messaggio_bacheca(request:HttpRequest):
     if request.method == "POST":
         titolo=request.POST.get('titolo').strip()
@@ -177,7 +166,6 @@ def aggiungi_messaggio_bacheca(request:HttpRequest):
             return render(request,'hrms_app/bacheca.html')        
     return redirect('bacheca')
 
-
 def cancella_messaggio_bacheca(request: HttpRequest,id):
     messaggio = Bacheca.objects.get(id=id)
     messaggio.delete()
@@ -189,7 +177,17 @@ def crea_busta_paga():
 
 def visualizza_busta_paga():
     pass
+def visualizza_report_presenze(request:HttpRequest):
+    pass
 
+def visualizza_report_ferie(request:HttpRequest):
+    pass
+
+def visualizza_report_permessi(request:HttpRequest):
+    pass
+
+def visualizza_report_mensile(request:HttpRequest):
+    pass
 
 def aggiungi_dipendente(request:HttpRequest):
     if request.method == "POST":
@@ -203,8 +201,7 @@ def aggiungi_dipendente(request:HttpRequest):
     else:
         form = RegisterForm()  # Creazione di un form vuoto se è una GET
 
-    return render(request, "hrms_app/aggiungi_dipendente.html", {"form": form})
-    
+    return render(request, "hrms_app/aggiungi_dipendente.html", {"form": form})    
 
 def modifica_dipendente(request: HttpRequest, id):
     dipendente = Dipendenti.objects.get(id=id)  # Recupera l'utente esistente
@@ -222,20 +219,11 @@ def modifica_dipendente(request: HttpRequest, id):
         form = EditUserForm(instance=dipendente)  # Precompila il form
     return render(request, 'hrms_app/modifica_dipendente.html', {'form': form, 'dipendente': dipendente})
 
-
-
-
-
-
 def elimina_dipendente(request: HttpRequest, id):
     dipendente = get_object_or_404(Dipendenti, id=id)
     dipendente.delete()
     messages.success(request, f"🗑️ Dipendente '{dipendente.nome} {dipendente.cognome}' eliminato con successo!")
     return redirect('gestione_dipendenti')
-
-
-
-
 
 def registrati(request: HttpRequest):
     if request.method == "POST":
@@ -257,11 +245,6 @@ from django.urls import reverse
 
 def vai_all_admin(request):
     return redirect(reverse('admin:index'))  # Ricava l'URL dinamicamente
-
-
-
-
-
 
 # Login
 def user_login(request: HttpRequest):
@@ -344,11 +327,6 @@ class CustomPasswordResetCompleteView(PasswordResetCompleteView):
 def documenti_personali(request:HttpRequest):
     return render(request,'hrms_app/documenti_personali.html')
 
-
-
-def busta_paga(request:HttpRequest):
-    return render(request,'hrms_app/busta_paga.html')
-
 def gestione_dipendenti(request:HttpRequest):
     if request.method == "POST":
         dipendente = request.POST.get("dipendente")
@@ -359,8 +337,7 @@ def gestione_dipendenti(request:HttpRequest):
         if lista_dipendenti:
             messages.success(request, "Utenti trovati")
         else:
-            messages.error(request, "Nessun dipendente trovato")    
-
+            messages.error(request, "Nessun dipendente trovato")
         if origine_form == "ruoli":
             ruoli = Ruoli.objects.all()
             return render(request, "hrms_app/gestione_ruoli.html", {"dipendenti": lista_dipendenti, "ruoli": ruoli})
@@ -368,11 +345,10 @@ def gestione_dipendenti(request:HttpRequest):
             return render(request, "hrms_app/report.html", {"dipendenti": lista_dipendenti})
         else:
             return render(request, "hrms_app/gestione_dipendenti.html", {"dipendenti": lista_dipendenti})
-        
-
     return render(request, "hrms_app/gestione_dipendenti.html")
 
-
+def gestione_assenze(request:HttpRequest):
+    return render(request,'hrms_app/gestione_assenze.html')
 
 def assegna_ruolo(request:HttpRequest):
     if request.method == "POST":
@@ -383,9 +359,6 @@ def assegna_ruolo(request:HttpRequest):
         dipendente.save()
         messages.success(request, f"Ruolo assegnato con successo {dipendente.nome} {dipendente.cognome} -> {dipendente.ruolo}")
     return redirect("gestione_ruoli")
-
-
-
     
 def gestione_assenze(request:HttpRequest):
     return render(request,'hrms_app/gestione_assenze.html')
@@ -395,33 +368,62 @@ def gestione_busta_paga(request: HttpRequest):
         dipendente = request.POST.get("dipendente")        
         #Ricerca incrociata su nome e cognome dove %dipendente%    
         lista_dipendenti = Dipendenti.objects.filter(Q(first_name__icontains=dipendente) | Q(last_name__icontains=dipendente))
+        lista_dipendenti_id = [ dipendente.id for dipendente in lista_dipendenti] # Salvo il dipendente nella sessione per il redirect
+        request.session['lista_dipendenti_id'] = lista_dipendenti_id # Salvo il dipendente nella sessione per il redirect
         if lista_dipendenti:
             messages.success(request, "Utenti trovati")
         else:
             messages.error(request, "Nessun dipendente trovato")
-        form_carica_busta = CaricaBustaPaga(request.POST)       
-
-        return render(request, 'hrms_app/gestione_busta_paga.html', {"lista_dipendenti": lista_dipendenti, "form_carica_busta": form_carica_busta})        
-    return render(request, 'hrms_app/gestione_busta_paga.html')
+    else:
+        if 'lista_dipendenti_id' in request.session:
+            lista_dipendenti = Dipendenti.objects.filter(id__in=request.session['lista_dipendenti_id'])
+        else:
+            lista_dipendenti = None
+    form_carica_busta = CaricaBustaPaga()    
+    return render(request, 'hrms_app/gestione_busta_paga.html', {"lista_dipendenti": lista_dipendenti, "form_carica_busta": form_carica_busta}) 
 
 def salva_busta_paga(request: HttpRequest):  
-    if request.method == "POST":
-        form_carica_busta = CaricaBustaPaga(request.POST)
-        if form_carica_busta.is_valid():
-            mese = form_carica_busta.cleaned_data['mese']
-            anno = form_carica_busta.cleaned_data['anno']
-            importo = form_carica_busta.cleaned_data['importo']
-            documento = form_carica_busta.cleaned_data['documento']
-            dipendente = Dipendenti.objects.get(id = id)
-            
-            #busta_paga = form_carica_busta.save(commit=False)
-            #busta_paga.save()
-            messages.success(request, "Busta paga caricata con successo")
-            return redirect('gestione_busta_paga' , 'dipendente' , dipendente , 'anno' , anno , 'mese' , mese, 'documento' , documento, 'importo' , importo)
+    if request.method == "POST":        
+        dipendente = Dipendenti.objects.get(id = request.POST.get("dipendente_id")) # Recupera l'utente selezionato
+        if not dipendente:
+            messages.error(request, "Dipendente non trovato.")
+            return redirect('gestione_busta_paga')
+        form_carica_busta = CaricaBustaPaga(request.POST, request.FILES) # Carica il form con i dati POST
+        if form_carica_busta.is_valid(): # Controlla se il form è valido           
+            busta_paga = form_carica_busta.save(commit=False)
+            busta_paga.dipendente = dipendente
+            busta_paga.save()
+            messages.success(request, "Busta paga caricata con successo")            
         else:
             messages.error(request, "Errore nel caricamento della busta paga")
-            return redirect('gestione_busta_paga')
-    return redirect('gestione_busta_paga')
+    return redirect('gestione_busta_paga', ) # Reindirizza alla pagina di gestione busta paga con l'elenco delle buste paga
+
+def visualizza_busta_paga(request: HttpRequest, id):
+    dipendente = Dipendenti.objects.get(id = id) # Recupera l'utente loggato
+    buste_paga_form_set = modelformset_factory(BustePaga, form=ModificaBustaPaga, extra=0) # Crea un formset per la modifica delle buste paga
+    elenco_buste_paga = buste_paga_form_set(queryset = BustePaga.objects.filter(dipendente=dipendente).order_by('-data_emissione', 'anno', 'mese')) # Recupera tutte le buste paga del dipendente
+   
+    return render(request, 'hrms_app/modifica_busta_paga.html', {'dipendente': dipendente, 'elenco_buste_paga': elenco_buste_paga}) # Reindirizza alla pagina di gestione busta paga con l'elenco delle buste paga('gestione_busta_paga')    
+
+def modifica_busta_paga(request: HttpRequest):
+    if request.method == "POST":
+        form = ModificaBustaPaga(request.POST, request.FILES) # Carica il form con i dati POST
+        if form.is_valid(): # Controlla se il form é valido
+            busta_paga = form.save(commit=False) # Salva la busta paga senza committare al database
+            busta_paga.dipendente = Dipendenti.objects.get(id = request.POST.get("dipendente_id")) # Recupera l'utente selezionato
+            busta_paga.save() # Salva la busta paga nel database
+            messages.success(request, "Busta paga modificata con successo")
+        else:
+            messages.error(request, "Errore nella modifica della busta paga")
+    else:
+        messages.error(request, "Errore nella modifica della busta paga")
+    return render(request, 'hrms_app/visualizza_busta_paga.html') # Reindirizza alla pagina di modifica busta paga con l'id della busta paga da modificare  
+
+def crea_busta_paga():
+    pass
+
+def busta_paga(request:HttpRequest):
+    return render(request,'hrms_app/busta_paga.html')
 
 def consulta_documenti(request:HttpRequest):
     return render(request,'hrms_app/consulta_documenti.html')
@@ -500,45 +502,6 @@ def crea_report_finti(request:HttpRequest):
 
 
 
-def crea_report_finti_old(request:HttpRequest):
-    if request.method == "POST":
-        some_dipendente = Dipendenti.objects.get(id=1)
-
-        # Inserire Ferie
-        Ferie.objects.bulk_create([
-            Ferie(dipendente=some_dipendente, data_inizio='2025-03-05', data_fine='2025-03-10', stato='Approvata'),
-            Ferie(dipendente=some_dipendente, data_inizio='2025-03-15', data_fine='2025-03-19', stato='Approvata'),
-            Ferie(dipendente=some_dipendente, data_inizio='2025-04-07', data_fine='2025-04-13', stato='Approvata'),
-            Ferie(dipendente=some_dipendente, data_inizio='2025-05-08', data_fine='2025-05-14', stato='Approvata'),
-            Ferie(dipendente=some_dipendente, data_inizio='2025-05-25', data_fine='2025-05-29', stato='Approvata'),
-        ])
-
-        # Inserire Permessi
-        Permessi.objects.bulk_create([
-            Permessi(dipendente=some_dipendente, data_ora_inizio='2025-03-03 10:00:00', data_ora_fine='2025-03-03 12:00:00', stato='Approvata', retribuito=True, motivo='a'),
-            Permessi(dipendente=some_dipendente, data_ora_inizio='2025-03-04 14:00:00', data_ora_fine='2025-03-04 16:30:00', stato='Approvata', retribuito=True, motivo='b'),
-            Permessi(dipendente=some_dipendente, data_ora_inizio='2025-03-06 09:00:00', data_ora_fine='2025-03-06 11:00:00', stato='Approvata', retribuito=True, motivo='e'),
-            Permessi(dipendente=some_dipendente, data_ora_inizio='2025-03-07 13:30:00', data_ora_fine='2025-03-07 15:00:00', stato='Approvata', retribuito=True, motivo='f'),
-            Permessi(dipendente=some_dipendente, data_ora_inizio='2025-03-17 10:00:00', data_ora_fine='2025-03-03 12:00:00', stato='Approvata', retribuito=True, motivo='c'),
-            Permessi(dipendente=some_dipendente, data_ora_inizio='2025-03-22 14:00:00', data_ora_fine='2025-03-22 16:30:00', stato='Approvata', retribuito=True, motivo='d'),
-        ])
-
-        # Inserire Presenze
-        Presenze.objects.bulk_create([
-            Presenze(dipendente=some_dipendente, data='2025-03-03', ora_ingresso='08:30:00', ora_uscita='16:30:00'),
-            Presenze(dipendente=some_dipendente, data='2025-03-04', ora_ingresso='09:15:00', ora_uscita='17:15:00'),
-            Presenze(dipendente=some_dipendente, data='2025-03-05', ora_ingresso='08:30:00', ora_uscita='16:30:00'),
-            Presenze(dipendente=some_dipendente, data='2025-03-06', ora_ingresso='09:15:00', ora_uscita='17:15:00'),
-            Presenze(dipendente=some_dipendente, data='2025-03-19', ora_ingresso='08:45:00', ora_uscita='16:45:00'),
-            Presenze(dipendente=some_dipendente, data='2025-03-20', ora_ingresso='09:00:00', ora_uscita='17:00:00'),
-            Presenze(dipendente=some_dipendente, data='2025-03-21', ora_ingresso='09:30:00', ora_uscita='17:30:00'),
-        ])
-
-        return render(request,'hrms_app/report.html')
-
-    return render(request,'hrms_app/report.html')
-
-
 def gestione_ruoli(request:HttpRequest):
     ruoli = Ruoli.objects.all()
     return render(request,'hrms_app/gestione_ruoli.html',{'ruoli':ruoli})
@@ -546,7 +509,6 @@ def gestione_ruoli(request:HttpRequest):
 #controllare validation!
 
 def crea_ruolo(request: HttpRequest):
-
 
     if request.method == "POST":
         ruolo = request.POST.get("name") # testo
@@ -637,9 +599,6 @@ def cerca_ruolo(request:HttpRequest):
 
     return redirect('gestione_ruoli')
 
-
-
-
 def modifica_autorizzazioni(request: HttpRequest, id):
     ruoli = Group.objects.all()
     if request.method == "POST":
@@ -660,13 +619,6 @@ def modifica_autorizzazioni(request: HttpRequest, id):
     return render(request, 'hrms_app/gestione_ruoli.html', {
         'ruolo': ruolo,'ruoli':ruoli
     })
-
-
-
-
-
-
-
 
 @login_required
 def mostra_permessi(request):

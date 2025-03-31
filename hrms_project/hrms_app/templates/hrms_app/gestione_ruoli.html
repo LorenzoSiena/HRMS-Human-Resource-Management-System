@@ -1,45 +1,19 @@
 {% extends 'hrms_app/base.html' %}
+{% load static %}
+{% block style %}
+    <link href="{% static '/css/gestione_ruoli.css' %}" type="text/css" rel="stylesheet">
+{% endblock style %}         
 {% block title %} Gestione Ruoli {% endblock title %}
 {% block content %}
    
 
 
-<style>
-    /* Centrare il contenuto */
-    .container.mt-5 {
-        max-width: 900px; /* Larghezza massima del container */
-        margin-left: auto;
-        margin-right: auto;
-        width: 100%; /* Utilizzare tutta la larghezza disponibile */
-        padding: 0 15px; /* Aggiungere un po' di padding laterale */
-    }
-    ???
-    /* Posizionare l'alert in alto a destra */
-    #avviso {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        width: auto;
-        z-index: 1050;
-    }
-
-    /* Modifica dell'aspetto della card per dispositivi mobili */
-    .card {
-        margin-bottom: 1rem;
-    }
-    /* Impedisci lo zoom su dispositivi mobili quando si clicca */
-#btn-crea-ruolo {
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    
 
 
 
-}
 
-</style>
-
-{% if messages %}
+<div class="container mt-5">
+    {% if messages %}
     {% for message in messages %}
         <div class="alert {% if message.tags %}
             {% if 'error' in message.tags %}
@@ -48,13 +22,10 @@
                 alert-{{ message.tags }}
             {% endif %}
         {% endif %}">
-            {{ message }}
-        </div>
-    {% endfor %}
+        {{ message }}
+</div>
+{% endfor %}
 {% endif %}
-
-
-<div class="container mt-5">
 
 
 

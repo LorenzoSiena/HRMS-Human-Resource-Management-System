@@ -1,0 +1,17 @@
+
+    .card {
+      max-width: 100%;
+      margin: 0 auto;
+    }
+    .form-container {
+      margin-bottom: 20px;
+    }
+    .form-container input, .form-container select, .form-container button {
+      margin: 5px;
+      padding: 10px;
+      font-size: 14px;
+    }
+    /* Tabella responsive */
+    .table-responsive {
+      overflow-x: auto;
+    }
