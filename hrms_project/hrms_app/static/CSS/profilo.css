@@ -1,0 +1,55 @@
+
+/* Modifica della card per farla più lunga */
+.card-body {
+    max-height: none; 
+    overflow-y: auto;  
+}
+
+/* Allungare il contenitore per dare più spazio */
+.container.mt-2 {
+    width: 100%; 
+    padding: 15px;
+    box-sizing: border-box; 
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+}
+
+/* Impostiamo un massimo per la larghezza della card */
+.card {
+    max-width: 800px;
+    width: 100%;
+    min-height: 600px;  
+}
+
+/* Gestione del formato per lo stipendio */
+.stipendio-input {
+    display: flex;
+    align-items: center;
+}
+
+.stipendio-input input {
+    width: 80%; 
+    padding-right: 50px; 
+}
+
+/* Centra il titolo */
+.card-header h3 {
+    text-align: center; /* Centra il titolo */
+}
+
+/* Cambia il colore di bordo al passaggio del mouse con il colore primary */
+input:hover, select:hover, textarea:hover {
+    border-color: #007bff !important;  /* Colore primary di Bootstrap */
+}
+
+/* Cambia il colore del bordo e aggiungi un'ombra al focus */
+input:focus, select:focus, textarea:focus {
+    border-color: #007bff !important;  /* Colore primary di Bootstrap */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);  /* Effetto ombra */
+}
+
+/* Cambia il colore di sfondo al passaggio del mouse */
+input:hover, select:hover, textarea:hover {
+    background-color: #f1f1f1;  /* Un leggero cambio di sfondo al passaggio del mouse */
+}

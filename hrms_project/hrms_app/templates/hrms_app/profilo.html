@@ -1,4 +1,8 @@
 {% extends 'hrms_app/base.html' %}
+{% load static %}
+{% block style %}
+    <link href="{% static '/css/profilo.css' %}" type="text/css" rel="stylesheet">
+{% endblock style %}        
 {% block title %} Profilo Dipendente {% endblock title %}
 {% block content %}
 
