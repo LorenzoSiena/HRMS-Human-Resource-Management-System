@@ -1,0 +1,120 @@
+
+/* Modifica della card per farla più lunga */
+.card-body {
+    max-height: none; 
+    overflow-y: auto;  
+}
+
+/* Allungare il contenitore per dare più spazio */
+.container.mt-2 {
+    width: 100%; 
+    padding: 15px;
+    box-sizing: border-box; 
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+}
+
+/* Impostiamo un massimo per la larghezza della card */
+.card {
+    width: 100%;
+    max-width: 600px; /* Aumenta la larghezza massima della card per renderla meno stretta */
+    height: 550px; /* Altezza per una forma rettangolare in verticale */
+    margin: 0 auto; /* Centra la card orizzontalmente */
+}
+
+/* Responsività: la card si adatta su schermi più piccoli */
+@media (max-width: 768px) {
+    .card {
+        width: 100%;
+        max-width: 100%; /* La card occupa l'intera larghezza dello schermo sui dispositivi mobili */
+        height: auto; /* Altezza automatica in base al contenuto */
+    }
+}
+
+/* Gestione della barra di ricerca e dei bottoni */
+.search-container {
+    display: flex;
+    justify-content: space-between; /* Allinea input e bottone sulla stessa riga */
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px; /* Spazio tra input e bottone */
+    width: 100%;
+}
+
+/* Impostiamo un massimo per la larghezza dell'input */
+.search-container input[type="text"] {
+    width: 80%; /* Larghezza maggiore per l'input */
+    padding: 10px;
+    margin-right: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Stile per il bottone */
+.search-container button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: auto; /* La larghezza è determinata dal contenuto */
+}
+
+/* Hover del bottone */
+.search-container button:hover {
+    background-color: #0056b3;
+}
+
+/* Gestione del formato per la lista dipendenti */
+.dipendente-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.dipendente-list li {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.dipendente-list li:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Allinea il titolo e il bottone nella stessa riga */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h3 {
+    margin: 0; /* Rimuove margine predefinito */
+}
+
+.card-header .btn {
+    margin-left: 15px;
+}
+
+/* Stile per il ruolo dei dipendenti */
+.dipendente-list .role {
+    font-size: 0.9rem;
+    color: #6c757d; /* Grigio scuro */
+}
+
+/* Stile per i link cliccabili */
+.dipendente-list a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.dipendente-list a:hover {
+    text-decoration: underline;
+}
