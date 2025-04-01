@@ -3,32 +3,23 @@ from django.forms import modelformset_factory
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpRequest
 from django.contrib import messages
-
 from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-
 from django.contrib.auth.models import Permission
 from hrms_app.constant import PERMESSI_APP
-
-
-
 from django.contrib.auth.models import User,Group
 from .models import *
-
-#Form
-
 from .forms import *
-
 from django.contrib.auth import authenticate, login, logout
-
+from django.urls import reverse
 #Password reset
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import PasswordResetForm
-
 #Date
 from datetime import datetime ,date , time
+
 
 # Funzione per gestire il caricamento della HOME
 def hrms_app(request: HttpRequest):
@@ -214,8 +205,6 @@ def registrati(request: HttpRequest):
 
     return render(request, "hrms_app/register_forms.html", {"form": form})
 
-
-from django.urls import reverse
 
 def vai_all_admin(request):
     return redirect(reverse('admin:index'))  # Ricava l'URL dinamicamente
@@ -552,13 +541,6 @@ def crea_ruolo(request: HttpRequest):
         return redirect("gestione_ruoli") 
 
     return render(request,'hrms_app/gestione_ruoli.html')
-
-""" 
-SELECT *
-FROM ruoli JOIN Group 
-ON ruoli.ruolo_id = Group.id
-WHERE Group.name = 'Contabile';
-"""          
 
 
 

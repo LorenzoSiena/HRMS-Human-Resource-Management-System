@@ -13,14 +13,10 @@ from .utils import calcola_ore_lavorate,formatta_ore,calcola_giorni_totali,ore_l
 #ReportPermessi
 #Funziona solo se non sforo il mese , altrimenti sballa il conto
 
-#utils.py viene usato macodeium.enableCodeLens
-#calcola_ore_lavorate va letto bene se funziona
 
 class Dipendenti(AbstractUser):
     #email == username!!!
     
-    #telefono
-   
     telefono = models.CharField(max_length=20)
     data_assunzione = models.DateField(default=date.today)
     superiore = models.ForeignKey("Dipendenti", on_delete=models.SET_NULL, null=True,blank=True)
@@ -73,16 +69,6 @@ class Dipendenti(AbstractUser):
         return f"{self.nome} {self.cognome} ({self.email})"
 
 
-#Riconvertire in group e in permessi
-#https://docs.djangoproject.com/en/3.2/topics/auth/default/#default-permissions
-# LI DEVO TOGLIERE E SOSTITUIRE CON GROUP E PERMISSIONS
-
-""" class Autorizzazioni(models.Model):
-    nome=models.CharField(max_length=100,unique=True) #: 'gestione_dipendenti', 'approva_ferie'
-    descrizione=models.TextField()
-    def __str__(self): 
-        return self.nome
- """
 class Ruoli(models.Model):
     ruolo = models.OneToOneField(Group, on_delete=models.CASCADE, unique=True)  # Relazione 1 a 1 con Group
     """
@@ -106,18 +92,6 @@ class Ruoli(models.Model):
     !!!!Django genera automaticamente permessi add, change, delete e view per ogni modello.!!!
 
 """
-
-
-
-""" 
-class Ruoli(models.Model):
-    nome = models.CharField(max_length=50, unique=True)
-    livello_accesso = models.IntegerField(validators=[MinValueValidator(1)]) #solo positivi
-    descrizione = models.TextField()
-    autorizzazioni = models.ManyToManyField(Autorizzazioni)
-    def __str__(self):
-        return self.nome
- """
 
 
 class Ferie(models.Model):
@@ -179,7 +153,8 @@ class ReportFerie(models.Model):
         self.giorni_totali_previsti = giorni_totali_previsti
         super().save(*args, **kwargs)
 
-#---------------------------------------------------------------------------------------
+    def __str__(self):
+        return f"{self.dipendente} - {self.mese}/{self.anno}"
 
 
 class Permessi(models.Model): 
@@ -213,8 +188,7 @@ class Permessi(models.Model):
   
 
     def __str__(self):
-        #return  f" ({self.stato}) - ({self.data_ora_inizio} - {self.data_ora_fine} - sono previste {formatta_ore(self.ore_totali_permesso_previste_float)} ore)"
-        return  f" ({self.stato}) - ({self.data_ora_inizio} - {self.data_ora_fine} - ??? ore)"
+         return  f"({self.stato}) - ({self.data_ora_inizio} - {self.data_ora_fine} - {self.ore_totali_permesso_previste_float} ore)"
     @property
     def ore_totali_permesso_approvate_float(self) -> float:
         if self.stato == 'Approvata':
@@ -222,29 +196,17 @@ class Permessi(models.Model):
         else:
             ore_totali_permesso_approvate = 0
         return ore_totali_permesso_approvate
+    def __str__(self):
+         return  f"({self.stato}) - ({self.data_ora_inizio} - {self.data_ora_fine} - {self.ore_totali_permesso_previste_float} ore)"
 
 
-
-#BUG! Funziona solo se non sforo il mese @.@
+#BUG! Funziona solo se non sforo il mese 
 class ReportPermessi(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
     mese =  models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
     anno = models.IntegerField(validators=[MinValueValidator(2000)])
 
     ore_totali_permessi_float = models.DecimalField(max_digits=5, decimal_places=2) #999.99
-
-    
-    """ 
-    def save(self, *args, **kwargs):
-        ore_totali_permessi = Permessi.objects.filter(
-            dipendente=self.dipendente,
-            data_ora_inizio__year=self.anno, 
-            data_ora_inizio__month=self.mese #BUG!
-        ).aggregate(Sum('ore_totali_permesso_approvate_float'))['ore_totali_permesso_approvate_float__sum'] or 0
-
-        self.ore_totali_permessi_float = ore_totali_permessi
-        super().save(*args, **kwargs)   
-    """
     
     def save(self, *args, **kwargs):
         # Get all permessi for the given dipendente, year, and month
@@ -258,13 +220,11 @@ class ReportPermessi(models.Model):
         self.ore_totali_permessi_float = ore_totali_permessi
         super().save(*args, **kwargs)   
 
-
-
-
     @property
     def ore_totali_permessi(self):
         return formatta_ore(self.ore_totali_permessi_float or 0)
-
+    def __str__(self):
+        return f"{self.dipendente} - {self.mese}/{self.anno}"
 
 
 class Presenze(models.Model):
@@ -283,7 +243,9 @@ class Presenze(models.Model):
     @property
     def ore_lavorate(self):
         return formatta_ore(self.ore_lavorate_float or 0)
-
+    def __str__(self):
+        return f"{self.dipendente} - {self.data} - {self.ore_lavorate}"
+    
 class ReportPresenze(models.Model):
     dipendente = models.ForeignKey('Dipendenti', on_delete=models.CASCADE)
     mese =  models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
@@ -304,6 +266,8 @@ class ReportPresenze(models.Model):
     def ore_totali(self):
         return formatta_ore(self.ore_totali_float or 0)
 
+    def __str__(self):
+        return f"{self.dipendente} - {self.mese}/{self.anno}"
 
 
 class Bacheca(models.Model):
@@ -332,6 +296,8 @@ class Notifiche(models.Model):
     data_invio=models.DateTimeField(auto_now_add=True)
     letto=models.BooleanField(default=False)
 
+    def __str__(self):
+        return f"{self.dipendente} - {self.messaggio}"
 
 
 class Certificati(models.Model):
