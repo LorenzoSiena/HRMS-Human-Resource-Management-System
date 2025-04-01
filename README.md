@@ -1,6 +1,6 @@
-# Human-Resource-Management-System
+# Human-Resource-Management-System 
 
-## Un gestionale per le Risorse Umane sviluppato in Django
+## Un gestionale per le Risorse Umane sviluppato in Django 
 ![logo](logo.png)
 
 ## Descrizione del Progetto:  
@@ -35,7 +35,7 @@ Sezione bacheca per comunicazioni aziendali.
 Notifiche via email per ferie approvate o nuovi documenti disponibili.
 
 ### Tecnologie Utilizzate
-Backend: Django  
+Backend: Django   
 Frontend: HTML, CSS, JavaScript  
 Database: SQLite  
 Autenticazione: Django Authentication  
