@@ -92,12 +92,6 @@ def stipendi(request:HttpRequest):
 def richiedi_ferie():
     pass
 
-def accetta_ferie():
-    pass
-
-def rifiuta_ferie():
-    pass
-
 def archivia_documenti():
     pass
 
@@ -245,6 +239,31 @@ def user_login(request: HttpRequest):
 def user_logout(request: HttpRequest):
     logout(request)
     return redirect('home')
+
+def accetta_ferie(request: HttpRequest, id):
+    ferie = get_object_or_404(Ferie, id=id)
+    ferie.stato = 'Approvata'
+    ferie.save()
+    return redirect('gestione_assenze')
+
+def rifiuta_ferie(request: HttpRequest, id):
+    ferie = get_object_or_404(Ferie, id=id)
+    ferie.stato = 'Rifiutata'
+    ferie.save()
+    return redirect('gestione_assenze')
+
+def accetta_permesso(request: HttpRequest, id):
+    permesso = get_object_or_404(Permessi, id=id)
+    permesso.stato = 'Approvata'
+    permesso.save()
+    return redirect('gestione_assenze')
+
+def rifiuta_permesso(request: HttpRequest, id):
+    permesso = get_object_or_404(Permessi, id=id)
+    permesso.stato = 'Rifiutata'
+    permesso.save()
+    return redirect('gestione_assenze')
+
 
 # Funzione per la richiesta permessi e ferie
 def richiesta_permessi_ferie(request: HttpRequest):

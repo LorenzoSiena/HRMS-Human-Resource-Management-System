@@ -63,6 +63,9 @@
                             {% for item in dipendenti %}
                               <!-- Itera sulle ferie -->
                               {% for ferie in item.ferie %}
+                              
+                              
+                              
                               <tr>
                                 <td class="text-start">{{ item.dipendente.first_name }}</td>
                                 <td class="text-start">{{ item.dipendente.last_name }}</td>
@@ -72,10 +75,18 @@
                                 <td class="text-start">{{ ferie.motivo|default:"-" }}</td>
                                 <td class="text-start"><span class="badge bg-warning">{{ ferie.stato }}</span></td>
                                 <td class="text-center">
-                                  <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', {{ ferie.id }})">Approva</a>
-                                  <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', {{ ferie.id }})">Rifiuta</a>
+
+                                {% if ferie.stato == "In attesa" %}   
+                                  <a class="btn btn-success btn-sm" href="{% url 'accetta_ferie' ferie.id %}">Approva</a>
+                                  <a class="btn btn-danger btn-sm" href="{% url 'rifiuta_ferie' ferie.id %}">Rifiuta</a>
+                                  {% else %}
+                                  
+                                  {% endif %}
                                 </td>
                               </tr>
+
+
+
                               {% empty %}
                               <tr>
                                 <td colspan="8" class="text-center">Nessuna ferie trovata.</td>
@@ -93,9 +104,13 @@
                                 <td class="text-start">{{ permesso.motivo|default:"-" }}</td>
                                 <td class="text-start"><span class="badge bg-warning">{{ permesso.stato }}</span></td>
                                 <td class="text-center">
-                                  <a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="confirmAction('approva', {{ permesso.id }})">Approva</a>
-                                  <a class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="confirmAction('rifiuta', {{ permesso.id }})">Rifiuta</a>
-
+                                {% if permesso.stato == "In attesa" %}   
+                           
+                                  <a class="btn btn-success btn-sm" href="{% url 'accetta_permesso' permesso.id %}">Approva</a>
+                                  <a class="btn btn-danger btn-sm" href="{% url 'rifiuta_permesso' permesso.id %}">Rifiuta</a>
+                                {% else %}
+                                  
+                                {% endif %}
 
                                 </td>
                               </tr>
@@ -139,17 +154,14 @@
     </div>
 
 <script>
-  function confirmAction(action, requestId) {
-    let actionText = (action === 'approva') ? 'approvare' : 'rifiutare';
-    let confirmMessage = 'Sei sicuro di voler ' + actionText + ' questa richiesta?';
-
-    if (!confirm("Sei sicuro di voler " + actionText +  " questa richiesta?")) {
-        event.preventDefault();  // Blocca il redirect se l'utente preme "No"
-    }
+    function confirmAction(action, requestId) {
+        let actionText = (action === 'approva') ? 'approvare' : 'rifiutare';
+        let confirmMessage = 'Sei sicuro di voler ' + actionText + ' questa richiesta?';
     
- 
-  
-}
+        if (!confirm("Sei sicuro di voler " + actionText +  " questa richiesta?")) {
+            event.preventDefault();  // Blocca il redirect se l'utente preme "No"
+        }
+    };
 
 </script>
 {% endblock %}

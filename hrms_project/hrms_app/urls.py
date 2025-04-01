@@ -29,8 +29,16 @@ urlpatterns = [
     
     path("gestione_timbratura",views.gestione_timbratura,name="gestione_timbratura"),
     path("richiedi_ferie",views.richiedi_ferie,name="richiedi_ferie"),
-    path("accetta_ferie",views.accetta_ferie,name="accetta_ferie"),
-    path("rifiuta_ferie",views.rifiuta_ferie,name="rifiuta_ferie"),
+
+    path("accetta_ferie/<int:id>",views.accetta_ferie,name="accetta_ferie"),
+    path("rifiuta_ferie/<int:id>",views.rifiuta_ferie,name="rifiuta_ferie"),
+    
+
+    
+    path("accetta_permesso/<int:id>",views.accetta_permesso,name="accetta_permesso"),
+    path("rifiuta_permesso/<int:id>",views.rifiuta_permesso,name="rifiuta_permesso"),
+
+
     path("visualizza_busta_paga/<int:id>",views.visualizza_busta_paga,name="visualizza_busta_paga"),
     path("modifica_busta_paga",views.modifica_busta_paga,name="modifica_busta_paga"),
     path("crea_busta_paga",views.crea_busta_paga,name="crea_busta_paga"),
